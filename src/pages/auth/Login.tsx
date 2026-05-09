@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
-import { Loader2, ArrowLeft } from "lucide-react";
+import { Loader2, ArrowLeft, ShieldCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function Login() {
@@ -30,16 +30,16 @@ export function Login() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#040B1A] to-[#020617] flex items-center justify-center p-4 font-sans text-slate-200">
-      <div className="w-full max-w-md bg-slate-900/70 backdrop-blur-xl border border-slate-800 rounded-2xl p-8 shadow-2xl">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+      <div className="w-full max-w-md bg-slate-900/70 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 md:p-8 shadow-2xl">
+        <div className="text-center mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
             Orizon Match
           </h1>
-          <p className="text-slate-400 mt-2">Acesse sua conta para continuar</p>
+          <p className="text-slate-400 mt-2 text-sm">Acesse o ecossistema de inovação</p>
         </div>
 
         {error && (
-          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm mb-6">
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-lg text-sm mb-5">
             {error}
           </div>
         )}
@@ -52,7 +52,7 @@ export function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-950/50 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+              className="w-full bg-slate-950/50 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-sm"
               placeholder="seu@email.com"
             />
           </div>
@@ -64,21 +64,28 @@ export function Login() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-950/50 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
-              placeholder="••••••••"
+              className="w-full bg-slate-950/50 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all text-sm"
+              placeholder="Sua senha"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg py-2.5 font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] flex items-center justify-center gap-2"
+            className="w-full mt-5 md:mt-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg py-2.5 font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] flex items-center justify-center gap-2 text-sm"
           >
-            {loading ? <Loader2 className="animate-spin" size={20} /> : "Entrar na plataforma"}
+            {loading ? <Loader2 className="animate-spin" size={18} /> : "Entrar na plataforma"}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col gap-4">
+        <div className="mt-5 p-3 rounded-xl bg-slate-800/30 border border-slate-800 flex items-center gap-3">
+          <ShieldCheck size={18} className="text-emerald-400 flex-shrink-0" />
+          <p className="text-[11px] text-slate-500 leading-relaxed">
+            Seus dados são protegidos por criptografia. Negociações ocorrem sob NDA digital.
+          </p>
+        </div>
+
+        <div className="mt-6 md:mt-8 pt-5 md:pt-6 border-t border-slate-800 flex flex-col gap-3 md:gap-4">
           <Link
             to="/"
             className="flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"

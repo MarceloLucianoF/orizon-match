@@ -5,12 +5,13 @@ import { createProject } from "../../services/projectService";
 import { 
   Loader2, ArrowRight, ArrowLeft, CheckCircle2, 
   Lightbulb, GraduationCap, Factory, ShieldCheck, 
-  HelpCircle, MessageSquare, Info, Video, MapPin, Zap, Rocket
+  HelpCircle, MessageSquare, Info, Video, MapPin, Zap, Rocket, Search
 } from "lucide-react";
 import { TRLCalculator } from "../../components/TRLCalculator";
 import { searchPatentsInpi } from "../../services/inpiService";
 import type { INPIPatent } from "../../services/inpiService";
-import { Search } from "lucide-react";
+import { functions } from "../../firebase/config";
+import { httpsCallable } from "firebase/functions";
 
 const FIESC_CHAMBERS = [
   "Agroindústria",
@@ -210,27 +211,31 @@ export function CreateProject() {
               </button>
 
               <button
-                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/20 border border-slate-800 opacity-60 cursor-not-allowed"
+                onClick={() => { updateField('role', 'ict'); nextStep('SEGMENT'); }}
+                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 hover:bg-slate-800 transition-all group/btn"
               >
-                <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center group-hover/btn:scale-110 transition-transform">
                   <GraduationCap className="text-blue-400" size={32} />
                 </div>
                 <div className="text-left">
-                  <h3 className="text-lg font-bold text-slate-300">Sou um ICT</h3>
-                  <p className="text-xs uppercase tracking-widest font-bold text-indigo-400 mt-1 italic">Em Desenvolvimento</p>
+                  <h3 className="text-lg font-bold text-white">Sou um ICT / Universidade</h3>
+                  <p className="text-sm text-slate-400">Ofereço infraestrutura e linhas de pesquisa.</p>
                 </div>
+                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-indigo-400 group-hover/btn:translate-x-1 transition-all" />
               </button>
 
               <button
-                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/20 border border-slate-800 opacity-60 cursor-not-allowed"
+                onClick={() => { updateField('role', 'provider'); nextStep('SEGMENT'); }}
+                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 hover:bg-slate-800 transition-all group/btn"
               >
-                <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center group-hover/btn:scale-110 transition-transform">
                   <Factory className="text-emerald-400" size={32} />
                 </div>
                 <div className="text-left">
-                  <h3 className="text-lg font-bold text-slate-300">Sou um Prestador de serviço</h3>
-                  <p className="text-xs uppercase tracking-widest font-bold text-indigo-400 mt-1 italic">Em Desenvolvimento</p>
+                  <h3 className="text-lg font-bold text-white">Sou Empresa / Prestador</h3>
+                  <p className="text-sm text-slate-400">Ofereço capacidade produtiva ou serviços técnicos.</p>
                 </div>
+                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-indigo-400 group-hover/btn:translate-x-1 transition-all" />
               </button>
             </div>
           </div>
@@ -635,8 +640,6 @@ export function CreateProject() {
                       setLoading(true);
                       setError(null);
                       try {
-                        const { httpsCallable } = await import('firebase/functions');
-                        const { functions } = await import('../../firebase/config');
                         const enhancePitchFn = httpsCallable(functions, 'enhancePitch');
                         const result = await enhancePitchFn(formData.summaryQuestions);
                         const summary = (result.data as any).summary;

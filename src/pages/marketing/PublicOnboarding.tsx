@@ -461,8 +461,6 @@ export default function PublicOnboarding() {
                       setLoading(true);
                       setError(null);
                       try {
-                        const { httpsCallable } = await import('firebase/functions');
-                        const { functions } = await import('../../firebase/config');
                         const enhancePitchFn = httpsCallable(functions, 'enhancePitch');
                         const result = await enhancePitchFn(formData.summaryQuestions);
                         const summary = (result.data as any).summary;

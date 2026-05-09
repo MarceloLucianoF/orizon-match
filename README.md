@@ -1,101 +1,170 @@
-# Orizon Match V2
+# Orizon Match
 
-Plataforma inteligente de matchmaking de inovacao.
+<p align="center">
+  <strong>Plataforma de matchmaking inteligente para inovação aberta.</strong><br/>
+  Conectando inventores, investidores, ICTs e indústrias com precisão baseada em dados.
+</p>
 
-## Visao do Produto
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white" />
+  <img src="https://img.shields.io/badge/Firebase-Backend-FFCA28?logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white" />
+</p>
 
-Orizon Match conecta ideias, capital e execucao com precisao baseada em dados.
+---
 
-Fluxo alvo da V2:
-1. Usuario entra e escolhe perfil.
-2. Preenche formulario inteligente (wizard).
-3. Sistema estrutura dados e calcula score de match.
-4. Dashboard mostra recomendacoes ranqueadas com explicacao.
+## O Problema
 
-## Stack Tecnica
+**94% das patentes brasileiras nunca chegam ao mercado.** O problema não é a falta de ideias — é a falta de conexão estratégica entre quem possui a solução, quem possui a demanda e quem possui o capital.
 
-- React 19
-- Vite 8
-- TypeScript
-- Tailwind CSS v4
-- Firebase
-- React Hook Form + Zod
+O **Orizon Match** elimina esse gap usando algoritmos de compatibilidade e dados de maturidade tecnológica (TRL/IRL) para conectar automaticamente os agentes certos no momento certo.
 
-## Estado Atual da Migracao
+---
 
-### Fase A - Fundacao (Concluida)
+## Funcionalidades
 
-- [x] Projeto Vite + React + TypeScript criado.
-- [x] Tailwind CSS v4 configurado no padrao correto.
-- [x] Tema v4 com `@theme` em [src/index.css](src/index.css).
-- [x] Dark mode com classe no `html` e persistencia em localStorage.
-- [x] Tipos globais em [src/types/index.ts](src/types/index.ts).
-- [x] Algoritmo de matchmaking em [src/lib/matching.ts](src/lib/matching.ts).
-- [x] Validacoes Zod em [src/lib/validation.ts](src/lib/validation.ts).
+### Matchmaking de Precisão
+- Algoritmo de compatibilidade com **5 variáveis**: Segmento FIESC, TRL, IRL/VDR, Necessidades, Localização
+- Score de 0–100 com classificação visual (TOP FIT, BOM FIT)
+- Explicações textuais diferenciadas por nível de compatibilidade
+- **Página Explorar** (`/explore`): busca com filtros avançados e botão "Iniciar Conexão"
 
-### Fase B - Componentes Base (Em andamento)
+### Dashboards Especializados
 
-- [x] Navbar migrada para TypeScript + Tailwind em [src/components/Navbar.tsx](src/components/Navbar.tsx).
-- [x] Footer migrado para TypeScript + Tailwind em [src/components/Footer.tsx](src/components/Footer.tsx).
-- [x] ErrorBoundary migrado para TypeScript em [src/components/ErrorBoundary.tsx](src/components/ErrorBoundary.tsx).
-- [x] Design System inicial criado em [src/components/ui/Button.tsx](src/components/ui/Button.tsx), [src/components/ui/Input.tsx](src/components/ui/Input.tsx), [src/components/ui/Card.tsx](src/components/ui/Card.tsx), [src/components/ui/Badge.tsx](src/components/ui/Badge.tsx), [src/components/ui/Stepper.tsx](src/components/ui/Stepper.tsx).
-- [x] TaskDetail migrado para TypeScript em [src/components/TaskDetail.tsx](src/components/TaskDetail.tsx).
-- [ ] Conectar Navbar com React Router real.
-- [ ] Finalizar componentes base (Modal e variantes finais).
+| Perfil | Dashboard | Foco |
+|--------|-----------|------|
+| **Inventor** | Painel do Inventor | TRL/IRL, matches, radar de mercado, Data Room |
+| **Empresa / Investidor** | Pipeline de Investimentos | Kanban de Deal Flow (Triagem → Fechado) |
+| **Jurídico (Curadoria)** | Curadoria Jurídica | Validação de VDR, monitoramento INPI |
+| **Admin** | Painel Admin | Gestão global de usuários e plataforma |
 
-### Fase C - Fluxo Inteligente (Nao iniciado)
+### Deal Flow e Comunicação
+- Chat com mensagens de texto, NDA e reunião
+- Smart Prompts contextuais (envio automático de NDA, abertura de VDR)
+- Double opt-in para conexões
 
-- [ ] Tela de selecao de perfil (inventor, ict, industria, investidor, juridico).
-- [ ] Formulario multi-step com React Hook Form + Zod.
-- [ ] Salvamento progressivo de rascunho.
+### Data Room Virtual (VDR)
+- Estrutura de pastas temáticas (Patente, Finanças, Pitch)
+- Bloqueio por NDA digital
+- Checklist de Due Diligence
+- Convite funcional de escritório jurídico parceiro
 
-### Fase D - Match Engine no Produto (Nao iniciado)
+### Criação de Projeto (3 jornadas)
+- **Inventor / Startup**: Segmento → Proteção IP → P&D → TRL → Resumo com IA → Cadastro
+- **ICT / Universidade**: Segmento → Infraestrutura → Linhas de Pesquisa → Cadastro
+- **Empresa / Prestador**: Segmento → Serviços → Capacidade Produtiva → Cadastro
 
-- [ ] MatchCard com score + explicacao.
-- [ ] Dashboard de recomendacoes ranqueadas.
-- [ ] Acao "Tenho interesse" e trilha de interacao.
+### Responsividade
+- Sidebar colapsável com hamburger menu em mobile
+- Grids adaptativos em todos os dashboards
+- Kanban com scroll horizontal em telas pequenas
 
-## Estrutura Principal
+---
+
+## Stack Técnica
+
+| Camada | Tecnologia |
+|--------|-----------|
+| Frontend | React 19 + TypeScript |
+| Bundler | Vite 8 |
+| Estilização | Tailwind CSS v4 |
+| Backend | Firebase (Auth, Firestore, Functions) |
+| Ícones | Lucide React |
+| Tipografia | Google Fonts (Sora) |
+| IA | NVIDIA NIM (via Firebase Functions) |
+
+---
+
+## Estrutura do Projeto
 
 ```
 src/
-  components/
-    ui/
-      Button.tsx
-      Input.tsx
-      Card.tsx
-      Badge.tsx
-      Stepper.tsx
-    Navbar.tsx
-    Footer.tsx
-    ErrorBoundary.tsx
-    TaskDetail.tsx
-  lib/
-    matching.ts
-    validation.ts
-  types/
-    index.ts
-  App.tsx
-  index.css
+├── components/          # TRLCalculator, VDRRoom, DueDiligenceChecklist
+├── context/             # AuthContext (provider global)
+├── firebase/            # Configuração Firebase
+├── hooks/               # useAuth
+├── layout/              # MainLayout, Sidebar (responsiva), Topbar
+├── lib/                 # matching.ts (algoritmo + utilitários de classificação)
+├── pages/
+│   ├── admin/           # AdminDashboard
+│   ├── auth/            # Login
+│   ├── company/         # CompanyDashboard (Kanban Deal Flow)
+│   ├── inventor/        # InventorDashboard, Projects, CreateProject
+│   ├── legal/           # LegalDashboard (Curadoria)
+│   ├── marketing/       # Home, About, PublicOnboarding
+│   └── shared/          # Dashboard, Matches, Explore, Chat, Profile
+├── routes/              # AppRoutes (protegidas + públicas)
+└── services/            # matchService, chatService, projectService,
+                         # exploreService, adminService, inpiService
 ```
 
-## Scripts
+---
+
+## Executando Localmente
 
 ```bash
+# Instalar dependências
+npm install
+
+# Servidor de desenvolvimento
 npm run dev
+
+# Build de produção
 npm run build
-npm run preview
 ```
 
-## Convencoes da V2
+### Variáveis de Ambiente
 
-- Todo componente novo deve nascer em TypeScript.
-- Evitar CSS module novo; preferir Tailwind + tokens do tema.
-- Toda tela nova deve prever dark mode desde o inicio.
-- Reutilizar componentes de [src/components/ui](src/components/ui) para evitar divergencia visual.
+Crie um arquivo `.env` na raiz:
 
-## Proximos Passos Imediatos
+```env
+VITE_FIREBASE_API_KEY=
+VITE_FIREBASE_AUTH_DOMAIN=
+VITE_FIREBASE_PROJECT_ID=
+VITE_FIREBASE_STORAGE_BUCKET=
+VITE_FIREBASE_MESSAGING_SENDER_ID=
+VITE_FIREBASE_APP_ID=
+```
 
-1. Plugar React Router no layout base e usar `Navbar` com rotas reais.
-2. Criar `ProfileSelector` e iniciar wizard de onboarding.
-3. Evoluir `MatchCard` para consumir o algoritmo real no dashboard.
+### Deploy de Regras Firestore
+
+```bash
+firebase deploy --only firestore:rules
+```
+
+---
+
+## Convenções do Projeto
+
+- **Ícones**: Exclusivamente `lucide-react`. Emojis proibidos em toda a interface.
+- **Estilo**: Dark mode first, paleta `slate` / `indigo` / `cyan`.
+- **Estrutura**: Páginas organizadas por role em `src/pages/{role}/`.
+- **Dados sensíveis**: `.env` e `serviceAccountKey.json` fora do versionamento.
+- **Importações Firebase**: Sempre estáticas (sem `await import()`).
+
+---
+
+## Modelo de Negócio
+
+O Orizon Match opera no modelo **Tríplice Hélice**:
+
+```
+    Inventor ──── Orizon Match ──── Empresa / Investidor
+                      │
+                ICT / Universidade
+                      │
+                Jurídico (Curadoria)
+```
+
+- **Inventores** cadastram inovações e recebem matches automáticos
+- **Empresas/Investidores** filtram por TRL e gerenciam Deal Flow
+- **Jurídicos** validam documentação via convite (modelo curadoria)
+- **ICTs** conectam pesquisa acadêmica ao mercado
+
+---
+
+<p align="center">
+  <strong>Orizon Match</strong> · Ecossistema de Inovação Aberta · 2025
+</p>

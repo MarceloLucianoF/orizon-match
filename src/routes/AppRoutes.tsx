@@ -6,6 +6,7 @@ import { Dashboard } from "../pages/shared/Dashboard";
 import { Projects } from "../pages/inventor/Projects";
 import { CreateProject } from "../pages/inventor/CreateProject";
 import { Matches } from "../pages/shared/Matches";
+import { Explore } from "../pages/shared/Explore";
 import { Chat } from "../pages/shared/Chat";
 import { Profile } from "../pages/shared/Profile";
 import { AdminDashboard } from "../pages/admin/AdminDashboard";
@@ -63,6 +64,7 @@ export function AppRoutes() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/new" element={<CreateProject />} />
+          <Route path="/explore" element={<Explore />} />
           <Route path="/matches" element={<Matches />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
