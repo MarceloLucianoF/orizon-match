@@ -2,7 +2,11 @@ import {
   collection,
   getDocs,
   query,
-  where
+  where,
+  doc,
+  updateDoc,
+  arrayUnion,
+  arrayRemove
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 /**
@@ -20,4 +24,25 @@ export async function getMatches(projectId: string) {
     id: doc.id,
     ...doc.data(),
   }));
+}
+
+export async function updateMatchAction(matchId: string, userId: string, action: 'save' | 'ignore' | 'reset') {
+  const matchRef = doc(db, "matches", matchId);
+  
+  if (action === 'save') {
+    await updateDoc(matchRef, {
+      savedBy: arrayUnion(userId),
+      ignoredBy: arrayRemove(userId)
+    });
+  } else if (action === 'ignore') {
+    await updateDoc(matchRef, {
+      ignoredBy: arrayUnion(userId),
+      savedBy: arrayRemove(userId)
+    });
+  } else if (action === 'reset') {
+    await updateDoc(matchRef, {
+      savedBy: arrayRemove(userId),
+      ignoredBy: arrayRemove(userId)
+    });
+  }
 }

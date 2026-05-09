@@ -19,18 +19,29 @@ export function calculateMatch(a: Project, b: Organization) {
   breakdown.segment = b.segments.includes(a.segment) ? 30 : 10;
 
   // 🎯 MATURIDADE (peso 20)
-  // Como organizations não tem maturidade, podemos assumir peso máximo ou usar outro critério.
-  // Vamos dar 20 pontos de base para empresas que buscam inovação no estágio do projeto.
-  breakdown.maturity = 20;
+  let isTrlMatched = true;
+  if (b.trlMin !== undefined && b.trlMax !== undefined) {
+    if (a.maturity < b.trlMin || a.maturity > b.trlMax) {
+      isTrlMatched = false;
+      breakdown.maturity = 0;
+    } else {
+      breakdown.maturity = 20;
+    }
+  } else {
+    breakdown.maturity = 20; // Default se a org não definiu range
+  }
 
   // 🎯 COMPLEMENTARIDADE
-  if (a.needs.investment && b.interests.investment) breakdown.needs += 20;
-  if (a.needs.research && b.interests.research) breakdown.needs += 20;
-  if (a.needs.industry && b.interests.industry) breakdown.needs += 20;
+  let hasNeeds = a.needs?.investment || a.needs?.research || a.needs?.industry;
+  let matchedNeeds = 0;
+
+  if (a.needs?.investment && b.interests?.investment) { breakdown.needs += 20; matchedNeeds++; }
+  if (a.needs?.research && b.interests?.research) { breakdown.needs += 20; matchedNeeds++; }
+  if (a.needs?.industry && b.interests?.industry) { breakdown.needs += 20; matchedNeeds++; }
 
   // 🎯 LOCALIZAÇÃO
   breakdown.location =
-    a.location.region === b.location.region ? 10 : 5;
+    a.location?.region === b.location?.region ? 10 : 5;
 
   score =
     breakdown.segment +
@@ -38,8 +49,20 @@ export function calculateMatch(a: Project, b: Organization) {
     breakdown.needs +
     breakdown.location;
 
+  // 🔴 PUNIÇÃO NÃO-LINEAR: Complementaridade
+  // Se o projeto exigia algo específico e a empresa não atendeu a NENHUMA exigência
+  if (hasNeeds && matchedNeeds === 0) {
+    score -= 50; // Guilhotina do match: afunda o score
+  }
+
+  // 🔴 PUNIÇÃO NÃO-LINEAR: TRL Fora do Alvo
+  // Corta o score radicalmente (multiplicador) preservando a granularidade baixa
+  if (!isTrlMatched) {
+    score = score * 0.2; 
+  }
+
   return {
-    score: Math.min(score, 100),
+    score: Math.max(0, Math.min(Math.round(score), 100)),
     breakdown,
   };
 }

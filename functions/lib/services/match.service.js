@@ -5,12 +5,9 @@ const firebase_1 = require("../firebase");
 const engine_1 = require("../matching/engine");
 async function generateMatches(newProject) {
     const snapshot = await firebase_1.db
-        .collection("projects")
-        .where("segment", "==", newProject.segment) // 🔥 pré-filtro 1
-        .where("type", "!=", newProject.type) // 🔥 pré-filtro 2 (direcionado)
-        // Firestore requer orderBy no campo da desigualdade antes de outros orderBys
-        .orderBy("type")
-        .orderBy("createdAt", "desc") // 🔥 incremental / recência
+        .collection("users")
+        .where("role", "in", ["company", "investor"])
+        .where("segments", "array-contains", newProject.segment) // 🔥 pré-filtro
         .limit(30)
         .get();
     console.log("MATCH:", {
@@ -20,8 +17,6 @@ async function generateMatches(newProject) {
     const batch = firebase_1.db.batch();
     snapshot.forEach((doc) => {
         const other = Object.assign({ id: doc.id }, doc.data());
-        if (other.id === newProject.id)
-            return;
         if (!(0, engine_1.isValidPair)(newProject, other))
             return;
         const result = (0, engine_1.calculateMatch)(newProject, other);

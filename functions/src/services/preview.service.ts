@@ -9,7 +9,7 @@ export async function getPreviewMatches(inputProject: Partial<Project>) {
   const snapshot = await db
     .collection("users")
     .where("role", "in", ["company", "investor"])
-    .where("segment", "==", segment)
+    .where("segments", "array-contains", segment)
     .limit(10)
     .get();
 

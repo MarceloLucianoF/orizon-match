@@ -7,6 +7,9 @@ import { Projects } from "../pages/Projects";
 import { CreateProject } from "../pages/CreateProject";
 import { Matches } from "../pages/Matches";
 import { Chat } from "../pages/Chat";
+import { Profile } from "../pages/Profile";
+import { AdminDashboard } from "../pages/admin/AdminDashboard";
+import { SUPER_ADMIN_UID } from "../services/adminService";
 import Home from "../pages/marketing/Home";
 import About from "../pages/marketing/About";
 import PublicOnboarding from "../pages/marketing/PublicOnboarding";
@@ -24,6 +27,14 @@ function PrivateRoute() {
   }
 
   return user ? <Outlet /> : <Navigate to="/login" replace />;
+}
+
+function AdminRoute() {
+  const { user, loading } = useAuth();
+  
+  if (loading) return null;
+  
+  return user?.uid === SUPER_ADMIN_UID ? <Outlet /> : <Navigate to="/dashboard" replace />;
 }
 
 export function AppRoutes() {
@@ -54,6 +65,10 @@ export function AppRoutes() {
           <Route path="/projects/new" element={<CreateProject />} />
           <Route path="/matches" element={<Matches />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+          </Route>
         </Route>
       </Route>
 

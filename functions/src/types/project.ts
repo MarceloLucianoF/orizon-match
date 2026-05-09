@@ -22,8 +22,10 @@ export type Project = {
 
 export type Organization = {
   id: string;
-  role: "company" | "investor";
+  role: "company" | "investor" | "ict" | "provider";
   segments: string[];
+  trlMin?: number;
+  trlMax?: number;
   location: {
     region: string;
   };

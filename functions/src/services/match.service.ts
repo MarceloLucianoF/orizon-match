@@ -7,7 +7,7 @@ export async function generateMatches(newProject: Project) {
   const snapshot = await db
     .collection("users")
     .where("role", "in", ["company", "investor"])
-    .where("segment", "==", newProject.segment) // 🔥 pré-filtro
+    .where("segments", "array-contains", newProject.segment) // 🔥 pré-filtro
     .limit(30)
     .get();
 

@@ -5,11 +5,13 @@ import {
   updateDoc,
   serverTimestamp,
   setDoc,
-  getDoc
+  getDoc,
+  increment
 } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 export type DealStage = "initial_contact" | "nda" | "proposal" | "negotiation" | "closed";
+export type MessageType = "text" | "system" | "nda" | "meeting";
 
 export interface Conversation {
   id: string;
@@ -21,6 +23,9 @@ export interface Conversation {
   updatedAt: any;
   lastMessage?: string;
   projectTitle?: string;
+  unreadCount?: Record<string, number>;
+  status?: "pending" | "active" | "declined";
+  initiatorId?: string;
 }
 
 export interface Message {
@@ -29,7 +34,8 @@ export interface Message {
   senderId: string;
   text: string;
   createdAt: any;
-  isSystem?: boolean;
+  type?: MessageType;
+  isSystem?: boolean; // Mantido para compatibilidade, mas `type === "system"` é preferível
 }
 
 /**
@@ -43,10 +49,14 @@ export async function createOrGetConversation(
   projectTitle: string = "Projeto"
 ): Promise<string> {
   const convRef = doc(db, "conversations", matchId);
-  const snap = await getDoc(convRef);
-
-  if (snap.exists()) {
-    return snap.id;
+  
+  try {
+    const snap = await getDoc(convRef);
+    if (snap.exists()) {
+      return snap.id;
+    }
+  } catch (error) {
+    console.warn("Conversa não encontrada (ou sem permissão de leitura). Criando nova...");
   }
 
   // Cria nova conversa
@@ -54,10 +64,16 @@ export async function createOrGetConversation(
     projectId,
     organizationId,
     matchId,
-    participants: [userId, organizationId], // O userId criador e a organização alvo
+    participants: [userId, organizationId],
     stage: "initial_contact",
+    status: "pending",
+    initiatorId: userId,
     updatedAt: serverTimestamp(),
-    projectTitle
+    projectTitle,
+    unreadCount: {
+      [userId]: 0,
+      [organizationId]: 1 // O primeiro a receber já começa com 1 não lida do sistema
+    }
   };
 
   await setDoc(convRef, newConv);
@@ -67,6 +83,7 @@ export async function createOrGetConversation(
     conversationId: matchId,
     senderId: "system",
     text: "Interesse demonstrado. O Deal Flow foi iniciado na etapa de Contato Inicial.",
+    type: "system",
     createdAt: serverTimestamp(),
     isSystem: true
   });
@@ -75,19 +92,66 @@ export async function createOrGetConversation(
 }
 
 /**
- * Envia uma mensagem no chat
+ * Envia uma mensagem de texto padrão no chat
  */
-export async function sendMessage(conversationId: string, senderId: string, text: string) {
+export async function sendMessage(conversationId: string, senderId: string, text: string, participants: string[]) {
   await addDoc(collection(db, "messages"), {
     conversationId,
     senderId,
     text,
+    type: "text",
     createdAt: serverTimestamp()
   });
 
+  // Atualiza a conversa: lastMessage e unreadCount para o outro participante
+  const receiverId = participants.find(p => p !== senderId) || "";
+  
   await updateDoc(doc(db, "conversations", conversationId), {
     lastMessage: text,
-    updatedAt: serverTimestamp()
+    updatedAt: serverTimestamp(),
+    [`unreadCount.${receiverId}`]: increment(1)
+  });
+}
+
+/**
+ * Envia um "Card Rico" no chat (Ex: NDA, Reunião)
+ */
+export async function sendActionMessage(
+  conversationId: string, 
+  senderId: string, 
+  actionType: MessageType, 
+  participants: string[],
+  customText: string = ""
+) {
+  let defaultText = "";
+  if (actionType === "nda") defaultText = "Minuta de NDA enviada para análise.";
+  if (actionType === "meeting") defaultText = "Convite para reunião de alinhamento enviado.";
+
+  const text = customText || defaultText;
+
+  await addDoc(collection(db, "messages"), {
+    conversationId,
+    senderId,
+    text,
+    type: actionType,
+    createdAt: serverTimestamp()
+  });
+
+  const receiverId = participants.find(p => p !== senderId) || "";
+  
+  await updateDoc(doc(db, "conversations", conversationId), {
+    lastMessage: text,
+    updatedAt: serverTimestamp(),
+    [`unreadCount.${receiverId}`]: increment(1)
+  });
+}
+
+/**
+ * Zera o contador de não lidas para o usuário logado
+ */
+export async function markAsRead(conversationId: string, userId: string) {
+  await updateDoc(doc(db, "conversations", conversationId), {
+    [`unreadCount.${userId}`]: 0
   });
 }
 
@@ -104,6 +168,30 @@ export async function updateDealStage(conversationId: string, newStage: DealStag
     conversationId,
     senderId: "system",
     text: `O status da negociação avançou para: ${newStage.toUpperCase()}`,
+    type: "system",
+    createdAt: serverTimestamp(),
+    isSystem: true
+  });
+}
+
+/**
+ * Atualiza o status do Double Opt-in (Aceitar/Recusar conexão)
+ */
+export async function updateConversationStatus(conversationId: string, newStatus: "active" | "declined") {
+  await updateDoc(doc(db, "conversations", conversationId), {
+    status: newStatus,
+    updatedAt: serverTimestamp()
+  });
+
+  const messageText = newStatus === "active" 
+    ? "O parceiro aceitou a conexão. O Deal Flow está oficialmente aberto." 
+    : "A conexão foi declinada. A negociação foi encerrada.";
+
+  await addDoc(collection(db, "messages"), {
+    conversationId,
+    senderId: "system",
+    text: messageText,
+    type: "system",
     createdAt: serverTimestamp(),
     isSystem: true
   });

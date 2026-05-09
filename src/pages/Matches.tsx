@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { getMatches } from "../services/matchService";
+import { getMatches, updateMatchAction } from "../services/matchService";
 import { createOrGetConversation } from "../services/chatService";
 import { explainMatch } from "../lib/matching";
-import { Loader2, ArrowRight, Star } from "lucide-react";
+import { Loader2, ArrowRight, Search, Filter, Heart, X } from "lucide-react";
 
 export function Matches() {
   const { user } = useAuth();
@@ -14,6 +14,8 @@ export function Matches() {
   
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState("all"); // all, saved
+  const [minScore, setMinScore] = useState(60);
 
   useEffect(() => {
     if (!projectId) {
@@ -24,7 +26,6 @@ export function Matches() {
     async function load() {
       try {
         const data = await getMatches(projectId as string);
-        // Ordenar por score DESC
         const sorted = (data as any[]).sort((a, b) => b.score - a.score);
         setMatches(sorted);
       } catch (err) {
@@ -35,6 +36,36 @@ export function Matches() {
     }
     load();
   }, [projectId]);
+
+  const handleMatchAction = async (matchId: string, action: 'save' | 'ignore' | 'reset') => {
+    if (!user) return;
+    try {
+      // Optimistic UI update
+      setMatches(prev => prev.map(m => {
+        if (m.id !== matchId) return m;
+        
+        let savedBy = m.savedBy || [];
+        let ignoredBy = m.ignoredBy || [];
+        
+        if (action === 'save') {
+          savedBy = [...new Set([...savedBy, user.uid])];
+          ignoredBy = ignoredBy.filter((id: string) => id !== user.uid);
+        } else if (action === 'ignore') {
+          ignoredBy = [...new Set([...ignoredBy, user.uid])];
+          savedBy = savedBy.filter((id: string) => id !== user.uid);
+        } else {
+          savedBy = savedBy.filter((id: string) => id !== user.uid);
+          ignoredBy = ignoredBy.filter((id: string) => id !== user.uid);
+        }
+        
+        return { ...m, savedBy, ignoredBy };
+      }));
+      
+      await updateMatchAction(matchId, user.uid, action);
+    } catch (err) {
+      console.error("Erro ao atualizar match", err);
+    }
+  };
 
   if (!projectId) {
     return (
@@ -48,59 +79,115 @@ export function Matches() {
     );
   }
 
+  // Filtragem local
+  const filteredMatches = matches.filter(m => {
+    const isIgnored = m.ignoredBy?.includes(user?.uid);
+    const isSaved = m.savedBy?.includes(user?.uid);
+    
+    if (activeFilter === "saved" && !isSaved) return false;
+    if (activeFilter === "all" && isIgnored) return false;
+    if (m.score < minScore) return false;
+    
+    return true;
+  });
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">Ranking de Compatibilidade</h1>
-          <p className="text-slate-400 mt-1">Os melhores parceiros para o seu projeto, baseados no nosso algoritmo.</p>
+          <h1 className="text-2xl font-bold text-slate-100">Triagem de Matches</h1>
+          <p className="text-slate-400 mt-1">Classifique seus matches para focar nas melhores oportunidades.</p>
         </div>
+        
+        {/* Filtros Rapidos */}
+        <div className="flex items-center gap-2 bg-slate-900/50 border border-slate-800 p-1.5 rounded-lg">
+          <button 
+            onClick={() => setActiveFilter("all")}
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeFilter === "all" ? "bg-indigo-500/20 text-indigo-400" : "text-slate-400 hover:text-slate-200"}`}
+          >
+            Caixa de Entrada
+          </button>
+          <button 
+            onClick={() => setActiveFilter("saved")}
+            className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeFilter === "saved" ? "bg-pink-500/20 text-pink-400" : "text-slate-400 hover:text-slate-200"}`}
+          >
+            Salvos
+          </button>
+        </div>
+      </div>
+
+      {/* Filtros Avancados */}
+      <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-4 flex flex-wrap gap-6 items-center">
+        <div className="flex items-center gap-2 text-slate-400">
+          <Filter size={16} />
+          <span className="text-sm font-medium">Score Mínimo:</span>
+          <span className="text-indigo-400 font-bold">{minScore}%</span>
+        </div>
+        <input 
+          type="range" 
+          min="50" max="95" step="5"
+          value={minScore}
+          onChange={(e) => setMinScore(Number(e.target.value))}
+          className="w-48 accent-indigo-500"
+        />
       </div>
 
       {loading ? (
         <div className="flex justify-center p-12">
           <Loader2 className="animate-spin text-indigo-500" size={32} />
         </div>
-      ) : matches.length === 0 ? (
+      ) : filteredMatches.length === 0 ? (
         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-12 text-center">
-          <Star className="mx-auto text-slate-600 mb-4" size={48} />
-          <h2 className="text-xl font-semibold text-slate-300 mb-2">Nenhum match encontrado ainda</h2>
-          <p className="text-slate-500">Nosso algoritmo não encontrou projetos com score acima de 70% para o seu perfil.</p>
+          <Search className="mx-auto text-slate-600 mb-4" size={48} />
+          <h2 className="text-xl font-semibold text-slate-300 mb-2">Nenhum match na visão atual</h2>
+          <p className="text-slate-500">Tente ajustar os filtros ou aguarde novas conexões.</p>
         </div>
       ) : (
         <div className="space-y-4">
-          {matches.map((match, index) => (
-            <div key={match.id} className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-all flex flex-col md:flex-row md:items-center gap-6">
+          {filteredMatches.map((match, index) => {
+            const isSaved = match.savedBy?.includes(user?.uid);
+
+            return (
+            <div key={match.id} className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-2xl p-5 hover:border-indigo-500/50 transition-all flex flex-col md:flex-row md:items-center gap-6 relative overflow-hidden">
               
-              <div className="flex-shrink-0 flex flex-col items-center justify-center w-20 h-20 rounded-full border-4 border-slate-800 relative">
+              {/* Highlight bar para os salvos */}
+              {isSaved && <div className="absolute left-0 top-0 bottom-0 w-1 bg-pink-500"></div>}
+
+              <div className="flex-shrink-0 flex flex-col items-center justify-center w-20 h-20 rounded-full border-4 border-slate-800 relative bg-slate-900">
                 <span className="text-xl font-bold text-slate-100">{match.score}%</span>
-                {index === 0 && (
-                  <div className="absolute -top-3 bg-amber-500 text-amber-950 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                {index === 0 && activeFilter === "all" && (
+                  <div className="absolute -top-3 bg-amber-500 text-amber-950 text-[10px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]">
                     TOP 1
                   </div>
                 )}
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-bold text-slate-100">Projeto Oculto (ID: {match.targetProjectId.slice(-6)})</h3>
-                  <span className="bg-indigo-500/10 text-indigo-400 text-xs px-2 py-1 rounded border border-indigo-500/20">Alta Sinergia</span>
+                  <h3 className="text-lg font-bold text-slate-100 truncate">Organização Confidencial <span className="text-slate-500 text-sm font-normal ml-2">#ID-{match.id.slice(0, 6).toUpperCase()}</span></h3>
+                  {match.score >= 80 ? (
+                    <span className="bg-amber-500/10 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/20 font-medium">🔥 Alto Fit</span>
+                  ) : match.score >= 70 ? (
+                    <span className="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/20 font-medium">Bom Fit</span>
+                  ) : (
+                    <span className="bg-slate-500/10 text-slate-400 text-xs px-2 py-0.5 rounded border border-slate-500/20 font-medium">Médio Fit</span>
+                  )}
                 </div>
                 
-                <div className="w-full bg-slate-800 rounded-full h-2 mb-3">
-                  <div className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-2 rounded-full" style={{ width: `${match.score}%` }}></div>
+                <div className="w-full bg-slate-800 rounded-full h-1.5 mb-3 max-w-sm">
+                  <div className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-1.5 rounded-full" style={{ width: `${match.score}%` }}></div>
                 </div>
 
-                <div className="flex flex-wrap gap-4 text-xs text-slate-400 mb-2">
-                  <span>Segmento: <strong className="text-slate-300">{match.breakdown.segment} pts</strong></span>
-                  <span>Maturidade: <strong className="text-slate-300">{match.breakdown.maturity} pts</strong></span>
-                  <span>Necessidades: <strong className="text-slate-300">{match.breakdown.needs} pts</strong></span>
-                  <span>Localização: <strong className="text-slate-300">{match.breakdown.location} pts</strong></span>
+                <div className="flex flex-wrap gap-2 text-xs mb-3">
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Segmento: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.segment} pts</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Maturidade: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.maturity} pts</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Necessidades: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.needs} pts</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Localização: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.location} pts</span></span>
                 </div>
-                <p className="text-sm font-medium text-slate-300">{explainMatch(match.breakdown)}</p>
+                <p className="text-sm text-slate-300">{explainMatch(match.breakdown)}</p>
               </div>
 
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 flex md:flex-col gap-2 w-full md:w-auto">
                 <button 
                   onClick={async () => {
                     if (!user || !projectId) return;
@@ -117,14 +204,34 @@ export function Matches() {
                       console.error("Erro ao iniciar conversa", err);
                     }
                   }}
-                  className="w-full md:w-auto bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg font-medium transition-all flex items-center justify-center gap-2"
+                  className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.2)]"
                 >
-                  Tenho interesse <ArrowRight size={18} />
+                  Tenho interesse <ArrowRight size={16} />
                 </button>
+
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => handleMatchAction(match.id, isSaved ? 'reset' : 'save')}
+                    className={`flex-1 md:flex-none px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 border ${
+                      isSaved 
+                        ? "bg-pink-500/10 border-pink-500/30 text-pink-400 hover:bg-pink-500/20" 
+                        : "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
+                    }`}
+                  >
+                    <Heart size={16} className={isSaved ? "fill-current" : ""} /> {isSaved ? "Salvo" : "Salvar"}
+                  </button>
+                  <button 
+                    onClick={() => handleMatchAction(match.id, 'ignore')}
+                    className="flex-shrink-0 bg-slate-800 border border-slate-700 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 text-slate-400 px-3 py-2.5 rounded-lg transition-all flex items-center justify-center"
+                    title="Ignorar Match"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
               </div>
 
             </div>
-          ))}
+          )})}
         </div>
       )}
     </div>

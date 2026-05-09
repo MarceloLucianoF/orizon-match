@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, where, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase/config";
 
 export interface ProjectData {
@@ -16,12 +16,14 @@ export interface ProjectData {
     region: string;
   };
   createdAt?: number;
+  active?: boolean;
 }
 
 export async function createProject(data: ProjectData) {
   try {
     const docRef = await addDoc(collection(db, "projects"), {
       ...data,
+      active: true,
       createdAt: Date.now(),
     });
     return docRef.id;
@@ -36,12 +38,21 @@ export async function getUserProjects(userId: string) {
     const q = query(
       collection(db, "projects"),
       where("userId", "==", userId)
-      // orderBy("createdAt", "desc") // Requires index, ommiting for now to avoid errors if not created
     );
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return snapshot.docs.map(doc => ({ id: doc.id, active: true, ...doc.data() }));
   } catch (error) {
     console.error("Error getting user projects:", error);
+    throw error;
+  }
+}
+
+export async function updateProject(projectId: string, data: Partial<ProjectData>) {
+  try {
+    const projectRef = doc(db, "projects", projectId);
+    await updateDoc(projectRef, data);
+  } catch (error) {
+    console.error("Error updating project:", error);
     throw error;
   }
 }
