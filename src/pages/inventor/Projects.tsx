@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { getUserProjects, updateProject } from "../services/projectService";
+import { useAuth } from "../../hooks/useAuth";
+import { getUserProjects, updateProject } from "../../services/projectService";
 import { Plus, Loader2, FolderKanban, Activity, BarChart3, Pause, Play, Settings2, X, Save } from "lucide-react";
 
 export function Projects() {

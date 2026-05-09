@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { Loader2 } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import { Loader2, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -76,6 +77,22 @@ export function Login() {
             {loading ? <Loader2 className="animate-spin" size={20} /> : "Entrar na plataforma"}
           </button>
         </form>
+
+        <div className="mt-8 pt-6 border-t border-slate-800 flex flex-col gap-4">
+          <Link
+            to="/"
+            className="flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
+          >
+            <ArrowLeft size={16} /> Voltar para Home
+          </Link>
+          
+          <div className="text-center text-sm text-slate-500">
+            Não tem uma conta?{" "}
+            <Link to="/onboarding" className="text-indigo-400 hover:text-indigo-300 font-medium">
+              Começar agora
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );

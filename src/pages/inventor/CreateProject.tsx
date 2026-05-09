@@ -1,0 +1,807 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
+import { createProject } from "../../services/projectService";
+import { 
+  Loader2, ArrowRight, ArrowLeft, CheckCircle2, 
+  Lightbulb, GraduationCap, Factory, ShieldCheck, 
+  HelpCircle, MessageSquare, Info, Video, MapPin, Zap, Rocket
+} from "lucide-react";
+import { TRLCalculator } from "../../components/TRLCalculator";
+import { searchPatentsInpi } from "../../services/inpiService";
+import type { INPIPatent } from "../../services/inpiService";
+import { Search } from "lucide-react";
+
+const FIESC_CHAMBERS = [
+  "Agroindústria",
+  "Alimentos e Bebidas",
+  "Assuntos Tributários e Fiscais",
+  "Bens de Capital",
+  "Construção Civil",
+  "Economia",
+  "Energia",
+  "Meio Ambiente e Sustentabilidade",
+  "Pesca e Maricultura",
+  "Relações Trabalhistas",
+  "Saneamento",
+  "Segurança e Saúde no Trabalho",
+  "Tecnologia e Inovação",
+  "Transporte e Logística"
+];
+
+const REGIONS = ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"];
+
+type Step = 
+  | 'ROLE' 
+  | 'SEGMENT' 
+  | 'PROTECTION' 
+  | 'RESEARCH' 
+  | 'INNOVATION_TYPE' 
+  | 'LOCATION'
+  | 'MATURITY'
+  | 'SUMMARY_METHOD' 
+  | 'SUMMARY_CONTENT' 
+  | 'CADASTRO' 
+  | 'REVIEW';
+
+export function CreateProject() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [step, setStep] = useState<Step>('ROLE');
+  const [loading, setLoading] = useState(false);
+  const [inpiLoading, setInpiLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [inpiResults, setInpiResults] = useState<INPIPatent[]>([]);
+
+  const [formData, setFormData] = useState({
+    title: "",
+    role: "", // idea, ict, provider
+    segment: "",
+    isProtected: "", // sim, nao
+    patentNumber: "",
+    isGranted: "", // sim, nao
+    needsResearch: "", // sim, nao
+    innovationType: "", // melhoria, inovacao
+    summaryMethod: "", // questions, text
+    summary: "",
+    summaryQuestions: {
+      problem: "",
+      solution: "",
+      difference: ""
+    },
+    location: {
+      region: "Sudeste"
+    },
+    trl: 1,
+    irl: 0,
+    trlChecklist: {},
+    // Cadastro data
+    registration: {
+      name: "",
+      idNumber: "", // CNPJ/CPF
+      phone: "",
+      email: user?.email || "",
+      password: "",
+      confirmPassword: ""
+    }
+  });
+
+  const nextStep = (next: Step) => setStep(next);
+  const prevStep = (prev: Step) => setStep(prev);
+
+  const updateField = (field: string, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const updateRegistration = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      registration: { ...prev.registration, [field]: value }
+    }));
+  };
+
+  const updateSummaryQuestions = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      summaryQuestions: { ...prev.summaryQuestions, [field]: value }
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!user) return;
+    setLoading(true);
+
+    const finalSummary = formData.summaryMethod === 'questions' 
+      ? `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}`
+      : formData.summary;
+
+    try {
+      const projectId = await createProject({
+        userId: user.uid,
+        title: formData.title || "Projeto sem título",
+        type: formData.role,
+        segment: formData.segment,
+        needs: {
+          investment: true,
+          research: formData.needsResearch === 'sim',
+          industry: true,
+        },
+        location: {
+          region: formData.location.region,
+        },
+        // Additional metadata
+        innovationType: formData.innovationType,
+        isProtected: formData.isProtected === 'sim',
+        patentNumber: formData.patentNumber,
+        summary: finalSummary,
+        trlChecklist: formData.trlChecklist,
+        irlScore: formData.irl,
+        maturity: formData.trl || 1
+      } as any);
+
+      navigate(`/matches?project=${projectId}`);
+    } catch (error) {
+      console.error("Erro ao salvar projeto", error);
+      setError("Ocorreu um erro ao salvar o projeto. Por favor, tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderProgressBar = () => {
+    const steps: Step[] = ['ROLE', 'SEGMENT', 'PROTECTION', 'RESEARCH', 'INNOVATION_TYPE', 'LOCATION', 'MATURITY', 'SUMMARY_METHOD', 'SUMMARY_CONTENT', 'CADASTRO', 'REVIEW'];
+    const currentIndex = steps.indexOf(step);
+    return (
+      <div className="flex gap-1 mb-8">
+        {steps.map((s, i) => (
+          <div 
+            key={s} 
+            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+              i <= currentIndex ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-slate-800'
+            }`} 
+          />
+        ))}
+      </div>
+    );
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto pb-20">
+      <div className="mb-10 text-center">
+        <h1 className="text-3xl font-black text-white tracking-tight mb-2">Novo Projeto</h1>
+        <p className="text-slate-400">Preencha os detalhes para encontrar o match ideal.</p>
+      </div>
+
+      {renderProgressBar()}
+
+      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-1000" />
+        
+        {error && (
+          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-in fade-in zoom-in-95">
+            <Info size={18} />
+            <div className="flex-1">{error}</div>
+            <button onClick={() => setError(null)} className="text-red-400/50 hover:text-red-400">
+              <ArrowRight size={18} className="rotate-45" />
+            </button>
+          </div>
+        )}
+        {/* STEP: ROLE */}
+        {step === 'ROLE' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white">Como você deseja começar?</h2>
+              <p className="text-slate-400">Escolha o seu perfil para este projeto.</p>
+            </div>
+
+            <div className="grid gap-4">
+              <button
+                onClick={() => { updateField('role', 'idea'); nextStep('SEGMENT'); }}
+                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 hover:bg-slate-800 transition-all group/btn"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center group-hover/btn:scale-110 transition-transform">
+                  <Lightbulb className="text-amber-400" size={32} />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-bold text-white">Tenho uma Ideia</h3>
+                  <p className="text-sm text-slate-400">Desejo transformar uma ideia em inovação real.</p>
+                </div>
+                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-indigo-400 group-hover/btn:translate-x-1 transition-all" />
+              </button>
+
+              <button
+                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/20 border border-slate-800 opacity-60 cursor-not-allowed"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center">
+                  <GraduationCap className="text-blue-400" size={32} />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-bold text-slate-300">Sou um ICT</h3>
+                  <p className="text-xs uppercase tracking-widest font-bold text-indigo-400 mt-1 italic">Em Desenvolvimento</p>
+                </div>
+              </button>
+
+              <button
+                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/20 border border-slate-800 opacity-60 cursor-not-allowed"
+              >
+                <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center">
+                  <Factory className="text-emerald-400" size={32} />
+                </div>
+                <div className="text-left">
+                  <h3 className="text-lg font-bold text-slate-300">Sou um Prestador de serviço</h3>
+                  <p className="text-xs uppercase tracking-widest font-bold text-indigo-400 mt-1 italic">Em Desenvolvimento</p>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: SEGMENT */}
+        {step === 'SEGMENT' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Segmento do Projeto</h2>
+              <p className="text-slate-400">Selecione a Câmara ou Comitê da FIESC mais adequada.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {FIESC_CHAMBERS.map(chamber => (
+                <button
+                  key={chamber}
+                  onClick={() => updateField('segment', chamber)}
+                  className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
+                    formData.segment === chamber 
+                      ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  {chamber}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('ROLE')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('PROTECTION')} 
+                disabled={!formData.segment}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: PROTECTION */}
+        {step === 'PROTECTION' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Proteção Intelectual</h2>
+              <p className="text-slate-400">Sua ideia já está protegida por patente?</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => updateField('isProtected', 'sim')}
+                className={`flex flex-col items-center gap-4 p-8 rounded-2xl border transition-all ${
+                  formData.isProtected === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <ShieldCheck size={40} />
+                <span className="font-bold">Sim, está</span>
+              </button>
+              <button
+                onClick={() => updateField('isProtected', 'nao')}
+                className={`flex flex-col items-center gap-4 p-8 rounded-2xl border transition-all ${
+                  formData.isProtected === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <HelpCircle size={40} />
+                <span className="font-bold">Não, ainda não</span>
+              </button>
+            </div>
+
+            {formData.isProtected === 'sim' && (
+              <div className="space-y-6 p-6 rounded-2xl bg-slate-950/50 border border-slate-800 animate-in zoom-in-95">
+                <div className="flex gap-4 items-end">
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-slate-400 mb-2">Seu CPF ou CNPJ (para busca)</label>
+                    <input
+                      type="text"
+                      value={formData.registration.idNumber}
+                      onChange={(e) => updateRegistration('idNumber', e.target.value)}
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:border-indigo-500 outline-none"
+                      placeholder="00.000.000/0001-00"
+                    />
+                  </div>
+                  <button 
+                    onClick={async () => {
+                      if (!formData.registration.idNumber) {
+                        setError("Preencha seu CPF/CNPJ para realizar a busca no INPI.");
+                        return;
+                      }
+                      setInpiLoading(true);
+                      setError(null);
+                      try {
+                        const results = await searchPatentsInpi(formData.registration.idNumber);
+                        setInpiResults(results);
+                        if (results.length > 0) {
+                          updateField('patentNumber', results[0].processo);
+                          updateField('title', results[0].titulo);
+                        } else {
+                          setError("Nenhuma patente encontrada para este documento.");
+                        }
+                      } catch (e) {
+                        setError("Erro ao consultar INPI. Tente inserir manualmente.");
+                      } finally {
+                        setInpiLoading(false);
+                      }
+                    }}
+                    disabled={inpiLoading}
+                    className="h-[52px] px-6 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold transition flex items-center gap-2 border border-slate-700"
+                  >
+                    {inpiLoading ? <Loader2 className="animate-spin" size={20} /> : <Search size={20} />}
+                    <span className="hidden md:inline">Buscar no INPI</span>
+                  </button>
+                </div>
+
+                <div className="h-px bg-slate-800 my-2" />
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Número do Processo (Patente)</label>
+                  <input
+                    type="text"
+                    value={formData.patentNumber}
+                    onChange={(e) => updateField('patentNumber', e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:border-indigo-500 outline-none"
+                    placeholder="BR 10 202X XXXXXX-X"
+                  />
+                </div>
+
+                {inpiResults.length > 0 && (
+                  <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-xs text-emerald-400 animate-in fade-in">
+                    <strong>Patente encontrada:</strong> {inpiResults[0].titulo}
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Já possui o certificado de concessão?</label>
+                  <div className="flex gap-4">
+                    <button onClick={() => updateField('isGranted', 'sim')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'sim' ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-700 text-slate-400'}`}>Sim</button>
+                    <button onClick={() => updateField('isGranted', 'nao')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'nao' ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-700 text-slate-400'}`}>Não</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {formData.isProtected === 'nao' && (
+              <div className="p-6 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 space-y-4 animate-in zoom-in-95">
+                <div className="flex gap-4">
+                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                    <Info size={24} />
+                  </div>
+                  <div className="space-y-2">
+                    <h4 className="font-bold text-white">Importância da Proteção</h4>
+                    <p className="text-sm text-slate-400 leading-relaxed">
+                      Proteger sua ideia é o primeiro passo para uma inovação segura. Temos uma equipe para te auxiliar em todo o processo dentro do portal.
+                    </p>
+                  </div>
+                </div>
+                <button className="w-full py-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 font-bold flex items-center justify-center gap-2 transition border border-indigo-500/20">
+                  <Video size={18} /> Assistir Vídeo Explicativo
+                </button>
+              </div>
+            )}
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('SEGMENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('RESEARCH')} 
+                disabled={!formData.isProtected}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: RESEARCH */}
+        {step === 'RESEARCH' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Pesquisa e Desenvolvimento</h2>
+              <p className="text-slate-400">Você precisa de apoio técnico (ICT, Startups) para transformar sua ideia em realidade?</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => updateField('needsResearch', 'sim')}
+                className={`p-8 rounded-2xl border transition-all font-bold ${
+                  formData.needsResearch === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >Sim</button>
+              <button
+                onClick={() => updateField('needsResearch', 'nao')}
+                className={`p-8 rounded-2xl border transition-all font-bold ${
+                  formData.needsResearch === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >Não</button>
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('PROTECTION')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('INNOVATION_TYPE')} 
+                disabled={!formData.needsResearch}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: INNOVATION_TYPE */}
+        {step === 'INNOVATION_TYPE' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Tipo de Inovação</h2>
+              <p className="text-slate-400">Sua ideia é uma melhoria ou algo radicalmente novo?</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => updateField('innovationType', 'melhoria')}
+                className={`p-8 rounded-2xl border transition-all text-center space-y-2 ${
+                  formData.innovationType === 'melhoria' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <div className="font-bold text-lg">Melhoria Incremental</div>
+                <div className="text-xs text-slate-500">Otimização de produto existente</div>
+              </button>
+              <button
+                onClick={() => updateField('innovationType', 'inovacao')}
+                className={`p-8 rounded-2xl border transition-all text-center space-y-2 ${
+                  formData.innovationType === 'inovacao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <div className="font-bold text-lg">Inovação Radical</div>
+                <div className="text-xs text-slate-500">Nova tecnologia ou mercado</div>
+              </button>
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('RESEARCH')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('LOCATION')} 
+                disabled={!formData.innovationType}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: LOCATION */}
+        {step === 'LOCATION' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Localização</h2>
+              <p className="text-slate-400">Qual a região principal de atuação deste projeto?</p>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {REGIONS.map(region => (
+                <button
+                  key={region}
+                  onClick={() => updateField('location', { region })}
+                  className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
+                    formData.location.region === region ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  <MapPin size={20} />
+                  <span className="font-bold">{region}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('INNOVATION_TYPE')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('MATURITY')} 
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: MATURITY */}
+        {step === 'MATURITY' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2 text-center">
+              <h2 className="text-2xl font-bold text-white">Maturidade do Projeto</h2>
+              <p className="text-slate-400">Preencha o checklist para certificar o TRL/IRL (Opcional).</p>
+            </div>
+
+            <div className="bg-slate-950/40 p-6 rounded-2xl border border-slate-800">
+              <TRLCalculator 
+                initialValues={formData.trlChecklist}
+                onUpdate={(data) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    trl: data.trl,
+                    irl: data.irl,
+                    trlChecklist: data.checklist
+                  }));
+                }}
+              />
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between items-center">
+              <button onClick={() => prevStep('LOCATION')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => nextStep('SUMMARY_METHOD')} 
+                  className="px-6 py-3 rounded-xl text-slate-400 hover:text-white font-medium transition"
+                >Pular por enquanto</button>
+                <button 
+                  onClick={() => nextStep('SUMMARY_METHOD')} 
+                  className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                >Confirmar e Prosseguir</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: SUMMARY_METHOD */}
+        {step === 'SUMMARY_METHOD' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2 text-center">
+              <h2 className="text-2xl font-bold text-white">Como deseja descrever sua ideia?</h2>
+              <p className="text-slate-400">Escolha a forma que mais te agrada para apresentar o projeto.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <button
+                onClick={() => { updateField('summaryMethod', 'questions'); nextStep('SUMMARY_CONTENT'); }}
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+              >
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover/card:scale-110 transition-transform">
+                  <HelpCircle size={28} />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-white">Perguntas Guiadas</h3>
+                  <p className="text-sm text-slate-500 mt-2">Nós te ajudamos a construir o resumo através de pequenas perguntas.</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => { updateField('summaryMethod', 'text'); nextStep('SUMMARY_CONTENT'); }}
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+              >
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover/card:scale-110 transition-transform">
+                  <MessageSquare size={28} />
+                </div>
+                <div className="text-left">
+                  <h3 className="font-bold text-white">Texto Livre</h3>
+                  <p className="text-sm text-slate-500 mt-2">Você escreve o resumo da sua ideia em um único campo de texto.</p>
+                </div>
+              </button>
+            </div>
+
+            <div className="pt-6 border-t border-slate-800">
+              <button onClick={() => prevStep('INNOVATION_TYPE')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: SUMMARY_CONTENT */}
+        {step === 'SUMMARY_CONTENT' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <h2 className="text-2xl font-bold text-white">Resumo do Projeto</h2>
+
+            {formData.summaryMethod === 'questions' ? (
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Qual problema sua ideia resolve?</label>
+                  <textarea
+                    value={formData.summaryQuestions.problem}
+                    onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    placeholder="Descreva a dor do mercado..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Qual a sua solução?</label>
+                  <textarea
+                    value={formData.summaryQuestions.solution}
+                    onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    placeholder="Como sua ideia funciona..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Qual o grande diferencial?</label>
+                  <textarea
+                    value={formData.summaryQuestions.difference}
+                    onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    placeholder="Por que você é melhor que a concorrência..."
+                  />
+                </div>
+                
+                <div className="pt-4 border-t border-slate-800/50">
+                  <button 
+                    onClick={async () => {
+                      if (!formData.summaryQuestions.problem || !formData.summaryQuestions.solution || !formData.summaryQuestions.difference) {
+                        setError("Preencha as três perguntas para que a IA possa lapidar seu pitch.");
+                        return;
+                      }
+                      setLoading(true);
+                      setError(null);
+                      try {
+                        const { httpsCallable } = await import('firebase/functions');
+                        const { functions } = await import('../../firebase/config');
+                        const enhancePitchFn = httpsCallable(functions, 'enhancePitch');
+                        const result = await enhancePitchFn(formData.summaryQuestions);
+                        const summary = (result.data as any).summary;
+                        updateField('summary', summary);
+                        updateField('summaryMethod', 'text'); // Switch to text view to see and edit the result
+                      } catch (error) {
+                        console.error(error);
+                        setError("Falha na comunicação com a IA. Você pode prosseguir com o texto manual.");
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {loading ? <Loader2 className="animate-spin" size={20} /> : <><Zap size={18} /> Lapidar Pitch com IA</>}
+                  </button>
+                  <p className="text-center text-xs text-slate-500 mt-3">Powered by NVIDIA NIM</p>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-2">Descreva sua ideia em detalhes</label>
+                <textarea
+                  value={formData.summary}
+                  onChange={(e) => updateField('summary', e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-64"
+                  placeholder="Escreva aqui o resumo da sua patente ou ideia de negócio..."
+                />
+              </div>
+            )}
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('SUMMARY_METHOD')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('CADASTRO')} 
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: CADASTRO */}
+        {step === 'CADASTRO' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white">Finalização de Cadastro</h2>
+              <p className="text-slate-400">Quase lá! Precisamos de alguns dados para contato.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="col-span-full">
+                <label className="block text-sm font-medium text-slate-400 mb-1">Razão Social / Nome</label>
+                <input
+                  type="text"
+                  value={formData.registration.name}
+                  onChange={(e) => updateRegistration('name', e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-1">CNPJ / CPF</label>
+                <input
+                  type="text"
+                  value={formData.registration.idNumber}
+                  onChange={(e) => updateRegistration('idNumber', e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-1">Telefone</label>
+                <input
+                  type="text"
+                  value={formData.registration.phone}
+                  onChange={(e) => updateRegistration('phone', e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                />
+              </div>
+              <div className="col-span-full">
+                <label className="block text-sm font-medium text-slate-400 mb-1">E-mail</label>
+                <input
+                  type="email"
+                  value={formData.registration.email}
+                  onChange={(e) => updateRegistration('email', e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                />
+              </div>
+              {!user && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-400 mb-1">Senha</label>
+                    <input
+                      type="password"
+                      value={formData.registration.password}
+                      onChange={(e) => updateRegistration('password', e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-400 mb-1">Confirmar Senha</label>
+                    <input
+                      type="password"
+                      value={formData.registration.confirmPassword}
+                      onChange={(e) => updateRegistration('confirmPassword', e.target.value)}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('SUMMARY_CONTENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('REVIEW')} 
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: REVIEW */}
+        {step === 'REVIEW' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="text-center">
+              <CheckCircle2 className="mx-auto text-emerald-400 mb-4" size={56} />
+              <h2 className="text-3xl font-bold text-white mb-2">Tudo Pronto!</h2>
+              <p className="text-slate-400 max-w-md mx-auto">
+                Seu projeto está pronto para ser processado pelo nosso algoritmo de matchmaking.
+              </p>
+            </div>
+
+            <div className="grid gap-4 p-6 rounded-2xl bg-slate-950/50 border border-slate-800 text-sm">
+              <div className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Segmento</span>
+                <span className="text-slate-200 font-bold">{formData.segment}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Proteção</span>
+                <span className="text-slate-200 font-bold">{formData.isProtected === 'sim' ? 'Protegida (Patente)' : 'Não Protegida'}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Tipo</span>
+                <span className="text-slate-200 font-bold uppercase">{formData.innovationType}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-800 pb-2">
+                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">P&D</span>
+                <span className="text-slate-200 font-bold">{formData.needsResearch === 'sim' ? 'Necessário' : 'Não Necessário'}</span>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('CADASTRO')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={handleSubmit} 
+                disabled={loading}
+                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-white font-black text-lg shadow-[0_0_30px_rgba(79,70,229,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {loading ? <Loader2 className="animate-spin" size={24} /> : <>{ "Finalizar e Gerar Matches" } <Rocket size={24} /></>}
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
+    </div>
+  );
+}

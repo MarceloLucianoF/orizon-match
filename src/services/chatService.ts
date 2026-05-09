@@ -26,7 +26,44 @@ export interface Conversation {
   unreadCount?: Record<string, number>;
   status?: "pending" | "active" | "declined";
   initiatorId?: string;
+  ndaSignedBy?: string[];
+  vdrLink?: string;
 }
+
+export async function signNDA(conversationId: string, userId: string) {
+  const convRef = doc(db, "conversations", conversationId);
+  await updateDoc(convRef, {
+    ndaSignedBy: arrayUnion(userId),
+    updatedAt: serverTimestamp()
+  });
+
+  await addDoc(collection(db, "messages"), {
+    conversationId,
+    senderId: "system",
+    text: "NDA assinado eletronicamente por uma das partes.",
+    type: "system",
+    createdAt: serverTimestamp(),
+    isSystem: true
+  });
+}
+
+export async function updateVDRLink(conversationId: string, link: string) {
+  await updateDoc(doc(db, "conversations", conversationId), {
+    vdrLink: link,
+    updatedAt: serverTimestamp()
+  });
+
+  await addDoc(collection(db, "messages"), {
+    conversationId,
+    senderId: "system",
+    text: "O Inventor configurou o link seguro do Data Room.",
+    type: "system",
+    createdAt: serverTimestamp(),
+    isSystem: true
+  });
+}
+
+import { arrayUnion } from "firebase/firestore";
 
 export interface Message {
   id: string;

@@ -20,7 +20,7 @@ if (import.meta.env.DEV) {
 
   if (missingKeys.length > 0) {
     console.warn(
-      "⚠️ Variáveis Firebase não configuradas:",
+      "Variáveis Firebase não configuradas:",
       missingKeys.join(", ")
     );
   }

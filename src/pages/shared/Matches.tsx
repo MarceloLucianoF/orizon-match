@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import { getMatches, updateMatchAction } from "../services/matchService";
-import { createOrGetConversation } from "../services/chatService";
-import { explainMatch } from "../lib/matching";
-import { Loader2, ArrowRight, Search, Filter, Heart, X } from "lucide-react";
+import { useAuth } from "../../hooks/useAuth";
+import { getMatches, updateMatchAction } from "../../services/matchService";
+import { createOrGetConversation } from "../../services/chatService";
+import { explainMatch } from "../../lib/matching";
+import { 
+  Loader2, ArrowRight, Search, Filter, 
+  Zap, Lock, Heart, X, ShieldCheck 
+} from "lucide-react";
 
 export function Matches() {
   const { user } = useAuth();
@@ -165,13 +168,29 @@ export function Matches() {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
                   <h3 className="text-lg font-bold text-slate-100 truncate">Organização Confidencial <span className="text-slate-500 text-sm font-normal ml-2">#ID-{match.id.slice(0, 6).toUpperCase()}</span></h3>
+                  
+                  {match.targetStats && match.targetStats.saves > 0 && (
+                    <span className="bg-pink-500/10 text-pink-400 text-xs px-2 py-0.5 rounded border border-pink-500/20 font-medium flex items-center gap-1">
+                      <Zap size={12} className="fill-pink-400/20" /> {match.targetStats.saves} Investidores avaliaram
+                    </span>
+                  )}
+                  {match.targetStats && match.targetStats.ndaRequests > 0 && (
+                    <span className="bg-indigo-500/10 text-indigo-400 text-xs px-2 py-0.5 rounded border border-indigo-500/20 font-medium flex items-center gap-1">
+                      <Lock size={12} /> {match.targetStats.ndaRequests} NDAs Solicitados
+                    </span>
+                  )}
+
+                  {match.isVdrReady && (
+                    <span className="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/20 font-medium flex items-center gap-1">
+                      <ShieldCheck size={12} /> VDR Auditado
+                    </span>
+                  )}
+
                   {match.score >= 80 ? (
-                    <span className="bg-amber-500/10 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/20 font-medium">🔥 Alto Fit</span>
+                    <span className="bg-amber-500/10 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/20 font-medium">Top Fit</span>
                   ) : match.score >= 70 ? (
                     <span className="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/20 font-medium">Bom Fit</span>
-                  ) : (
-                    <span className="bg-slate-500/10 text-slate-400 text-xs px-2 py-0.5 rounded border border-slate-500/20 font-medium">Médio Fit</span>
-                  )}
+                  ) : null}
                 </div>
                 
                 <div className="w-full bg-slate-800 rounded-full h-1.5 mb-3 max-w-sm">
@@ -180,9 +199,9 @@ export function Matches() {
 
                 <div className="flex flex-wrap gap-2 text-xs mb-3">
                   <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Segmento: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.segment} pts</span></span>
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Maturidade: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.maturity} pts</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Maturidade (TRL): <span className="text-indigo-400 font-bold ml-1">{match.breakdown.maturity} pts</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Prontidão (VDR/IRL): <span className="text-indigo-400 font-bold ml-1">{match.breakdown.readiness} pts</span></span>
                   <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Necessidades: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.needs} pts</span></span>
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Localização: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.location} pts</span></span>
                 </div>
                 <p className="text-sm text-slate-300">{explainMatch(match.breakdown)}</p>
               </div>

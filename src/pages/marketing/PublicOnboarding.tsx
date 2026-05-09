@@ -1,16 +1,48 @@
 import { useState } from 'react';
-import { Lightbulb, Factory, GraduationCap, ArrowRight, Loader2, Star, Lock } from 'lucide-react';
+import { 
+  Lightbulb, Factory, GraduationCap, ArrowRight, 
+  Loader2, Star, Lock, ShieldCheck, HelpCircle, 
+  Video, ArrowLeft, MessageSquare, Zap, Rocket, Info 
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { functions } from "../../firebase/config";
 import { httpsCallable } from "firebase/functions";
 import { explainMatch } from "../../lib/matching";
 
-type Step = 'PROFILE' | 'SEGMENT' | 'PROTECTION' | 'MATURITY' | 'NEEDS_INTERESTS' | 'FINAL_REGISTER' | 'RESULTS';
+const FIESC_CHAMBERS = [
+  "Agroindústria",
+  "Alimentos e Bebidas",
+  "Assuntos Tributários e Fiscais",
+  "Bens de Capital",
+  "Construção Civil",
+  "Economia",
+  "Energia",
+  "Meio Ambiente e Sustentabilidade",
+  "Pesca e Maricultura",
+  "Relações Trabalhistas",
+  "Saneamento",
+  "Segurança e Saúde no Trabalho",
+  "Tecnologia e Inovação",
+  "Transporte e Logística"
+];
+
+type Step = 
+  | 'PROFILE' 
+  | 'EMAIL' 
+  | 'SEGMENT' 
+  | 'PROTECTION' 
+  | 'RESEARCH' 
+  | 'INNOVATION_TYPE' 
+  | 'SUMMARY_METHOD'
+  | 'SUMMARY_CONTENT'
+  | 'FINAL_REGISTER' 
+  | 'RESULTS';
 
 export default function PublicOnboarding() {
   const [step, setStep] = useState<Step>('PROFILE');
   const [loading, setLoading] = useState(false);
   const [previewResult, setPreviewResult] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     role: '',
@@ -18,43 +50,60 @@ export default function PublicOnboarding() {
     segment: '',
     isProtected: '',
     patentNumber: '',
+    isGranted: '',
+    needsResearch: '',
+    innovationType: '',
+    summaryMethod: '', // questions, text
+    summary: '',
+    summaryQuestions: {
+      problem: '',
+      solution: '',
+      difference: ''
+    },
     maturity: 1,
     trlMin: 1,
     trlMax: 9,
-    needs: { investment: false, research: false, industry: false },
-    interests: { investment: false, research: false, industry: false },
+    needs: { investment: true, research: false, industry: true },
     name: '',
-    password: ''
+    idNumber: '', // CNPJ/CPF
+    phone: '',
+    password: '',
+    confirmPassword: ''
   });
 
   const nextStep = (next: Step) => setStep(next);
+  const prevStep = (prev: Step) => setStep(prev);
+
   const updateField = (field: string, value: any) => setFormData(p => ({ ...p, [field]: value }));
-  const updateNestedField = (parent: 'needs'|'interests', field: string, value: boolean) => 
-    setFormData(p => ({ ...p, [parent]: { ...p[parent], [field]: value } }));
-
-  const handleNextFromSegment = () => {
-    if (formData.role === 'inventor') nextStep('PROTECTION');
-    else if (formData.role === 'provider') nextStep('MATURITY');
-    else nextStep('NEEDS_INTERESTS'); // ICT skip to interests
+  const updateSummaryQuestions = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      summaryQuestions: { ...prev.summaryQuestions, [field]: value }
+    }));
   };
-
-  const handleNextFromProtection = () => nextStep('MATURITY');
-  const handleNextFromMaturity = () => nextStep('NEEDS_INTERESTS');
-  const handleNextFromNeeds = () => nextStep('FINAL_REGISTER');
 
   const handleGeneratePreview = async () => {
     setLoading(true);
     setStep('RESULTS');
     
+    const finalSummary = formData.summaryMethod === 'questions' 
+      ? `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}`
+      : formData.summary;
+
     try {
       const previewMatchesFn = httpsCallable(functions, 'previewMatches');
       
       const dataForBackend = {
-        title: "Projeto Em Empreendedorismo",
+        title: "Meu Projeto Inovador",
         type: formData.role === 'inventor' ? 'startup' : formData.role,
-        segment: formData.segment || "tecnologia",
+        segment: formData.segment,
         maturity: formData.maturity,
-        needs: formData.role === 'inventor' ? formData.needs : { investment: false, research: false, industry: false },
+        needs: {
+          investment: true,
+          research: formData.needsResearch === 'sim',
+          industry: true
+        },
+        summary: finalSummary,
         location: { region: "sudeste" }
       };
       
@@ -76,23 +125,16 @@ export default function PublicOnboarding() {
   };
 
   const ProgressBar = () => {
-    const steps: Step[] = ['PROFILE', 'SEGMENT', 'PROTECTION', 'MATURITY', 'NEEDS_INTERESTS', 'FINAL_REGISTER'];
-    // Pula Protection para Provider/ICT visualmente
-    const activeSteps = formData.role === 'provider' 
-      ? ['PROFILE', 'SEGMENT', 'MATURITY', 'NEEDS_INTERESTS', 'FINAL_REGISTER'] 
-      : formData.role === 'ict' 
-      ? ['PROFILE', 'SEGMENT', 'NEEDS_INTERESTS', 'FINAL_REGISTER']
-      : steps;
-      
-    const currentIndex = activeSteps.indexOf(step === 'RESULTS' ? 'FINAL_REGISTER' : step);
+    const steps: Step[] = ['PROFILE', 'EMAIL', 'SEGMENT', 'PROTECTION', 'RESEARCH', 'INNOVATION_TYPE', 'SUMMARY_METHOD', 'SUMMARY_CONTENT', 'FINAL_REGISTER'];
+    const currentIndex = steps.indexOf(step === 'RESULTS' ? 'FINAL_REGISTER' : step);
     
     return (
-      <div className="flex gap-2 mb-8">
-        {activeSteps.map((s, i) => (
+      <div className="flex gap-1 mb-8">
+        {steps.map((s, i) => (
           <div 
             key={s} 
-            className={`h-1.5 flex-1 rounded-full transition-colors ${
-              i <= currentIndex ? 'bg-indigo-500' : 'bg-slate-800'
+            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+              i <= currentIndex ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-slate-800'
             }`} 
           />
         ))}
@@ -107,7 +149,7 @@ export default function PublicOnboarding() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[120px]"></div>
       </div>
 
-      <div className="max-w-xl w-full bg-slate-900/60 border border-slate-800 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative z-10">
+      <div className="max-w-xl w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative z-10">
         
         <div className="flex justify-between items-center mb-8">
           <Link to="/" className="font-semibold text-xl text-white tracking-tight">Orizon Match</Link>
@@ -116,10 +158,23 @@ export default function PublicOnboarding() {
 
         {step !== 'RESULTS' && <ProgressBar />}
 
-        {/* PASSO 1: PERFIL */}
+        {error && (
+          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-in fade-in zoom-in-95">
+            <Info size={18} />
+            <div className="flex-1">{error}</div>
+            <button onClick={() => setError(null)} className="text-red-400/50 hover:text-red-400">
+              <ArrowLeft size={18} className="rotate-45" />
+            </button>
+          </div>
+        )}
+
+        {/* STEP: PROFILE */}
         {step === 'PROFILE' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-            <h2 className="text-2xl font-bold text-white leading-tight">Como você se identifica?</h2>
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white leading-tight">Como você se identifica?</h2>
+              <p className="text-slate-400">Escolha o seu perfil para começar.</p>
+            </div>
             
             <div className="grid gap-3">
               {[
@@ -129,99 +184,138 @@ export default function PublicOnboarding() {
               ].map((opt) => (
                 <button
                   key={opt.id}
-                  onClick={() => updateField('role', opt.id)}
+                  onClick={() => { updateField('role', opt.id); nextStep('EMAIL'); }}
                   className={`flex items-center gap-4 p-4 rounded-2xl border transition text-left group ${
                     formData.role === opt.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-700 bg-slate-800/40 hover:border-indigo-500/50 hover:bg-slate-800'
                   }`}
                 >
                   <div className="p-3 bg-slate-900 rounded-xl group-hover:scale-110 transition duration-300">{opt.icon}</div>
                   <span className="font-medium text-slate-200">{opt.label}</span>
+                  <ArrowRight className="ml-auto text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* STEP: EMAIL */}
+        {step === 'EMAIL' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white">Qual seu melhor e-mail?</h2>
+              <p className="text-slate-400">Usaremos para salvar seu progresso e enviar o Radar de Oportunidades.</p>
+            </div>
+
+            <input 
+              type="email" 
+              value={formData.email}
+              onChange={(e) => updateField('email', e.target.value)}
+              placeholder="seu@email.com" 
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-4 focus:outline-none focus:border-indigo-500 text-slate-200 text-lg" 
+            />
+
+            <div className="flex gap-4 pt-4">
+              <button onClick={() => prevStep('PROFILE')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('SEGMENT')} 
+                disabled={!formData.email}
+                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 text-white font-bold transition shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+              >Continuar</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: SEGMENT */}
+        {step === 'SEGMENT' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white">Segmento do Projeto</h2>
+              <p className="text-slate-400">Qual Câmara da FIESC melhor representa sua ideia?</p>
+            </div>
+            
+            <div className="max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar grid gap-2">
+              {FIESC_CHAMBERS.map(chamber => (
+                <button
+                  key={chamber}
+                  onClick={() => updateField('segment', chamber)}
+                  className={`p-3 rounded-xl text-left text-sm font-medium transition-all border ${
+                    formData.segment === chamber 
+                      ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  {chamber}
                 </button>
               ))}
             </div>
 
-            <div className="pt-4 space-y-3">
-              <label className="block text-sm font-medium text-slate-400">Qual o seu melhor e-mail?</label>
-              <input 
-                type="email" 
-                value={formData.email}
-                onChange={(e) => updateField('email', e.target.value)}
-                placeholder="seu@email.com" 
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-indigo-500 text-slate-200" 
-              />
-            </div>
-
-            <button 
-              onClick={() => nextStep('SEGMENT')} 
-              disabled={!formData.role || !formData.email}
-              className="w-full p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 text-white font-bold mt-4 flex justify-center items-center gap-2 hover:bg-indigo-500 transition-colors"
-            >
-              Começar minha jornada <ArrowRight size={18} />
-            </button>
-          </div>
-        )}
-
-        {/* PASSO 2: SEGMENTO */}
-        {step === 'SEGMENT' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <div>
-              <h2 className="text-2xl font-bold text-white mb-2">Qual a sua área de atuação principal?</h2>
-            </div>
-            
-            <select 
-              value={formData.segment}
-              onChange={(e) => updateField('segment', e.target.value)}
-              className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 outline-none focus:border-indigo-500 text-slate-200 appearance-none"
-            >
-              <option value="">Selecione uma câmara...</option>
-              <option value="agro">Agroindústria / Alimentos</option>
-              <option value="energy">Energia / CleanTech</option>
-              <option value="tech">Tecnologia & Software</option>
-              <option value="health">Saúde e Biotecnologia</option>
-              <option value="industry">Indústria 4.0</option>
-            </select>
-
             <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => setStep('PROFILE')} className="flex-1 p-4 rounded-xl border border-slate-700 hover:bg-slate-800 transition">Voltar</button>
+              <button onClick={() => prevStep('EMAIL')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={handleNextFromSegment} 
+                onClick={() => nextStep('PROTECTION')} 
                 disabled={!formData.segment}
-                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 disabled:text-slate-500 font-bold transition"
+                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 font-bold transition"
               >Próximo</button>
             </div>
           </div>
         )}
 
-        {/* PASSO 3: PROTEÇÃO (APENAS INVENTORES) */}
+        {/* STEP: PROTECTION */}
         {step === 'PROTECTION' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <h2 className="text-2xl font-bold text-white">Sua inovação já está protegida?</h2>
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white">Sua inovação já está protegida?</h2>
+              <p className="text-slate-400 text-sm">A proteção IP é vital para a confiança do investidor.</p>
+            </div>
             
-            <div className="flex gap-4">
-              <button 
+            <div className="grid grid-cols-2 gap-4">
+              <button
                 onClick={() => updateField('isProtected', 'sim')}
-                className={`flex-1 p-4 rounded-xl border transition ${formData.isProtected === 'sim' ? 'border-indigo-500 bg-indigo-500/10 text-white' : 'border-slate-700 text-slate-300 hover:bg-slate-800'}`}
-              >Sim, está</button>
-              <button 
+                className={`flex flex-col items-center gap-4 p-6 rounded-2xl border transition-all ${
+                  formData.isProtected === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <ShieldCheck size={32} />
+                <span className="font-bold">Sim, está</span>
+              </button>
+              <button
                 onClick={() => updateField('isProtected', 'nao')}
-                className={`flex-1 p-4 rounded-xl border transition ${formData.isProtected === 'nao' ? 'border-indigo-500 bg-indigo-500/10 text-white' : 'border-slate-700 text-slate-300 hover:bg-slate-800'}`}
-              >Não</button>
+                className={`flex flex-col items-center gap-4 p-6 rounded-2xl border transition-all ${
+                  formData.isProtected === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <HelpCircle size={32} />
+                <span className="font-bold">Não, ainda não</span>
+              </button>
             </div>
 
             {formData.isProtected === 'sim' && (
-              <input 
-                type="text" 
-                value={formData.patentNumber}
-                onChange={(e) => updateField('patentNumber', e.target.value)}
-                placeholder="Número do processo (opcional)" 
-                className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-slate-200"
-              />
+              <div className="space-y-4 p-4 rounded-xl bg-slate-950/50 border border-slate-800 animate-in zoom-in-95">
+                <input 
+                  type="text" 
+                  value={formData.patentNumber}
+                  onChange={(e) => updateField('patentNumber', e.target.value)}
+                  placeholder="Número do processo de Patente" 
+                  className="w-full p-3 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 outline-none focus:border-indigo-500"
+                />
+              </div>
             )}
 
-            <div className="flex gap-4 pt-4">
-              <button onClick={() => setStep('SEGMENT')} className="w-1/3 p-4 rounded-xl border border-slate-700 hover:bg-slate-800 transition">Voltar</button>
+            {formData.isProtected === 'nao' && (
+              <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 space-y-3 animate-in zoom-in-95">
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  <strong>Importância da Proteção:</strong> Proteger sua ideia evita cópias e atrai investimentos sérios.
+                </p>
+                <button className="w-full py-2 rounded-lg bg-indigo-600/20 text-indigo-300 text-xs font-bold flex items-center justify-center gap-2 transition">
+                  <Video size={14} /> Entenda como proteger sua ideia
+                </button>
+              </div>
+            )}
+
+            <div className="flex gap-4 pt-4 border-t border-slate-800">
+              <button onClick={() => prevStep('SEGMENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={handleNextFromProtection} 
+                onClick={() => nextStep('RESEARCH')} 
                 disabled={!formData.isProtected}
                 className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 font-bold transition"
               >Próximo</button>
@@ -229,122 +323,248 @@ export default function PublicOnboarding() {
           </div>
         )}
 
-        {/* PASSO 4: MATURIDADE (INVENTOR = SEU TRL | PROVIDER = TRL ALVO) */}
-        {step === 'MATURITY' && (
+        {/* STEP: RESEARCH */}
+        {step === 'RESEARCH' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <h2 className="text-2xl font-bold text-white">
-              {formData.role === 'inventor' ? 'Qual a maturidade da solução?' : 'Qual o TRL alvo que você busca?'}
-            </h2>
-            
-            {formData.role === 'inventor' ? (
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white">P&D é necessário?</h2>
+              <p className="text-slate-400">Você precisa de apoio de laboratórios ou ICTs para criar o protótipo?</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => updateField('needsResearch', 'sim')}
+                className={`p-6 rounded-2xl border transition-all font-bold ${
+                  formData.needsResearch === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >Sim</button>
+              <button
+                onClick={() => updateField('needsResearch', 'nao')}
+                className={`p-6 rounded-2xl border transition-all font-bold ${
+                  formData.needsResearch === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >Não</button>
+            </div>
+
+            <div className="flex gap-4 pt-4 border-t border-slate-800">
+              <button onClick={() => prevStep('PROTECTION')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('INNOVATION_TYPE')} 
+                disabled={!formData.needsResearch}
+                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 font-bold transition"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: INNOVATION_TYPE */}
+        {step === 'INNOVATION_TYPE' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white">Tipo de Inovação</h2>
+              <p className="text-slate-400">Seu projeto é uma melhoria ou algo radical?</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => updateField('innovationType', 'melhoria')}
+                className={`p-6 rounded-2xl border transition-all text-center ${
+                  formData.innovationType === 'melhoria' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <div className="font-bold">Melhoria</div>
+                <div className="text-[10px] text-slate-500">Incremental</div>
+              </button>
+              <button
+                onClick={() => updateField('innovationType', 'inovacao')}
+                className={`p-6 rounded-2xl border transition-all text-center ${
+                  formData.innovationType === 'inovacao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                }`}
+              >
+                <div className="font-bold">Inovação</div>
+                <div className="text-[10px] text-slate-500">Radical</div>
+              </button>
+            </div>
+
+            <div className="flex gap-4 pt-4 border-t border-slate-800">
+              <button onClick={() => prevStep('RESEARCH')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('SUMMARY_METHOD')} 
+                disabled={!formData.innovationType}
+                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 font-bold transition"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: SUMMARY_METHOD */}
+        {step === 'SUMMARY_METHOD' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 text-center">
+            <h2 className="text-2xl font-bold text-white">Como deseja descrever sua ideia?</h2>
+            <div className="grid gap-4 mt-6">
+              <button
+                onClick={() => { updateField('summaryMethod', 'questions'); nextStep('SUMMARY_CONTENT'); }}
+                className="p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all flex items-center gap-4"
+              >
+                <HelpCircle className="text-indigo-400" size={32} />
+                <div className="text-left">
+                  <div className="font-bold">Perguntas Guiadas</div>
+                  <div className="text-xs text-slate-500">Te ajudamos a construir o resumo</div>
+                </div>
+              </button>
+              <button
+                onClick={() => { updateField('summaryMethod', 'text'); nextStep('SUMMARY_CONTENT'); }}
+                className="p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all flex items-center gap-4"
+              >
+                <MessageSquare className="text-emerald-400" size={32} />
+                <div className="text-left">
+                  <div className="font-bold">Texto Livre</div>
+                  <div className="text-xs text-slate-500">Escreva tudo em um único campo</div>
+                </div>
+              </button>
+            </div>
+            <button onClick={() => prevStep('INNOVATION_TYPE')} className="mt-6 text-sm text-slate-500 hover:text-white transition">Voltar</button>
+          </div>
+        )}
+
+        {/* STEP: SUMMARY_CONTENT */}
+        {step === 'SUMMARY_CONTENT' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+            <h2 className="text-2xl font-bold text-white">Resumo do Projeto</h2>
+            {formData.summaryMethod === 'questions' ? (
               <div className="space-y-4">
-                <input type="range" min="1" max="9" value={formData.maturity} onChange={e => updateField('maturity', parseInt(e.target.value))} className="w-full accent-indigo-500" />
-                <div className="flex justify-between text-xs text-slate-400 font-medium px-1">
-                  <span>TRL 1 (Ideia)</span>
-                  <span className="text-indigo-400 text-sm font-bold border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 rounded-full">TRL {formData.maturity}</span>
-                  <span>TRL 9 (Escala)</span>
+                <textarea
+                  value={formData.summaryQuestions.problem}
+                  onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
+                  placeholder="Qual problema sua ideia resolve?"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500 h-20"
+                />
+                <textarea
+                  value={formData.summaryQuestions.solution}
+                  onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
+                  placeholder="Qual a sua solução?"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500 h-20"
+                />
+                <textarea
+                  value={formData.summaryQuestions.difference}
+                  onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
+                  placeholder="Qual o grande diferencial?"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500 h-20"
+                />
+                <div className="pt-2 border-t border-slate-800/50">
+                  <button 
+                    onClick={async () => {
+                      if (!formData.summaryQuestions.problem || !formData.summaryQuestions.solution || !formData.summaryQuestions.difference) {
+                        setError("Preencha as três perguntas para que a IA possa lapidar seu pitch.");
+                        return;
+                      }
+                      setLoading(true);
+                      setError(null);
+                      try {
+                        const { httpsCallable } = await import('firebase/functions');
+                        const { functions } = await import('../../firebase/config');
+                        const enhancePitchFn = httpsCallable(functions, 'enhancePitch');
+                        const result = await enhancePitchFn(formData.summaryQuestions);
+                        const summary = (result.data as any).summary;
+                        updateField('summary', summary);
+                        updateField('summaryMethod', 'text');
+                      } catch (error) {
+                        console.error(error);
+                        setError("Falha na comunicação com a IA. Você pode prosseguir com o resumo manual.");
+                      } finally {
+                        setLoading(false);
+                      }
+                    }}
+                    disabled={loading}
+                    className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-[0_0_15px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {loading ? <Loader2 className="animate-spin" size={18} /> : <><Zap size={18} /> Lapidar Pitch com IA</>}
+                  </button>
+                  <p className="text-center text-[10px] text-slate-500 mt-2">Powered by NVIDIA NIM</p>
                 </div>
               </div>
             ) : (
-              <div className="space-y-6">
-                <p className="text-sm text-slate-400">Defina o intervalo de maturidade dos projetos que você aceita avaliar.</p>
-                <div>
-                  <label className="text-xs text-slate-400 mb-2 block">Maturidade Mínima (TRL)</label>
-                  <input type="range" min="1" max={formData.trlMax} value={formData.trlMin} onChange={e => updateField('trlMin', parseInt(e.target.value))} className="w-full accent-cyan-500" />
-                  <div className="text-right text-xs text-cyan-400 mt-1">Mínimo: TRL {formData.trlMin}</div>
-                </div>
-                <div>
-                  <label className="text-xs text-slate-400 mb-2 block">Maturidade Máxima (TRL)</label>
-                  <input type="range" min={formData.trlMin} max="9" value={formData.trlMax} onChange={e => updateField('trlMax', parseInt(e.target.value))} className="w-full accent-emerald-500" />
-                  <div className="text-right text-xs text-emerald-400 mt-1">Máximo: TRL {formData.trlMax}</div>
-                </div>
-              </div>
+              <textarea
+                value={formData.summary}
+                onChange={(e) => updateField('summary', e.target.value)}
+                placeholder="Descreva sua ideia em detalhes..."
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 outline-none focus:border-indigo-500 h-64"
+              />
             )}
-
             <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => formData.role === 'inventor' ? setStep('PROTECTION') : setStep('SEGMENT')} className="w-1/3 p-4 rounded-xl border border-slate-700 hover:bg-slate-800 transition">Voltar</button>
-              <button onClick={handleNextFromMaturity} className="flex-1 p-4 rounded-xl bg-indigo-600 font-bold transition">Próximo</button>
+              <button onClick={() => prevStep('SUMMARY_METHOD')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button onClick={() => nextStep('FINAL_REGISTER')} className="flex-1 p-4 rounded-xl bg-indigo-600 font-bold transition">Próximo</button>
             </div>
           </div>
         )}
 
-        {/* PASSO 5: NECESSIDADES VS INTERESSES */}
-        {step === 'NEEDS_INTERESTS' && (
+        {/* STEP: FINAL_REGISTER */}
+        {step === 'FINAL_REGISTER' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <h2 className="text-2xl font-bold text-white">
-              {formData.role === 'inventor' ? 'O que o seu projeto busca na rede?' : 'O que você oferece para a rede?'}
-            </h2>
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-bold text-white leading-tight">Finalização de Cadastro</h2>
+              <p className="text-slate-400">Precisamos de alguns dados para criar seu perfil de acesso.</p>
+            </div>
             
             <div className="space-y-3">
-              <label className="flex items-center gap-3 p-4 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/50 transition">
+              <div className="grid grid-cols-2 gap-3">
                 <input 
-                  type="checkbox" 
-                  checked={formData.role === 'inventor' ? formData.needs.investment : formData.interests.investment} 
-                  onChange={e => updateNestedField(formData.role === 'inventor' ? 'needs' : 'interests', 'investment', e.target.checked)} 
-                  className="w-5 h-5 accent-indigo-500" 
+                  type="text" 
+                  value={formData.name} 
+                  onChange={(e) => updateField('name', e.target.value)} 
+                  placeholder="Razão Social / Nome" 
+                  className="col-span-2 w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
                 />
-                <span className="font-medium">Investimento Financeiro</span>
-              </label>
-              <label className="flex items-center gap-3 p-4 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/50 transition">
                 <input 
-                  type="checkbox" 
-                  checked={formData.role === 'inventor' ? formData.needs.research : formData.interests.research} 
-                  onChange={e => updateNestedField(formData.role === 'inventor' ? 'needs' : 'interests', 'research', e.target.checked)} 
-                  className="w-5 h-5 accent-indigo-500" 
+                  type="text" 
+                  value={formData.idNumber} 
+                  onChange={(e) => updateField('idNumber', e.target.value)} 
+                  placeholder="CNPJ / CPF" 
+                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
                 />
-                <span className="font-medium">Apoio em P&D e Laboratórios</span>
-              </label>
-              <label className="flex items-center gap-3 p-4 border border-slate-800 rounded-xl cursor-pointer hover:bg-slate-800/50 transition">
                 <input 
-                  type="checkbox" 
-                  checked={formData.role === 'inventor' ? formData.needs.industry : formData.interests.industry} 
-                  onChange={e => updateNestedField(formData.role === 'inventor' ? 'needs' : 'interests', 'industry', e.target.checked)} 
-                  className="w-5 h-5 accent-indigo-500" 
+                  type="text" 
+                  value={formData.phone} 
+                  onChange={(e) => updateField('phone', e.target.value)} 
+                  placeholder="Telefone" 
+                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
                 />
-                <span className="font-medium">Parceria de Manufatura/Indústria</span>
-              </label>
+                <input 
+                  type="password" 
+                  value={formData.password} 
+                  onChange={(e) => updateField('password', e.target.value)} 
+                  placeholder="Senha" 
+                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
+                />
+                <input 
+                  type="password" 
+                  value={formData.confirmPassword} 
+                  onChange={(e) => updateField('confirmPassword', e.target.value)} 
+                  placeholder="Confirmar" 
+                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
+                />
+              </div>
             </div>
 
             <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => formData.role === 'ict' ? setStep('SEGMENT') : setStep('MATURITY')} className="w-1/3 p-4 rounded-xl border border-slate-700 hover:bg-slate-800 transition">Voltar</button>
-              <button onClick={handleNextFromNeeds} className="flex-1 p-4 rounded-xl bg-indigo-600 font-bold transition">Continuar para Cadastro</button>
-            </div>
-          </div>
-        )}
-
-        {/* PASSO 6: CADASTRO FINAL */}
-        {step === 'FINAL_REGISTER' && (
-          <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-white">Último passo!</h2>
-              <p className="text-slate-400 text-sm mt-2">Crie sua senha para rodar o motor de Match e ver resultados reais.</p>
-            </div>
-            
-            <input type="email" value={formData.email} disabled className="w-full p-4 rounded-xl bg-slate-950/50 border border-slate-800 text-slate-500 cursor-not-allowed" />
-            <input type="text" value={formData.name} onChange={(e) => updateField('name', e.target.value)} placeholder="Seu Nome Completo" className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 focus:outline-none focus:border-indigo-500" />
-            <input type="password" value={formData.password} onChange={(e) => updateField('password', e.target.value)} placeholder="Crie uma Senha Forte" className="w-full p-4 rounded-xl bg-slate-950 border border-slate-700 text-slate-200 focus:outline-none focus:border-indigo-500" />
-            
-            <div className="flex gap-4 pt-4">
-              <button onClick={() => setStep('NEEDS_INTERESTS')} className="w-1/3 p-4 rounded-xl border border-slate-700 hover:bg-slate-800 transition">Voltar</button>
+              <button onClick={() => prevStep('SUMMARY_CONTENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
                 onClick={handleGeneratePreview}
-                disabled={!formData.name || !formData.password}
-                className="flex-1 p-4 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 font-bold text-white shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-all"
-              >
-                Gerar Meus Matches 🚀
-              </button>
+                disabled={!formData.name || !formData.idNumber || !formData.password || formData.password !== formData.confirmPassword}
+                className="flex-1 p-4 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold transition shadow-[0_0_20px_rgba(79,70,229,0.4)] disabled:opacity-50 flex items-center justify-center gap-2"
+              >Gerar Matches Agora <Rocket size={20} /></button>
             </div>
           </div>
         )}
 
-        {/* PASSO 7: RESULTADOS */}
+        {/* STEP: RESULTS */}
         {step === 'RESULTS' && (
           <div className="space-y-8 animate-in zoom-in-95 duration-500">
             {loading ? (
               <div className="py-12 flex flex-col items-center text-center space-y-4">
                 <Loader2 className="animate-spin text-indigo-500" size={48} />
-                <p className="text-lg text-slate-300 font-medium">Motor de Match operando...</p>
-                <p className="text-sm text-slate-500">Avaliando compatibilidade de TRL e interesses na rede...</p>
+                <p className="text-lg text-slate-300 font-medium">Orizon Match operando...</p>
+                <p className="text-sm text-slate-500">Buscando investidores e parceiros compatíveis...</p>
               </div>
             ) : previewResult && (
               <div>
@@ -354,7 +574,7 @@ export default function PublicOnboarding() {
                   </div>
                   <h2 className="text-2xl font-bold text-white mb-2">Processo Concluído!</h2>
                   <p className="text-slate-400 text-sm">
-                    Encontramos {previewResult.total} potenciais matches com base no seu perfil de {formData.role}.
+                    Encontramos {previewResult.total} potenciais matches para seu perfil de {formData.segment}.
                   </p>
                 </div>
 

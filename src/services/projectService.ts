@@ -17,6 +17,13 @@ export interface ProjectData {
   };
   createdAt?: number;
   active?: boolean;
+  stats?: {
+    views: number;
+    saves: number;
+    ndaRequests: number;
+  };
+  trlChecklist?: Record<string, boolean>;
+  irlScore?: number;
 }
 
 export async function createProject(data: ProjectData) {
@@ -25,6 +32,11 @@ export async function createProject(data: ProjectData) {
       ...data,
       active: true,
       createdAt: Date.now(),
+      stats: {
+        views: 0,
+        saves: 0,
+        ndaRequests: 0
+      }
     });
     return docRef.id;
   } catch (error) {

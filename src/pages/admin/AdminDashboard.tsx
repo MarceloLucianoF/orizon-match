@@ -1,19 +1,34 @@
 import { useEffect, useState } from "react";
-import { getGlobalMetrics, getLiveDealFlows } from "../../services/adminService";
-import { ShieldAlert, Activity, Users, FolderKanban, Network, Zap, Loader2, ServerCog, Cpu } from "lucide-react";
+import { getGlobalMetrics, getLiveDealFlows, getAllUsers, toggleUserVerification } from "../../services/adminService";
+import { 
+  ShieldAlert, Activity, Users, FolderKanban, Network, 
+  Zap, Loader2, ServerCog, CheckCircle, FileSearch,
+  PieChart, BarChart3, Download
+} from "lucide-react";
+import { exportEcosystemReport } from "../../services/reportService";
+import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 export function AdminDashboard() {
   const [metrics, setMetrics] = useState<any>(null);
   const [deals, setDeals] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [m, d] = await Promise.all([getGlobalMetrics(), getLiveDealFlows()]);
+        const [m, d, u] = await Promise.all([getGlobalMetrics(), getLiveDealFlows(), getAllUsers()]);
         setMetrics(m);
         setDeals(d);
+        setUsers(u);
+
+        // Load AI Logs
+        const logsQ = query(collection(db, "logs_ai"), orderBy("timestamp", "desc"), limit(10));
+        const logsSnap = await getDocs(logsQ);
+        setLogs(logsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
       } catch (error) {
         console.error("Erro no AdminDashboard:", error);
       } finally {
@@ -23,14 +38,16 @@ export function AdminDashboard() {
     loadData();
   }, []);
 
-  const triggerMatchEngine = () => {
-    setIsEngineRunning(true);
-    // Simula a execução do Cloud Function
-    setTimeout(() => {
-      setIsEngineRunning(false);
-      alert("Motor de Match executado com sucesso! Ecossistema scaneado.");
-    }, 2500);
+  const handleToggleVerification = async (userId: string, currentStatus: boolean) => {
+    try {
+      await toggleUserVerification(userId, !currentStatus);
+      setUsers(users.map(u => u.id === userId ? { ...u, verified: !currentStatus } : u));
+    } catch (error) {
+      alert("Erro ao alterar verificação do usuário.");
+    }
   };
+
+
 
   if (loading) {
     return <div className="flex justify-center items-center h-full"><Loader2 className="animate-spin text-fuchsia-500" size={48} /></div>;
@@ -61,17 +78,84 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        <button 
-          onClick={triggerMatchEngine}
-          disabled={isEngineRunning}
-          className="bg-slate-900 hover:bg-slate-800 text-fuchsia-400 border border-fuchsia-500/30 px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-3 shadow-[0_0_20px_rgba(217,70,239,0.1)] hover:shadow-[0_0_30px_rgba(217,70,239,0.2)] disabled:opacity-50"
-        >
-          {isEngineRunning ? <Loader2 size={18} className="animate-spin" /> : <Cpu size={18} />}
-          {isEngineRunning ? "Processando Algoritmo..." : "Forçar Motor de Match"}
-        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => exportEcosystemReport()}
+            className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2.5 rounded-xl font-medium transition-all border border-slate-700 flex items-center gap-2"
+          >
+            <Download size={18} /> Exportar Relatório
+          </button>
+          <button 
+            onClick={() => setIsEngineRunning(!isEngineRunning)}
+            className={`px-5 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${isEngineRunning ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'}`}
+          >
+            <ServerCog size={18} className={isEngineRunning ? 'animate-spin' : ''} /> 
+            {isEngineRunning ? 'Engine: Ativa' : 'Engine: Pausada'}
+          </button>
+        </div>
       </div>
 
       {/* MÉTRICAS MACRO */}
+      {/* ECOSYSTEM HEALTH & TRL DISTRIBUTION */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="bg-[#0A0514] border border-slate-800 rounded-2xl p-6 shadow-2xl">
+          <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-6">
+            <PieChart className="text-indigo-400" size={20} /> Distribuição de Maturidade (TRL)
+          </h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-400">Fase de Ideação (TRL 1-3)</span>
+              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.ideia || 0}</span>
+            </div>
+            <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+              <div 
+                className="bg-indigo-500 h-full transition-all duration-1000" 
+                style={{ width: `${(metrics?.trlDistribution?.ideia / metrics?.totalProjects) * 100 || 0}%` }} 
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-400">Prototipação (TRL 4-6)</span>
+              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.prototipo || 0}</span>
+            </div>
+            <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+              <div 
+                className="bg-cyan-500 h-full transition-all duration-1000" 
+                style={{ width: `${(metrics?.trlDistribution?.prototipo / metrics?.totalProjects) * 100 || 0}%` }} 
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <span className="text-xs text-slate-400">Pronto para Mercado (TRL 7+)</span>
+              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.mercado || 0}</span>
+            </div>
+            <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
+              <div 
+                className="bg-emerald-500 h-full transition-all duration-1000" 
+                style={{ width: `${(metrics?.trlDistribution?.mercado / metrics?.totalProjects) * 100 || 0}%` }} 
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#0A0514] border border-slate-800 rounded-2xl p-6 shadow-2xl flex flex-col justify-center items-center text-center">
+          <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
+            <BarChart3 className="text-amber-400" size={20} /> Saúde do Ecossistema
+          </h2>
+          <div className="relative w-32 h-32 flex items-center justify-center mb-4">
+            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+              <path className="text-slate-800" strokeWidth="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+              <path className="text-amber-500 transition-all duration-1000" strokeWidth="3" strokeDasharray={`${metrics?.avgVdrProgress || 0}, 100`} strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+            </svg>
+            <div className="absolute flex flex-col items-center">
+              <span className="text-3xl font-black text-slate-100">{metrics?.avgVdrProgress || 0}%</span>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Média de Completude VDR</p>
+          <p className="text-[10px] text-slate-600 mt-2 max-w-[200px]">Indica o nível médio de prontidão para investimento do ecossistema.</p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-[#0A0514] border border-fuchsia-900/50 rounded-2xl p-6 relative overflow-hidden group">
           <div className="absolute -right-6 -top-6 text-fuchsia-900/20 group-hover:text-fuchsia-900/40 transition-colors"><Users size={120} /></div>
@@ -151,6 +235,121 @@ export function AdminDashboard() {
                     </td>
                     <td className="p-4 text-right text-xs text-slate-400">
                       {deal.updatedAt?.toDate ? deal.updatedAt.toDate().toLocaleString() : 'Recente'}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* AI AUDIT LOGS */}
+      <div className="bg-[#0A0514] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+          <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <FileSearch className="text-amber-400" size={20} /> Auditoria de IA (Histórico de Refinamento)
+          </h2>
+          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Powered by NVIDIA NIM</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr className="border-b border-slate-800 uppercase tracking-wider text-slate-500 bg-slate-900/30">
+                <th className="p-4 font-medium">ID / Status</th>
+                <th className="p-4 font-medium">Pitch Resultante</th>
+                <th className="p-4 font-medium">Data / Hora</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/50">
+              {logs.length === 0 ? (
+                <tr><td colSpan={3} className="p-8 text-center text-slate-600 italic">Nenhum log de IA registrado.</td></tr>
+              ) : (
+                logs.map(log => (
+                  <tr key={log.id} className="hover:bg-slate-800/20 transition-colors">
+                    <td className="p-4">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-mono text-slate-500">{log.id.slice(0, 8)}</span>
+                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded w-fit ${log.status === 'success' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
+                          {log.status.toUpperCase()}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="p-4 max-w-md">
+                      <p className="text-slate-300 line-clamp-2 italic">"{log.output?.summary || 'N/A'}"</p>
+                    </td>
+                    <td className="p-4 text-slate-500">
+                      {log.timestamp?.seconds ? new Date(log.timestamp.seconds * 1000).toLocaleString() : 'Recent'}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* CONTROLE DE USUÁRIOS */}
+      <div className="bg-[#0A0514] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
+          <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <Users className="text-indigo-500" size={20} /> Controle de Usuários
+          </h2>
+          <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5"><ServerCog size={14}/> Últimos 100</span>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-500 bg-slate-900/80">
+                <th className="p-4 font-medium">Nome / Email</th>
+                <th className="p-4 font-medium">Papel (Role)</th>
+                <th className="p-4 font-medium">Status</th>
+                <th className="p-4 font-medium text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="p-8 text-center text-slate-500">Nenhum usuário encontrado.</td>
+                </tr>
+              ) : (
+                users.map(u => (
+                  <tr key={u.id} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
+                    <td className="p-4">
+                      <div className="flex flex-col">
+                        <span className="text-slate-200 font-bold">{u.name || "Sem Nome"}</span>
+                        <span className="text-[10px] text-slate-500 font-mono mt-1">{u.email}</span>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${
+                        u.role === 'company' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                        u.role === 'investor' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                        u.role === 'ict' ? 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20' :
+                        'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                      }`}>
+                        {u.role}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      {u.verified ? (
+                         <span className="flex items-center gap-1 text-emerald-400 text-xs font-bold"><CheckCircle size={14} /> Verificado</span>
+                      ) : (
+                         <span className="text-slate-500 text-xs font-bold">Pendente</span>
+                      )}
+                    </td>
+                    <td className="p-4 text-right">
+                      <button 
+                        onClick={() => handleToggleVerification(u.id, u.verified)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                          u.verified 
+                            ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' 
+                            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
+                        }`}
+                      >
+                        {u.verified ? "Remover Selo" : "Verificar Perfil"}
+                      </button>
                     </td>
                   </tr>
                 ))

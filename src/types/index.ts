@@ -147,10 +147,10 @@ export interface Match {
   score: number;
   scoreBreakdown: MatchScoreBreakdown;
   classification:
-    | "🔥 Alto potencial"
-    | "👍 Bom match"
-    | "🤔 Possível match"
-    | "❌ Baixo match";
+    | "Alto potencial"
+    | "Bom match"
+    | "Possível match"
+    | "Baixo match";
 
   // Status
   status: MatchStatus;

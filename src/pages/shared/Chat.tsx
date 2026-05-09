@@ -1,15 +1,18 @@
 import { useEffect, useState, useRef } from "react";
-import { useAuth } from "../hooks/useAuth";
-import type { DealStage, Conversation, Message, MessageType } from "../services/chatService";
-import { sendMessage, sendActionMessage, updateDealStage, markAsRead, updateConversationStatus } from "../services/chatService";
+import { useAuth } from "../../hooks/useAuth";
+import type { DealStage, Conversation, Message, MessageType } from "../../services/chatService";
+import { sendMessage, sendActionMessage, updateDealStage, markAsRead, updateConversationStatus, signNDA, updateVDRLink } from "../../services/chatService";
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
-import { db } from "../firebase/config";
-import { DealFlowPipeline } from "../components/DealFlowPipeline";
-import { Loader2, Send, Handshake, ChevronRight, MessageSquare, Calendar, ShieldCheck, Download, X } from "lucide-react";
+import { db } from "../../firebase/config";
+import { DealFlowPipeline } from "../../components/DealFlowPipeline";
+import { 
+  Loader2, Send, Handshake, ChevronRight, MessageSquare, Calendar, ShieldCheck, Download, 
+  Lock, CheckCircle, XCircle, X 
+} from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 
 export function Chat() {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [searchParams] = useSearchParams();
   const initialConvId = searchParams.get("id");
 
@@ -19,6 +22,8 @@ export function Chat() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [modalData, setModalData] = useState<{type: MessageType, text: string} | null>(null);
+  const [vdrOpen, setVdrOpen] = useState(false);
+  const [vdrInput, setVdrInput] = useState("");
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -164,15 +169,15 @@ export function Chat() {
                     <div className="flex gap-3">
                       <button 
                         onClick={() => updateConversationStatus(activeConv.id, "active")}
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)]"
+                        className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center gap-2"
                       >
-                        ✅ Aceitar Conexão
+                        <CheckCircle size={18} /> Aceitar Conexão
                       </button>
                       <button 
                         onClick={() => updateConversationStatus(activeConv.id, "declined")}
-                        className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-2 rounded-lg font-bold text-sm transition-all border border-slate-700"
+                        className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-6 py-2 rounded-lg font-bold text-sm transition-all border border-slate-700 flex items-center gap-2"
                       >
-                        ❌ Recusar
+                        <XCircle size={18} /> Recusar
                       </button>
                     </div>
                   </>
@@ -196,6 +201,15 @@ export function Chat() {
               >
                 <ShieldCheck size={14} className="text-pink-400" /> Enviar NDA
               </button>
+
+              {activeConv.stage !== "initial_contact" && (
+                <button 
+                  onClick={() => setVdrOpen(true)}
+                  className="text-xs bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-[0_0_10px_rgba(245,158,11,0.2)] font-bold"
+                >
+                  <Lock size={14} /> Data Room
+                </button>
+              )}
 
               <div className="w-px h-6 bg-slate-700 mx-1 self-center"></div>
 
@@ -338,6 +352,85 @@ export function Chat() {
               <button onClick={() => setModalData(null)} className="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 rounded-lg transition">
                 Fechar
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* VDR MODAL (Cofre de Links) */}
+      {vdrOpen && activeConv && user && (
+        <div className="absolute inset-0 z-50 bg-[#040B1A]/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-amber-500/30 rounded-2xl w-full max-w-lg overflow-hidden shadow-[0_0_50px_rgba(245,158,11,0.15)]">
+            <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
+              <h3 className="font-bold text-slate-100 flex items-center gap-2">
+                <Lock className="text-amber-400" size={20} /> Cofre de Dados (VDR)
+              </h3>
+              <button onClick={() => setVdrOpen(false)} className="text-slate-400 hover:text-white transition"><X size={20}/></button>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-xl">
+                <p className="text-amber-400 text-sm font-medium">Ambiente Seguro. O acesso ao link protegido só é liberado após a assinatura do NDA na plataforma.</p>
+              </div>
+
+              {/* Lógica para Inventor */}
+              {(userProfile?.role === 'inventor' || userProfile?.role === 'ict') ? (
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium text-slate-300 block mb-2">Link Restrito (Google Drive / Dropbox)</label>
+                    <input 
+                      type="url"
+                      value={activeConv.vdrLink || vdrInput}
+                      onChange={e => setVdrInput(e.target.value)}
+                      placeholder="https://drive.google.com/..."
+                      className="w-full bg-slate-950 border border-slate-700 rounded-lg px-4 py-2 text-slate-200 focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                  <button 
+                    onClick={async () => {
+                      if (!vdrInput) return;
+                      await updateVDRLink(activeConv.id, vdrInput);
+                      alert("Link atualizado e seguro salvo no cofre!");
+                    }}
+                    className="w-full bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold py-2 rounded-lg transition"
+                  >
+                    Salvar Link no Cofre
+                  </button>
+                </div>
+              ) : (
+                /* Lógica para Investidor / Empresa */
+                <div className="space-y-4 text-center">
+                  {activeConv.vdrLink ? (
+                    activeConv.ndaSignedBy?.includes(user.uid) ? (
+                      <div className="bg-emerald-500/10 border border-emerald-500/20 p-6 rounded-xl">
+                        <ShieldCheck size={48} className="text-emerald-400 mx-auto mb-4" />
+                        <h4 className="text-emerald-400 font-bold mb-2">Acesso Liberado</h4>
+                        <p className="text-slate-300 text-sm mb-4">Você assinou o NDA. O acesso aos dados restritos está liberado.</p>
+                        <a href={activeConv.vdrLink} target="_blank" rel="noreferrer" className="inline-block bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 px-6 rounded-lg transition">
+                          Acessar Documentos
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
+                        <h4 className="text-slate-200 font-bold mb-2">Acesso Restrito</h4>
+                        <p className="text-slate-400 text-sm mb-4">O Inventor já disponibilizou os arquivos, mas você precisa assinar o NDA para desbloqueá-los.</p>
+                        <button 
+                          onClick={async () => {
+                            await signNDA(activeConv.id, user.uid);
+                          }}
+                          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg transition shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+                        >
+                          Assinar NDA Eletrônico
+                        </button>
+                      </div>
+                    )
+                  ) : (
+                    <div className="py-8">
+                      <p className="text-slate-500">O Inventor ainda não disponibilizou o link do Data Room.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>

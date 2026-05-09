@@ -1,21 +1,23 @@
-import { LayoutDashboard, FolderKanban, Users, LogOut, MessageSquare, Building2, ShieldAlert } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Users, LogOut, MessageSquare, Building2, ShieldAlert, Gavel } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { SUPER_ADMIN_UID } from "../services/adminService";
 
 export function Sidebar() {
   const { pathname } = useLocation();
-  const { logout, user } = useAuth();
+  const { logout, user, userProfile } = useAuth();
+  const isAdmin = userProfile?.role === 'admin' || user?.uid === SUPER_ADMIN_UID;
+  const isLegal = userProfile?.role === 'legal';
 
   const links = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/projects", icon: FolderKanban, label: "Meus Projetos" },
+    { to: "/projects", icon: isLegal ? Gavel : FolderKanban, label: isLegal ? "Ativos de PI" : "Meus Projetos" },
     { to: "/matches", icon: Users, label: "Matches" },
     { to: "/chat", icon: MessageSquare, label: "Deal Flow" },
     { to: "/profile", icon: Building2, label: "Meu Perfil" },
   ];
 
-  if (user?.uid === SUPER_ADMIN_UID) {
+  if (isAdmin) {
     links.push({ to: "/admin", icon: ShieldAlert, label: "Painel Admin" });
   }
 
