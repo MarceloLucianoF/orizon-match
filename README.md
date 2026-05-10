@@ -42,15 +42,17 @@ Conectamos os três pilares fundamentais da inovação:
 - **Score 360°:** Avaliação baseada em Segmento, TRL, IRL, Localização e Necessidades.
 - **Executive Summary:** Transformação de dados técnicos em pitches comerciais via NVIDIA NIM.
 
-### 🛡️ Deal-Making Seguro (Clickwrap NDA)
-- **VDR Protegido:** Sala de dados virtual com pastas sensíveis (Jurídico, Financeiro) bloqueadas.
-- **Clickwrap NDA:** Aceite digital de termos de confidencialidade com registro jurídico de timestamp.
-- **Due Diligence:** Checklist interativo para auditoria de projetos.
+### 🛡️ Legal Tech & Proteção (Phase C)
+- **Asset Registry:** Registro completo de Ativos de PI (Patentes, Marcas, Softwares) vinculados a projetos.
+- **Smart Clickwrap NDA:** Assinatura digital instantânea com snapshot jurídico imutável no Firestore.
+- **VDR Protegido:** Sala de dados virtual liberada automaticamente após assinatura do NDA.
+- **Selo de Garantia:** Verificação de ativos via integração lógica com dados do INPI.
 
-### 📊 Dashboards de Alto Impacto
-- **Pipeline de Investimento:** Kanban dinâmico para gestão de Deal Flow.
-- **Radar de Mercado:** Visualização de compatibilidade em tempo real.
-- **Curadoria Jurídica:** Painel exclusivo para validação de documentação.
+### 💳 Monetização & Gestão (Phase B)
+- **Orizon Pro:** Plano de assinatura com Radar Geoespacial e matches ilimitados.
+- **Stripe Integration:** Checkout seguro e Customer Portal para autogestão de faturamento.
+- **Admin "God Mode":** Painel administrativo total para gestão de usuários, verificação e planos.
+- **Radar Geoespacial:** Inteligência de mercado com visualização de clusters tecnológicos.
 
 ---
 

@@ -75,7 +75,7 @@ export default function PublicOnboarding() {
     setError(null);
     
     try {
-      const response = await fetch('https://us-central1-orizon-match.cloudfunctions.net/getMatchesPreview', {
+      const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/getMatchesPreview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

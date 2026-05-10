@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
+exports.stripeWebhook = exports.createPortalSession = exports.createCheckoutSession = exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
 const functions = __importStar(require("firebase-functions"));
 const admin = __importStar(require("firebase-admin"));
 const match_service_1 = require("./services/match.service");
@@ -45,7 +45,7 @@ const analytics_service_1 = require("./services/analytics.service");
 const openai_1 = __importDefault(require("openai"));
 const cors_1 = __importDefault(require("cors"));
 const corsHandler = (0, cors_1.default)({ origin: true });
-// import { createCheckoutSession as createStripeSession, handleWebhook } from "./services/stripe.service";
+const stripe_service_1 = require("./services/stripe.service");
 if (!admin.apps.length) {
     admin.initializeApp();
 }
@@ -257,44 +257,53 @@ exports.onLegalInviteCreated = functions.region("us-central1").runWith({
 // ====================================================
 // FASE B: Monetização com Stripe
 // ====================================================
-/*
-export const createCheckoutSession = functions.region("us-central1").runWith({
-  secrets: ["STRIPE_SECRET_KEY"]
+exports.createCheckoutSession = functions.region("us-central1").runWith({
+    secrets: ["STRIPE_SECRET_KEY"]
 }).https.onCall(async (data, context) => {
-  if (!context.auth) {
-    throw new functions.https.HttpsError("unauthenticated", "Apenas usuários logados podem assinar.");
-  }
-
-  const { priceId } = data;
-  if (!priceId) {
-    throw new functions.https.HttpsError("invalid-argument", "priceId é obrigatório.");
-  }
-
-  try {
-    return await createStripeSession(context.auth.uid, context.auth.token.email || "", priceId);
-  } catch (error: any) {
-    console.error("Error creating checkout session:", error);
-    throw new functions.https.HttpsError("internal", error.message);
-  }
+    if (!context.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "Apenas usuários logados podem assinar.");
+    }
+    const { priceId } = data;
+    if (!priceId) {
+        throw new functions.https.HttpsError("invalid-argument", "priceId é obrigatório.");
+    }
+    try {
+        return await (0, stripe_service_1.createCheckoutSession)(context.auth.uid, context.auth.token.email || "", priceId);
+    }
+    catch (error) {
+        console.error("Error creating checkout session:", error);
+        throw new functions.https.HttpsError("internal", error.message);
+    }
 });
-
-export const stripeWebhook = functions.region("us-central1").runWith({
-  secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
+exports.createPortalSession = functions.region("us-central1").runWith({
+    secrets: ["STRIPE_SECRET_KEY"]
+}).https.onCall(async (data, context) => {
+    if (!context.auth) {
+        throw new functions.https.HttpsError("unauthenticated", "Apenas usuários logados podem gerenciar faturamento.");
+    }
+    try {
+        return await (0, stripe_service_1.createPortalSession)(context.auth.uid);
+    }
+    catch (error) {
+        console.error("Error creating portal session:", error);
+        throw new functions.https.HttpsError("internal", error.message);
+    }
+});
+exports.stripeWebhook = functions.region("us-central1").runWith({
+    secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
 }).https.onRequest(async (req, res) => {
-  const sig = req.headers["stripe-signature"];
-
-  if (!sig) {
-    res.status(400).send("Webhook Error: Missing signature");
-    return;
-  }
-
-  try {
-    const result = await handleWebhook(req.rawBody, sig as string);
-    res.status(200).json(result);
-  } catch (err: any) {
-    console.error("Webhook Error:", err.message);
-    res.status(400).send(`Webhook Error: ${err.message}`);
-  }
+    const sig = req.headers["stripe-signature"];
+    if (!sig) {
+        res.status(400).send("Webhook Error: Missing signature");
+        return;
+    }
+    try {
+        const result = await (0, stripe_service_1.handleWebhook)(req.rawBody, sig);
+        res.status(200).json(result);
+    }
+    catch (err) {
+        console.error("Webhook Error:", err.message);
+        res.status(400).send(`Webhook Error: ${err.message}`);
+    }
 });
-*/
 //# sourceMappingURL=index.js.map

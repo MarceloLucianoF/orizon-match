@@ -16,7 +16,7 @@ const db = admin.firestore();
 // Secrets
 // Note: functions.runWith() is used in the exports themselves to specify secrets
 
-export const getMatchesPreview = functions.region("us-central1").https.onRequest((req, res) => {
+export const getMatchesPreview = functions.region("southamerica-east1").https.onRequest((req, res) => {
   return corsHandler(req, res, async () => {
     if (req.method !== "POST") {
       res.status(405).send("Method Not Allowed");
@@ -41,7 +41,7 @@ export const getMatchesPreview = functions.region("us-central1").https.onRequest
 
 import { createNotification } from "./services/notifications.service";
 
-export const onProjectCreated = functions.region("us-central1").firestore
+export const onProjectCreated = functions.region("southamerica-east1").firestore
   .document("projects/{projectId}")
   .onCreate(async (snap) => {
     const data = snap.data();
@@ -60,7 +60,7 @@ export const onProjectCreated = functions.region("us-central1").firestore
     });
   });
 
-export const onMatchCreated = functions.region("us-central1").firestore
+export const onMatchCreated = functions.region("southamerica-east1").firestore
   .document("matches/{matchId}")
   .onCreate(async (snap) => {
     const match = snap.data();
@@ -90,7 +90,7 @@ export const onMatchCreated = functions.region("us-central1").firestore
     });
   });
 
-export const recordView = functions.region("us-central1").https.onCall(async (data, context) => {
+export const recordView = functions.region("southamerica-east1").https.onCall(async (data, context) => {
   const { projectId } = data;
   if (!projectId) throw new functions.https.HttpsError("invalid-argument", "projectId is required");
   
@@ -103,7 +103,7 @@ export const recordView = functions.region("us-central1").https.onCall(async (da
   }
 });
 
-export const enhancePitch = functions.region("us-central1").runWith({ 
+export const enhancePitch = functions.region("southamerica-east1").runWith({ 
   secrets: ["NVIDIA_NIM_API_KEY"],
   timeoutSeconds: 60,
   memory: "256MB" 
@@ -189,7 +189,7 @@ export const enhancePitch = functions.region("us-central1").runWith({
 import { Resend } from "resend";
 import { legalInviteEmail } from "./emailTemplates";
 
-export const onLegalInviteCreated = functions.region("us-central1").runWith({
+export const onLegalInviteCreated = functions.region("southamerica-east1").runWith({
   secrets: ["RESEND_API_KEY"]
 }).firestore
   .document("legal_invites/{inviteId}")
@@ -249,7 +249,7 @@ export const onLegalInviteCreated = functions.region("us-central1").runWith({
 // FASE B: Monetização com Stripe
 // ====================================================
 
-export const createCheckoutSession = functions.region("us-central1").runWith({
+export const createCheckoutSession = functions.region("southamerica-east1").runWith({
   secrets: ["STRIPE_SECRET_KEY"]
 }).https.onCall(async (data, context) => {
   if (!context.auth) {
@@ -269,7 +269,7 @@ export const createCheckoutSession = functions.region("us-central1").runWith({
   }
 });
 
-export const createPortalSession = functions.region("us-central1").runWith({
+export const createPortalSession = functions.region("southamerica-east1").runWith({
   secrets: ["STRIPE_SECRET_KEY"]
 }).https.onCall(async (data, context) => {
   if (!context.auth) {
@@ -284,7 +284,7 @@ export const createPortalSession = functions.region("us-central1").runWith({
   }
 });
 
-export const stripeWebhook = functions.region("us-central1").runWith({
+export const stripeWebhook = functions.region("southamerica-east1").runWith({
   secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
 }).https.onRequest(async (req, res) => {
   const sig = req.headers["stripe-signature"];

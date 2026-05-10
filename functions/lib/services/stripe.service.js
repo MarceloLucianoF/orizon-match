@@ -37,6 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createCheckoutSession = createCheckoutSession;
+exports.createPortalSession = createPortalSession;
 exports.handleWebhook = handleWebhook;
 const stripe_1 = __importDefault(require("stripe"));
 const admin = __importStar(require("firebase-admin"));
@@ -69,6 +70,21 @@ async function createCheckoutSession(userId, email, priceId) {
         },
     });
     return { sessionId: session.id, url: session.url };
+}
+async function createPortalSession(userId) {
+    const stripe = getStripe();
+    // Buscar o stripeCustomerId no Firestore
+    const userDoc = await db.collection("users").doc(userId).get();
+    const userData = userDoc.data();
+    const customerId = userData === null || userData === void 0 ? void 0 : userData.stripeCustomerId;
+    if (!customerId) {
+        throw new Error("Usuário não possui um Customer ID do Stripe.");
+    }
+    const session = await stripe.billingPortal.sessions.create({
+        customer: customerId,
+        return_url: 'https://orizon-match.web.app/billing',
+    });
+    return { url: session.url };
 }
 async function handleWebhook(body, signature) {
     var _a;
