@@ -76,8 +76,12 @@ export function CreateProject() {
             ...(leadData.registration || {})
           }
         }));
-        // If it comes from lead capture, it probably already has role and segment
-        if (leadData.role) setStep('SEGMENT');
+        if (leadData.role) {
+          if (leadData.role === 'idea') setStep('PROTECTION');
+          else if (leadData.role === 'provider') setStep('PROVIDER_SERVICES');
+          else if (leadData.role === 'ict') setStep('ICT_RESEARCH');
+          else setStep('SEGMENT');
+        }
         sessionStorage.removeItem('@orizon:lead_data');
       } catch (e) {
         console.error("Erro ao recuperar dados do lead", e);
@@ -132,9 +136,13 @@ export function CreateProject() {
   };
 
   const updateRegistration = (field: string, value: string) => {
+    let finalValue = value;
+    if (field === 'phone') finalValue = maskPhone(value);
+    if (field === 'idNumber') finalValue = maskCpfCnpj(value);
+
     setFormData(prev => ({
       ...prev,
-      registration: { ...prev.registration, [field]: value }
+      registration: { ...prev.registration, [field]: finalValue }
     }));
   };
 

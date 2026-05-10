@@ -13,17 +13,17 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 // Secrets
 // Note: functions.runWith() is used in the exports themselves to specify secrets
-exports.previewMatches = functions.https.onCall(async (data, context) => {
+exports.previewMatches = functions.region("us-central1").https.onCall(async (data, context) => {
     try {
         return await (0, preview_service_1.getPreviewMatches)(data);
     }
     catch (error) {
         console.error("Error on previewMatches:", error);
-        throw new functions.https.HttpsError("internal", "Erro ao gerar preview de matches");
+        throw new functions.https.HttpsError("internal", error.message || "Erro ao gerar preview de matches");
     }
 });
 const notifications_service_1 = require("./services/notifications.service");
-exports.onProjectCreated = functions.firestore
+exports.onProjectCreated = functions.region("us-central1").firestore
     .document("projects/{projectId}")
     .onCreate(async (snap) => {
     const data = snap.data();
@@ -39,7 +39,7 @@ exports.onProjectCreated = functions.firestore
         link: "/app/dashboard"
     });
 });
-exports.onMatchCreated = functions.firestore
+exports.onMatchCreated = functions.region("us-central1").firestore
     .document("matches/{matchId}")
     .onCreate(async (snap) => {
     const match = snap.data();
@@ -154,7 +154,7 @@ exports.enhancePitch = functions.region("us-central1").runWith({
 // ====================================================
 const resend_1 = require("resend");
 const emailTemplates_1 = require("./emailTemplates");
-exports.onLegalInviteCreated = functions.runWith({
+exports.onLegalInviteCreated = functions.region("us-central1").runWith({
     secrets: ["RESEND_API_KEY"]
 }).firestore
     .document("legal_invites/{inviteId}")

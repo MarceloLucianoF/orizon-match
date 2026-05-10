@@ -16,7 +16,7 @@ export function calculateMatch(a: Project, b: Organization) {
   };
 
   // 🎯 SEGMENTO (peso alto)
-  breakdown.segment = b.segments.includes(a.segment) ? 30 : 10;
+  breakdown.segment = (b.segments && b.segments.includes(a.segment)) ? 30 : 10;
 
   // 🎯 MATURIDADE (peso 20)
   let isTrlMatched = true;
@@ -41,7 +41,7 @@ export function calculateMatch(a: Project, b: Organization) {
 
   // 🎯 LOCALIZAÇÃO
   breakdown.location =
-    a.location?.region === b.location?.region ? 10 : 5;
+    (a.location?.region && b.location?.region && a.location.region === b.location.region) ? 10 : 5;
 
   score =
     breakdown.segment +

@@ -16,7 +16,7 @@ function calculateMatch(a, b) {
         location: 0,
     };
     // 🎯 SEGMENTO (peso alto)
-    breakdown.segment = b.segments.includes(a.segment) ? 30 : 10;
+    breakdown.segment = (b.segments && b.segments.includes(a.segment)) ? 30 : 10;
     // 🎯 MATURIDADE (peso 20)
     let isTrlMatched = true;
     if (b.trlMin !== undefined && b.trlMax !== undefined) {
@@ -48,7 +48,7 @@ function calculateMatch(a, b) {
     }
     // 🎯 LOCALIZAÇÃO
     breakdown.location =
-        ((_k = a.location) === null || _k === void 0 ? void 0 : _k.region) === ((_l = b.location) === null || _l === void 0 ? void 0 : _l.region) ? 10 : 5;
+        (((_k = a.location) === null || _k === void 0 ? void 0 : _k.region) && ((_l = b.location) === null || _l === void 0 ? void 0 : _l.region) && a.location.region === b.location.region) ? 10 : 5;
     score =
         breakdown.segment +
             breakdown.maturity +

@@ -4,6 +4,7 @@ import { generateMatches } from "./services/match.service";
 import { getPreviewMatches } from "./services/preview.service";
 import { recordProjectView, recordMatchCreated } from "./services/analytics.service";
 import OpenAI from "openai";
+import { createCheckoutSession as createStripeSession, handleWebhook } from "./services/stripe.service";
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -13,18 +14,18 @@ const db = admin.firestore();
 // Secrets
 // Note: functions.runWith() is used in the exports themselves to specify secrets
 
-export const previewMatches = functions.https.onCall(async (data, context) => {
+export const previewMatches = functions.region("us-central1").https.onCall(async (data, context) => {
   try {
     return await getPreviewMatches(data);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error on previewMatches:", error);
-    throw new functions.https.HttpsError("internal", "Erro ao gerar preview de matches");
+    throw new functions.https.HttpsError("internal", error.message || "Erro ao gerar preview de matches");
   }
 });
 
 import { createNotification } from "./services/notifications.service";
 
-export const onProjectCreated = functions.firestore
+export const onProjectCreated = functions.region("us-central1").firestore
   .document("projects/{projectId}")
   .onCreate(async (snap) => {
     const data = snap.data();
@@ -43,7 +44,7 @@ export const onProjectCreated = functions.firestore
     });
   });
 
-export const onMatchCreated = functions.firestore
+export const onMatchCreated = functions.region("us-central1").firestore
   .document("matches/{matchId}")
   .onCreate(async (snap) => {
     const match = snap.data();
@@ -172,7 +173,7 @@ export const enhancePitch = functions.region("us-central1").runWith({
 import { Resend } from "resend";
 import { legalInviteEmail } from "./emailTemplates";
 
-export const onLegalInviteCreated = functions.runWith({
+export const onLegalInviteCreated = functions.region("us-central1").runWith({
   secrets: ["RESEND_API_KEY"]
 }).firestore
   .document("legal_invites/{inviteId}")
@@ -227,3 +228,47 @@ export const onLegalInviteCreated = functions.runWith({
       await snap.ref.update({ emailError: error.message || "Unknown error" });
     }
   });
+
+// ====================================================
+// FASE B: Monetização com Stripe
+// ====================================================
+
+export const createCheckoutSession = functions.region("us-central1").runWith({
+  secrets: ["STRIPE_SECRET_KEY"]
+}).https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Apenas usuários logados podem assinar.");
+  }
+
+  const { priceId } = data;
+  if (!priceId) {
+    throw new functions.https.HttpsError("invalid-argument", "priceId é obrigatório.");
+  }
+
+  try {
+    return await createStripeSession(context.auth.uid, context.auth.token.email || "", priceId);
+  } catch (error: any) {
+    console.error("Error creating checkout session:", error);
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+});
+
+export const stripeWebhook = functions.region("us-central1").runWith({
+  secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
+}).https.onRequest(async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+
+  if (!sig) {
+    res.status(400).send("Webhook Error: Missing signature");
+    return;
+  }
+
+  try {
+    const result = await handleWebhook(req.rawBody, sig as string);
+    res.status(200).json(result);
+  } catch (err: any) {
+    console.error("Webhook Error:", err.message);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+});
+

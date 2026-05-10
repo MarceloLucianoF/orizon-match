@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { 
-  Lightbulb, Factory, GraduationCap, ArrowRight, 
-  Loader2, Star, Lock, ShieldCheck, HelpCircle, 
-  Video, ArrowLeft, MessageSquare, Zap, Rocket, Info 
+  Lightbulb, Factory, ArrowRight, 
+  Loader2, Star, Lock, Zap, Rocket, Info 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { functions } from "../../firebase/config";
 import { httpsCallable } from "firebase/functions";
 import { explainMatch } from "../../lib/matching";
-import { fullRegistrationSchema, maskCpfCnpj, maskPhone } from "../../lib/validators";
+import { maskPhone } from "../../lib/validators";
+import { useAuth } from '../../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 const FIESC_CHAMBERS = [
   "Agroindústria",
@@ -29,17 +30,15 @@ const FIESC_CHAMBERS = [
 
 type Step = 
   | 'PROFILE' 
-  | 'EMAIL' 
   | 'SEGMENT' 
-  | 'PROTECTION' 
-  | 'RESEARCH' 
-  | 'INNOVATION_TYPE' 
-  | 'SUMMARY_METHOD'
-  | 'SUMMARY_CONTENT'
-  | 'FINAL_REGISTER' 
-  | 'RESULTS';
+  | 'PITCH'
+  | 'RESULTS' 
+  | 'FINAL_REGISTER'
+  | 'SUCCESS';
 
 export default function PublicOnboarding() {
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
   const [step, setStep] = useState<Step>('PROFILE');
   const [loading, setLoading] = useState(false);
   const [previewResult, setPreviewResult] = useState<any>(null);
@@ -49,29 +48,17 @@ export default function PublicOnboarding() {
     role: '',
     email: '',
     segment: '',
-    isProtected: '',
-    patentNumber: '',
-    isGranted: '',
-    needsResearch: '',
-    innovationType: '',
-    summaryMethod: '', // questions, text
-    summary: '',
     summaryQuestions: {
       problem: '',
       solution: '',
       difference: ''
     },
-    maturity: 1,
-    trlMin: 1,
-    trlMax: 9,
-    needs: { investment: true, research: false, industry: true },
     name: '',
-    idNumber: '', // CNPJ/CPF
+    idNumber: '',
     phone: '',
     password: '',
     confirmPassword: ''
   });
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const nextStep = (next: Step) => setStep(next);
   const prevStep = (prev: Step) => setStep(prev);
@@ -86,33 +73,46 @@ export default function PublicOnboarding() {
 
   const handleGeneratePreview = async () => {
     setLoading(true);
-    setStep('RESULTS');
+    setError(null);
     
-    const finalSummary = formData.summaryMethod === 'questions' 
-      ? `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}`
-      : formData.summary;
-
     try {
       const previewMatchesFn = httpsCallable(functions, 'previewMatches');
       
       const dataForBackend = {
-        title: "Meu Projeto Inovador",
-        type: formData.role === 'inventor' ? 'startup' : formData.role,
+        title: "Projeto em Definição",
+        type: formData.role === 'idea' ? 'startup' : formData.role,
         segment: formData.segment,
-        maturity: formData.maturity,
-        needs: {
-          investment: true,
-          research: formData.needsResearch === 'sim',
-          industry: true
-        },
-        summary: finalSummary,
-        location: { region: "sudeste" }
+        summary: `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}`,
+        location: { region: "Sul" }
       };
-      
-      // Lead Capture: Save data to sessionStorage for hydration after login
+
+      const result = await previewMatchesFn(dataForBackend);
+      setPreviewResult(result.data as any);
+      setStep('RESULTS');
+    } catch (err: any) {
+      console.error("Error generating preview:", err);
+      setError(err.message || "Erro ao processar matches. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFinalRegister = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      await signUp(formData.email, formData.password, {
+        name: formData.name,
+        idNumber: formData.idNumber,
+        phone: formData.phone,
+        role: formData.role === 'provider' ? 'company' : 'user'
+      });
+
       sessionStorage.setItem('@orizon:lead_data', JSON.stringify({
-        ...dataForBackend,
         role: formData.role,
+        segment: formData.segment,
+        summaryQuestions: formData.summaryQuestions,
         registration: {
           name: formData.name,
           idNumber: formData.idNumber,
@@ -120,538 +120,236 @@ export default function PublicOnboarding() {
         }
       }));
 
-      const result = await previewMatchesFn(dataForBackend);
-      setPreviewResult(result.data as any);
-    } catch (error) {
-      console.error("Error generating preview:", error);
-      setPreviewResult({
-        total: Math.floor(Math.random() * 15) + 5,
-        topMatches: [
-          { score: 85, name: "Empresa Parceira Orizon", breakdown: { segment: 30, needs: 20 } },
-          { score: 78, name: "Fundo de Investimento", breakdown: { segment: 30, needs: 0 } },
-          { score: 72, name: "Indústria Local", breakdown: { segment: 10, needs: 20 } },
-        ]
-      });
+      setStep('SUCCESS');
+    } catch (err: any) {
+      console.error("Error in final register:", err);
+      let msg = "Erro ao criar conta.";
+      if (err.code === 'auth/email-already-in-use') msg = "E-mail já cadastrado.";
+      setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
-  const ProgressBar = () => {
-    const steps: Step[] = ['PROFILE', 'EMAIL', 'SEGMENT', 'PROTECTION', 'RESEARCH', 'INNOVATION_TYPE', 'SUMMARY_METHOD', 'SUMMARY_CONTENT', 'FINAL_REGISTER'];
-    const currentIndex = steps.indexOf(step === 'RESULTS' ? 'FINAL_REGISTER' : step);
-    
-    return (
-      <div className="flex gap-1 mb-8">
-        {steps.map((s, i) => (
-          <div 
-            key={s} 
-            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-              i <= currentIndex ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-slate-800'
-            }`} 
-          />
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 flex items-center justify-center p-6 relative overflow-hidden">
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[120px]"></div>
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
       </div>
 
       <div className="max-w-xl w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative z-10">
         
-        <div className="flex justify-between items-center mb-8">
-          <Link to="/" className="font-semibold text-xl text-white tracking-tight">Orizon Match</Link>
-          <Link to="/login" className="text-slate-400 hover:text-white transition text-sm">Já tenho conta</Link>
+        <div className="flex justify-between items-center mb-10">
+          <Link to="/" className="font-black text-2xl text-white tracking-tighter uppercase">ORIZON<span className="text-indigo-500">MATCH</span></Link>
+          <Link to="/login" className="text-slate-400 hover:text-white transition text-xs font-bold uppercase tracking-widest">Login</Link>
         </div>
 
-        {step !== 'RESULTS' && <ProgressBar />}
-
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-in fade-in zoom-in-95">
-            <Info size={18} />
-            <div className="flex-1">{error}</div>
-            <button onClick={() => setError(null)} className="text-red-400/50 hover:text-red-400">
-              <ArrowLeft size={18} className="rotate-45" />
-            </button>
+          <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-center gap-3">
+            <Info size={16} />
+            <span className="flex-1">{error}</span>
           </div>
         )}
 
-        {/* STEP: PROFILE */}
         {step === 'PROFILE' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white leading-tight">Como você se identifica?</h2>
-              <p className="text-slate-400">Escolha o seu perfil para começar.</p>
+              <h2 className="text-3xl font-bold text-white tracking-tight">Quem é você?</h2>
+              <p className="text-slate-400">Inicie sua jornada no ecossistema.</p>
             </div>
             
             <div className="grid gap-3">
               {[
-                { id: 'inventor', label: 'Tenho uma Ideia / Sou Inventor', icon: <Lightbulb className="text-amber-400"/> },
-                { id: 'ict', label: 'Sou uma ICT / Universidade', icon: <GraduationCap className="text-blue-400"/> },
-                { id: 'provider', label: 'Sou Empresa / Investidor', icon: <Factory className="text-emerald-400"/> }
+                { id: 'idea', label: 'Inventor / Pesquisador', desc: 'Tenho uma ideia ou patente', icon: <Lightbulb className="text-amber-400"/> },
+                { id: 'provider', label: 'Empresa / Investidor', desc: 'Busco inovações para investir', icon: <Factory className="text-emerald-400"/> }
               ].map((opt) => (
                 <button
                   key={opt.id}
-                  onClick={() => { updateField('role', opt.id); nextStep('EMAIL'); }}
-                  className={`flex items-center gap-4 p-4 rounded-2xl border transition text-left group ${
-                    formData.role === opt.id ? 'border-indigo-500 bg-indigo-500/10' : 'border-slate-700 bg-slate-800/40 hover:border-indigo-500/50 hover:bg-slate-800'
-                  }`}
+                  onClick={() => { updateField('role', opt.id); nextStep('SEGMENT'); }}
+                  className="flex items-center gap-4 p-5 rounded-2xl border border-slate-800 bg-slate-800/40 hover:border-indigo-500 hover:bg-slate-800 transition-all text-left group"
                 >
-                  <div className="p-3 bg-slate-900 rounded-xl group-hover:scale-110 transition duration-300">{opt.icon}</div>
-                  <span className="font-medium text-slate-200">{opt.label}</span>
-                  <ArrowRight className="ml-auto text-slate-600 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                  <div className="p-3 bg-slate-950 rounded-xl group-hover:scale-110 transition-transform">{opt.icon}</div>
+                  <div className="flex-1">
+                    <div className="font-bold text-white text-sm">{opt.label}</div>
+                    <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">{opt.desc}</div>
+                  </div>
+                  <ArrowRight size={18} className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
                 </button>
               ))}
             </div>
           </div>
         )}
 
-        {/* STEP: EMAIL */}
-        {step === 'EMAIL' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">Qual seu melhor e-mail?</h2>
-              <p className="text-slate-400">Usaremos para salvar seu progresso e enviar o Radar de Oportunidades.</p>
-            </div>
-
-            <input 
-              type="email" 
-              value={formData.email}
-              onChange={(e) => updateField('email', e.target.value)}
-              placeholder="seu@email.com" 
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-4 focus:outline-none focus:border-indigo-500 text-slate-200 text-lg" 
-            />
-
-            <div className="flex gap-4 pt-4">
-              <button onClick={() => prevStep('PROFILE')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
-              <button 
-                onClick={() => nextStep('SEGMENT')} 
-                disabled={!formData.email}
-                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 text-white font-bold transition shadow-[0_0_15px_rgba(79,70,229,0.3)]"
-              >Continuar</button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP: SEGMENT */}
         {step === 'SEGMENT' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">Segmento do Projeto</h2>
-              <p className="text-slate-400">Qual Câmara da FIESC melhor representa sua ideia?</p>
+              <h2 className="text-3xl font-bold text-white tracking-tight">Seu Território</h2>
+              <p className="text-slate-400">Em qual área sua inovação atua?</p>
             </div>
             
-            <div className="max-h-[40vh] overflow-y-auto pr-2 custom-scrollbar grid gap-2">
+            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
               {FIESC_CHAMBERS.map(chamber => (
                 <button
                   key={chamber}
-                  onClick={() => updateField('segment', chamber)}
-                  className={`p-3 rounded-xl text-left text-sm font-medium transition-all border ${
-                    formData.segment === chamber 
-                      ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
-                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-                  }`}
+                  onClick={() => { updateField('segment', chamber); nextStep('PITCH'); }}
+                  className="p-3 rounded-xl border border-slate-800 bg-slate-950/50 text-slate-400 text-xs font-medium hover:border-indigo-500 hover:text-white transition-all text-left"
                 >
                   {chamber}
                 </button>
               ))}
             </div>
-
-            <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => prevStep('EMAIL')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
-              <button 
-                onClick={() => nextStep('PROTECTION')} 
-                disabled={!formData.segment}
-                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 font-bold transition"
-              >Próximo</button>
-            </div>
+            <button onClick={() => prevStep('PROFILE')} className="text-xs text-slate-500 hover:text-white transition underline underline-offset-4">Voltar</button>
           </div>
         )}
 
-        {/* STEP: PROTECTION */}
-        {step === 'PROTECTION' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
+        {step === 'PITCH' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
             <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">Sua inovação já está protegida?</h2>
-              <p className="text-slate-400 text-sm">A proteção IP é vital para a confiança do investidor.</p>
+              <h2 className="text-3xl font-bold text-white tracking-tight">A Ideia</h2>
+              <p className="text-slate-400 text-sm">Resuma para nossa IA buscar matches preliminares.</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => updateField('isProtected', 'sim')}
-                className={`flex flex-col items-center gap-4 p-6 rounded-2xl border transition-all ${
-                  formData.isProtected === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-                }`}
-              >
-                <ShieldCheck size={32} />
-                <span className="font-bold">Sim, está</span>
-              </button>
-              <button
-                onClick={() => updateField('isProtected', 'nao')}
-                className={`flex flex-col items-center gap-4 p-6 rounded-2xl border transition-all ${
-                  formData.isProtected === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-                }`}
-              >
-                <HelpCircle size={32} />
-                <span className="font-bold">Não, ainda não</span>
-              </button>
-            </div>
-
-            {formData.isProtected === 'sim' && (
-              <div className="space-y-4 p-4 rounded-xl bg-slate-950/50 border border-slate-800 animate-in zoom-in-95">
-                <input 
-                  type="text" 
-                  value={formData.patentNumber}
-                  onChange={(e) => updateField('patentNumber', e.target.value)}
-                  placeholder="Número do processo de Patente" 
-                  className="w-full p-3 rounded-lg bg-slate-900 border border-slate-700 text-slate-200 outline-none focus:border-indigo-500"
-                />
-              </div>
-            )}
-
-            {formData.isProtected === 'nao' && (
-              <div className="p-4 rounded-xl bg-indigo-500/10 border border-indigo-500/20 space-y-3 animate-in zoom-in-95">
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  <strong>Importância da Proteção:</strong> Proteger sua ideia evita cópias e atrai investimentos sérios.
-                </p>
-                <button className="w-full py-2 rounded-lg bg-indigo-600/20 text-indigo-300 text-xs font-bold flex items-center justify-center gap-2 transition">
-                  <Video size={14} /> Entenda como proteger sua ideia
-                </button>
-              </div>
-            )}
-
-            <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => prevStep('SEGMENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
-              <button 
-                onClick={() => nextStep('RESEARCH')} 
-                disabled={!formData.isProtected}
-                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 font-bold transition"
-              >Próximo</button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP: RESEARCH */}
-        {step === 'RESEARCH' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">P&D é necessário?</h2>
-              <p className="text-slate-400">Você precisa de apoio de laboratórios ou ICTs para criar o protótipo?</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => updateField('needsResearch', 'sim')}
-                className={`p-6 rounded-2xl border transition-all font-bold ${
-                  formData.needsResearch === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-                }`}
-              >Sim</button>
-              <button
-                onClick={() => updateField('needsResearch', 'nao')}
-                className={`p-6 rounded-2xl border transition-all font-bold ${
-                  formData.needsResearch === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-                }`}
-              >Não</button>
-            </div>
-
-            <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => prevStep('PROTECTION')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
-              <button 
-                onClick={() => nextStep('INNOVATION_TYPE')} 
-                disabled={!formData.needsResearch}
-                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 font-bold transition"
-              >Próximo</button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP: INNOVATION_TYPE */}
-        {step === 'INNOVATION_TYPE' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white">Tipo de Inovação</h2>
-              <p className="text-slate-400">Seu projeto é uma melhoria ou algo radical?</p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => updateField('innovationType', 'melhoria')}
-                className={`p-6 rounded-2xl border transition-all text-center ${
-                  formData.innovationType === 'melhoria' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-                }`}
-              >
-                <div className="font-bold">Melhoria</div>
-                <div className="text-[10px] text-slate-500">Incremental</div>
-              </button>
-              <button
-                onClick={() => updateField('innovationType', 'inovacao')}
-                className={`p-6 rounded-2xl border transition-all text-center ${
-                  formData.innovationType === 'inovacao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
-                }`}
-              >
-                <div className="font-bold">Inovação</div>
-                <div className="text-[10px] text-slate-500">Radical</div>
-              </button>
-            </div>
-
-            <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => prevStep('RESEARCH')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
-              <button 
-                onClick={() => nextStep('SUMMARY_METHOD')} 
-                disabled={!formData.innovationType}
-                className="flex-1 p-4 rounded-xl bg-indigo-600 disabled:bg-slate-800 font-bold transition"
-              >Próximo</button>
-            </div>
-          </div>
-        )}
-
-        {/* STEP: SUMMARY_METHOD */}
-        {step === 'SUMMARY_METHOD' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4 text-center">
-            <h2 className="text-2xl font-bold text-white">Como deseja descrever sua ideia?</h2>
-            <div className="grid gap-4 mt-6">
-              <button
-                onClick={() => { updateField('summaryMethod', 'questions'); nextStep('SUMMARY_CONTENT'); }}
-                className="p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all flex items-center gap-4"
-              >
-                <HelpCircle className="text-indigo-400" size={32} />
-                <div className="text-left">
-                  <div className="font-bold">Perguntas Guiadas</div>
-                  <div className="text-xs text-slate-500">Te ajudamos a construir o resumo</div>
-                </div>
-              </button>
-              <button
-                onClick={() => { updateField('summaryMethod', 'text'); nextStep('SUMMARY_CONTENT'); }}
-                className="p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all flex items-center gap-4"
-              >
-                <MessageSquare className="text-emerald-400" size={32} />
-                <div className="text-left">
-                  <div className="font-bold">Texto Livre</div>
-                  <div className="text-xs text-slate-500">Escreva tudo em um único campo</div>
-                </div>
-              </button>
-            </div>
-            <button onClick={() => prevStep('INNOVATION_TYPE')} className="mt-6 text-sm text-slate-500 hover:text-white transition">Voltar</button>
-          </div>
-        )}
-
-        {/* STEP: SUMMARY_CONTENT */}
-        {step === 'SUMMARY_CONTENT' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <h2 className="text-2xl font-bold text-white">Resumo do Projeto</h2>
-            {formData.summaryMethod === 'questions' ? (
-              <div className="space-y-4">
-                <textarea
-                  value={formData.summaryQuestions.problem}
-                  onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
-                  placeholder="Qual problema sua ideia resolve?"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500 h-20"
-                />
-                <textarea
-                  value={formData.summaryQuestions.solution}
-                  onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
-                  placeholder="Qual a sua solução?"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500 h-20"
-                />
-                <textarea
-                  value={formData.summaryQuestions.difference}
-                  onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
-                  placeholder="Qual o grande diferencial?"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-indigo-500 h-20"
-                />
-                <div className="pt-2 border-t border-slate-800/50">
-                  <button 
-                    onClick={async () => {
-                      if (!formData.summaryQuestions.problem || !formData.summaryQuestions.solution || !formData.summaryQuestions.difference) {
-                        setError("Preencha as três perguntas para que a IA possa lapidar seu pitch.");
-                        return;
-                      }
-                      setLoading(true);
-                      setError(null);
-                      try {
-                        const enhancePitchFn = httpsCallable(functions, 'enhancePitch');
-                        const result = await enhancePitchFn(formData.summaryQuestions);
-                        const summary = (result.data as any).summary;
-                        updateField('summary', summary);
-                        updateField('summaryMethod', 'text');
-                      } catch (error) {
-                        console.error(error);
-                        setError("Falha na comunicação com a IA. Você pode prosseguir com o resumo manual.");
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                    disabled={loading}
-                    className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-[0_0_15px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
-                    {loading ? <Loader2 className="animate-spin" size={18} /> : <><Zap size={18} /> Lapidar Pitch com IA</>}
-                  </button>
-                  <p className="text-center text-[10px] text-slate-500 mt-2">Powered by NVIDIA NIM</p>
-                </div>
-              </div>
-            ) : (
+            <div className="space-y-4">
               <textarea
-                value={formData.summary}
-                onChange={(e) => updateField('summary', e.target.value)}
-                placeholder="Descreva sua ideia em detalhes..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 outline-none focus:border-indigo-500 h-64"
+                value={formData.summaryQuestions.problem}
+                onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
+                placeholder="Qual o problema que você resolve?"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
               />
-            )}
-            <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => prevStep('SUMMARY_METHOD')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
-              <button onClick={() => nextStep('FINAL_REGISTER')} className="flex-1 p-4 rounded-xl bg-indigo-600 font-bold transition">Próximo</button>
+              <textarea
+                value={formData.summaryQuestions.solution}
+                onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
+                placeholder="Como sua solução funciona?"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+              />
+              <textarea
+                value={formData.summaryQuestions.difference}
+                onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
+                placeholder="Qual o seu grande diferencial?"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+              />
+            </div>
+
+            <button 
+              onClick={handleGeneratePreview}
+              disabled={loading || !formData.summaryQuestions.problem || !formData.summaryQuestions.solution}
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="animate-spin" size={20} /> : <><Zap size={18} /> Ver Matches Agora</>}
+            </button>
+          </div>
+        )}
+
+        {step === 'RESULTS' && (
+          <div className="space-y-8 animate-in zoom-in-95">
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 mb-4 animate-bounce">
+                <Star size={32} />
+              </div>
+              <h2 className="text-3xl font-bold text-white">Conexões Encontradas!</h2>
+              <p className="text-slate-400 text-sm mt-2">
+                Identificamos {previewResult?.total || 0} parceiros compatíveis com sua ideia.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              {previewResult?.topMatches.slice(0, 3).map((match: any, idx: number) => (
+                <div key={idx} className="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl flex items-center gap-4 group">
+                  <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center font-black text-indigo-400 group-hover:border-indigo-500 transition-colors">
+                    {match.score}%
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-white text-sm flex items-center gap-2">
+                      <Lock size={14} className="text-slate-600" /> Confidencial
+                    </h4>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-tighter mt-1">{explainMatch(match.breakdown)}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="space-y-4">
+              <button 
+                onClick={() => nextStep('FINAL_REGISTER')}
+                className="w-full py-4 rounded-xl bg-white text-slate-950 font-black text-sm uppercase tracking-widest hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
+              >
+                Reivindicar Matches <ArrowRight size={18} />
+              </button>
             </div>
           </div>
         )}
 
-        {/* STEP: FINAL_REGISTER */}
         {step === 'FINAL_REGISTER' && (
-          <div className="space-y-6 animate-in fade-in slide-in-from-right-4">
-            <div className="text-center space-y-2">
-              <h2 className="text-2xl font-bold text-white leading-tight">Finalização de Cadastro</h2>
-              <p className="text-slate-400">Precisamos de alguns dados para criar seu perfil de acesso.</p>
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white tracking-tight">Último Passo</h2>
+              <p className="text-slate-400 text-sm">Crie sua conta para acessar os detalhes.</p>
             </div>
             
             <div className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div className="col-span-2">
-                  <input 
-                    type="text" 
-                    value={formData.name} 
-                    onChange={(e) => { updateField('name', e.target.value); setFieldErrors(p => ({ ...p, name: '' })); }} 
-                    placeholder="Razão Social / Nome" 
-                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.name ? 'border-red-500' : 'border-slate-800'}`} 
-                  />
-                  {fieldErrors.name && <p className="text-red-400 text-xs mt-1">{fieldErrors.name}</p>}
-                </div>
-                <div>
-                  <input 
-                    type="text" 
-                    value={formData.idNumber} 
-                    onChange={(e) => { updateField('idNumber', maskCpfCnpj(e.target.value)); setFieldErrors(p => ({ ...p, idNumber: '' })); }} 
-                    placeholder="000.000.000-00" 
-                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.idNumber ? 'border-red-500' : 'border-slate-800'}`} 
-                  />
-                  {fieldErrors.idNumber && <p className="text-red-400 text-xs mt-1">{fieldErrors.idNumber}</p>}
-                </div>
-                <div>
-                  <input 
-                    type="text" 
-                    value={formData.phone} 
-                    onChange={(e) => { updateField('phone', maskPhone(e.target.value)); setFieldErrors(p => ({ ...p, phone: '' })); }} 
-                    placeholder="(00) 00000-0000" 
-                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.phone ? 'border-red-500' : 'border-slate-800'}`} 
-                  />
-                  {fieldErrors.phone && <p className="text-red-400 text-xs mt-1">{fieldErrors.phone}</p>}
-                </div>
-                <div>
-                  <input 
-                    type="password" 
-                    value={formData.password} 
-                    onChange={(e) => { updateField('password', e.target.value); setFieldErrors(p => ({ ...p, password: '' })); }} 
-                    placeholder="Senha (min. 6 chars)" 
-                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.password ? 'border-red-500' : 'border-slate-800'}`} 
-                  />
-                  {fieldErrors.password && <p className="text-red-400 text-xs mt-1">{fieldErrors.password}</p>}
-                </div>
-                <div>
-                  <input 
-                    type="password" 
-                    value={formData.confirmPassword} 
-                    onChange={(e) => { updateField('confirmPassword', e.target.value); setFieldErrors(p => ({ ...p, confirmPassword: '' })); }} 
-                    placeholder="Confirmar senha" 
-                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.confirmPassword ? 'border-red-500' : 'border-slate-800'}`} 
-                  />
-                  {fieldErrors.confirmPassword && <p className="text-red-400 text-xs mt-1">{fieldErrors.confirmPassword}</p>}
-                </div>
+              <input 
+                type="text" value={formData.name} onChange={(e) => updateField('name', e.target.value)}
+                placeholder="Seu Nome Completo" 
+                className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <input 
+                  type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)}
+                  placeholder="E-mail" 
+                  className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+                />
+                <input 
+                  type="text" value={formData.phone} onChange={(e) => updateField('phone', maskPhone(e.target.value))}
+                  placeholder="Telefone" 
+                  className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+                />
               </div>
+              <input 
+                type="password" value={formData.password} onChange={(e) => updateField('password', e.target.value)}
+                placeholder="Senha (min. 6 chars)" 
+                className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+              />
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-slate-800">
-              <button onClick={() => prevStep('SUMMARY_CONTENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+            <button 
+              onClick={handleFinalRegister}
+              disabled={loading || !formData.email || !formData.password}
+              className="w-full py-4 rounded-xl bg-indigo-600 text-white font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
+            >
+              {loading ? <Loader2 className="animate-spin" size={20} /> : <><Rocket size={18} /> Finalizar e Entrar</>}
+            </button>
+          </div>
+        )}
+
+        {step === 'SUCCESS' && (
+          <div className="space-y-8 animate-in zoom-in-95 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-500/20 text-emerald-400 mb-4 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+              <Rocket size={40} />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold text-white tracking-tight">Conta Criada!</h2>
+              <p className="text-slate-400">Você já está autenticado no Orizon Match.</p>
+            </div>
+
+            <div className="space-y-4 pt-4">
               <button 
-                onClick={() => {
-                  const result = fullRegistrationSchema.safeParse({
-                    name: formData.name,
-                    idNumber: formData.idNumber,
-                    phone: formData.phone,
-                    email: formData.idNumber + '@placeholder.com', // email not in public form
-                    password: formData.password,
-                    confirmPassword: formData.confirmPassword,
-                  });
-                  if (!result.success) {
-                    const errs: Record<string, string> = {};
-                    for (const issue of result.error.issues) {
-                      const field = issue.path[0] as string;
-                      if (!errs[field]) errs[field] = issue.message;
-                    }
-                    setFieldErrors(errs);
-                    return;
-                  }
-                  setFieldErrors({});
-                  handleGeneratePreview();
-                }}
-                className="flex-1 p-4 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold transition shadow-[0_0_20px_rgba(79,70,229,0.4)] disabled:opacity-50 flex items-center justify-center gap-2"
-              >Gerar Matches Agora <Rocket size={20} /></button>
+                onClick={() => navigate('/projects/new')}
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 transition-all font-black text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center gap-2"
+              >
+                Completar Meu Projeto <ArrowRight size={20} />
+              </button>
+              <button 
+                onClick={() => navigate('/dashboard')}
+                className="w-full py-4 rounded-xl bg-slate-800 hover:bg-slate-700 transition-all font-bold text-slate-300 flex items-center justify-center gap-2"
+              >
+                Ir para o Dashboard
+              </button>
             </div>
+            
+            <p className="text-[10px] text-slate-500 mt-6 uppercase tracking-widest font-bold">Inovação sem limites</p>
           </div>
         )}
-
-        {/* STEP: RESULTS */}
-        {step === 'RESULTS' && (
-          <div className="space-y-8 animate-in zoom-in-95 duration-500">
-            {loading ? (
-              <div className="py-12 flex flex-col items-center text-center space-y-4">
-                <Loader2 className="animate-spin text-indigo-500" size={48} />
-                <p className="text-lg text-slate-300 font-medium">Orizon Match operando...</p>
-                <p className="text-sm text-slate-500">Buscando investidores e parceiros compatíveis...</p>
-              </div>
-            ) : previewResult && (
-              <div>
-                <div className="text-center mb-8">
-                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 mb-4">
-                    <Star size={32} />
-                  </div>
-                  <h2 className="text-2xl font-bold text-white mb-2">Processo Concluído!</h2>
-                  <p className="text-slate-400 text-sm">
-                    Encontramos {previewResult.total} potenciais matches para seu perfil de {formData.segment}.
-                  </p>
-                </div>
-
-                <div className="space-y-3 mb-8">
-                  {previewResult.topMatches.map((match: any, idx: number) => (
-                    <div key={idx} className="bg-slate-950/80 border border-slate-800 p-4 rounded-xl flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-slate-900 border-2 border-slate-700 flex items-center justify-center font-bold text-slate-300">
-                        {match.score}%
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-semibold text-slate-200 flex items-center gap-2">
-                          <Lock size={14} className="text-slate-500" /> {match.name}
-                        </h4>
-                        <div className="w-full bg-slate-800 rounded-full h-1 mt-2 mb-1">
-                          <div className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-1 rounded-full" style={{ width: `${match.score}%` }} />
-                        </div>
-                        <p className="text-[10px] text-slate-500 truncate">{explainMatch(match.breakdown)}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="text-center">
-                  <Link to="/login" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-indigo-600 hover:bg-indigo-500 transition-all font-bold text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] w-full justify-center">
-                    Fazer Login e Ver Conexões <ArrowRight size={20} />
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
       </div>
     </div>
   );

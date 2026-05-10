@@ -2,11 +2,12 @@ import { createContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { 
   onAuthStateChanged, signOut as firebaseSignOut, 
-  signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider
+  signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
+  createUserWithEmailAndPassword, updateProfile
 } from "firebase/auth";
 import type { User } from "firebase/auth";
 import { auth, db } from "../firebase/config";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -15,6 +16,7 @@ interface AuthContextType {
   userProfile: any | null;
   loading: boolean;
   login: (email: string, pass: string) => Promise<void>;
+  signUp: (email: string, pass: string, profile: any) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -35,12 +37,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setUserProfile(userDoc.data());
           } else {
-            // First-time Google SSO user — create profile
+            // First-time Google SSO user or manual register pending profile
             const newProfile = {
-              name: currentUser.displayName || "",
+              uid: currentUser.uid,
+              name: currentUser.displayName || "Usuário Orizon",
               email: currentUser.email || "",
-              role: "inventor",
-              createdAt: new Date().toISOString(),
+              role: "user", // default role
+              createdAt: serverTimestamp(),
             };
             await setDoc(doc(db, "users", currentUser.uid), newProfile);
             setUserProfile(newProfile);
@@ -62,6 +65,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
+  const signUp = async (email: string, pass: string, profile: any) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    const newUser = userCredential.user;
+
+    // Set display name in Auth
+    await updateProfile(newUser, { displayName: profile.name });
+
+    // Create Firestore profile
+    const newProfile = {
+      uid: newUser.uid,
+      ...profile,
+      email,
+      role: profile.role || "user",
+      createdAt: serverTimestamp(),
+    };
+
+    await setDoc(doc(db, "users", newUser.uid), newProfile);
+    setUserProfile(newProfile);
+  };
+
   const loginWithGoogle = async () => {
     await signInWithPopup(auth, googleProvider);
   };
@@ -75,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, login, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ user, userProfile, loading, login, signUp, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
