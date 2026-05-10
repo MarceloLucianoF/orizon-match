@@ -5,6 +5,7 @@ import { sendMessage, sendActionMessage, updateDealStage, markAsRead, updateConv
 import { collection, query, where, onSnapshot, orderBy } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { DealFlowPipeline } from "../../components/DealFlowPipeline";
+import { EmptyState } from "../../components/EmptyState";
 import { 
   Loader2, Send, Handshake, ChevronRight, MessageSquare, Calendar, ShieldCheck, Download, 
   Lock, CheckCircle, XCircle, X 
@@ -107,7 +108,13 @@ export function Chat() {
         </div>
         <div className="flex-1 overflow-y-auto">
           {conversations.length === 0 ? (
-            <p className="p-4 text-slate-500 text-sm text-center">Nenhuma conversa iniciada.</p>
+            <EmptyState
+              icon={MessageSquare}
+              title="Nenhuma conversa"
+              description="Explore matches e inicie sua primeira conexão."
+              ctaLabel="Explorar"
+              ctaLink="/explore"
+            />
           ) : (
             conversations.map(conv => {
               const unreadCount = user ? (conv.unreadCount?.[user.uid] || 0) : 0;

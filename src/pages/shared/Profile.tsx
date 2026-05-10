@@ -7,6 +7,7 @@ import {
   ShieldCheck, Bell, Save, Loader2,
   CheckCircle2, CreditCard, Newspaper
 } from "lucide-react";
+import { registrationSchema, maskCpfCnpj, maskPhone, validateForm } from "../../lib/validators";
 
 function ToggleSwitch({ active, onToggle, label, icon: Icon }: { active: boolean; onToggle: () => void; label: string; icon: any }) {
   return (
@@ -62,8 +63,20 @@ export function Profile() {
     }
   }, [userProfile]);
 
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
   const handleSave = async () => {
     if (!user) return;
+    // Validate
+    const errors = validateForm(registrationSchema, {
+      name: formData.name,
+      idNumber: formData.idNumber,
+      phone: formData.phone,
+      email: user.email || formData.name + '@valid.com',
+    });
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) return;
+
     setLoading(true);
     try {
       const userRef = doc(db, "users", user.uid);
@@ -116,11 +129,12 @@ export function Profile() {
                   <input 
                     type="text" 
                     value={formData.idNumber}
-                    onChange={e => setFormData({...formData, idNumber: e.target.value})}
+                    onChange={e => { setFormData({...formData, idNumber: maskCpfCnpj(e.target.value)}); setFieldErrors(p => ({...p, idNumber: ''})); }}
                     placeholder="000.000.000-00"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm"
+                    className={`w-full bg-slate-950 border rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm ${fieldErrors.idNumber ? 'border-red-500' : 'border-slate-800'}`}
                   />
                 </div>
+                {fieldErrors.idNumber && <p className="text-red-400 text-xs mt-1">{fieldErrors.idNumber}</p>}
               </div>
 
               <div className="space-y-2">
@@ -130,11 +144,12 @@ export function Profile() {
                   <input 
                     type="tel" 
                     value={formData.phone}
-                    onChange={e => setFormData({...formData, phone: e.target.value})}
+                    onChange={e => { setFormData({...formData, phone: maskPhone(e.target.value)}); setFieldErrors(p => ({...p, phone: ''})); }}
                     placeholder="(00) 00000-0000"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm"
+                    className={`w-full bg-slate-950 border rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm ${fieldErrors.phone ? 'border-red-500' : 'border-slate-800'}`}
                   />
                 </div>
+                {fieldErrors.phone && <p className="text-red-400 text-xs mt-1">{fieldErrors.phone}</p>}
               </div>
 
               <div className="space-y-2">
@@ -189,10 +204,34 @@ export function Profile() {
             </div>
             
             <div className="space-y-3">
-               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800">
-                 <span className="text-xs text-slate-400 flex items-center gap-2"><Building2 size={14} /> Perfil</span>
-                 <span className="text-xs font-bold text-indigo-400 uppercase">{userProfile?.role || 'inventor'}</span>
+               <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 group relative overflow-hidden">
+                 <div className={`absolute inset-0 opacity-10 bg-gradient-to-r ${
+                   userProfile?.role === 'ict' ? 'from-blue-500 to-indigo-500' : 
+                   userProfile?.role === 'company' ? 'from-emerald-500 to-teal-500' : 
+                   'from-indigo-500 to-purple-500'
+                 }`} />
+                 <span className="text-xs text-slate-400 flex items-center gap-2 relative z-10"><Building2 size={14} /> Perfil</span>
+                 <span className={`text-xs font-black uppercase relative z-10 px-2 py-0.5 rounded ${
+                   userProfile?.role === 'ict' ? 'text-blue-400 bg-blue-400/10 border border-blue-400/20' : 
+                   userProfile?.role === 'company' ? 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20' : 
+                   'text-indigo-400 bg-indigo-400/10 border border-indigo-400/20'
+                 }`}>
+                   {userProfile?.role || 'inventor'}
+                 </span>
                </div>
+               
+               {userProfile?.role === 'ict' && (
+                 <div className="p-3 rounded-xl bg-blue-500/5 border border-blue-500/10 flex items-center gap-2">
+                   <div className="w-2 h-2 rounded-full bg-blue-500" />
+                   <span className="text-[10px] font-bold text-blue-300 uppercase">Instituição de Pesquisa</span>
+                 </div>
+               )}
+               {userProfile?.role === 'company' && (
+                 <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-2">
+                   <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                   <span className="text-[10px] font-bold text-emerald-300 uppercase">Parceiro Industrial</span>
+                 </div>
+               )}
             </div>
           </div>
 

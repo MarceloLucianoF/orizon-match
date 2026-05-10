@@ -1,15 +1,21 @@
 import { createContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { onAuthStateChanged, signOut as firebaseSignOut, signInWithEmailAndPassword } from "firebase/auth";
+import { 
+  onAuthStateChanged, signOut as firebaseSignOut, 
+  signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider
+} from "firebase/auth";
 import type { User } from "firebase/auth";
 import { auth, db } from "../firebase/config";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
+const googleProvider = new GoogleAuthProvider();
 
 interface AuthContextType {
   user: User | null;
   userProfile: any | null;
   loading: boolean;
   login: (email: string, pass: string) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -29,7 +35,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (userDoc.exists()) {
             setUserProfile(userDoc.data());
           } else {
-            setUserProfile(null);
+            // First-time Google SSO user — create profile
+            const newProfile = {
+              name: currentUser.displayName || "",
+              email: currentUser.email || "",
+              role: "inventor",
+              createdAt: new Date().toISOString(),
+            };
+            await setDoc(doc(db, "users", currentUser.uid), newProfile);
+            setUserProfile(newProfile);
           }
         } catch (error) {
           console.error("Error fetching user profile:", error);
@@ -48,6 +62,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signInWithEmailAndPassword(auth, email, pass);
   };
 
+  const loginWithGoogle = async () => {
+    await signInWithPopup(auth, googleProvider);
+  };
+
   const logout = async () => {
     try {
       await firebaseSignOut(auth);
@@ -57,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, userProfile, loading, login, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );

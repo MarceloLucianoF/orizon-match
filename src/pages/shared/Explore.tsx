@@ -9,6 +9,7 @@ import {
   Loader2, Search, Filter, Compass, ArrowRight, ShieldCheck,
   MapPin, SlidersHorizontal, X
 } from "lucide-react";
+import { EmptyState } from "../../components/EmptyState";
 
 const FIESC_CHAMBERS = [
   "Agroindústria", "Alimentos e Bebidas", "Bens de Capital",
@@ -198,15 +199,14 @@ export function Explore() {
           <Loader2 className="animate-spin text-indigo-500" size={32} />
         </div>
       ) : results.length === 0 ? (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-12 text-center">
-          <Compass className="mx-auto text-slate-600 mb-4" size={48} />
-          <h2 className="text-lg font-semibold text-slate-300 mb-2">Nenhuma oportunidade encontrada</h2>
-          <p className="text-slate-500 text-sm mb-4">Ajuste os filtros ou aguarde novos cadastros no ecossistema.</p>
-          {hasActiveFilters && (
-            <button onClick={clearFilters} className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-5 py-2 rounded-lg text-sm transition">
-              Limpar Filtros
-            </button>
-          )}
+        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl">
+          <EmptyState
+            icon={Compass}
+            title="Nenhuma oportunidade encontrada"
+            description={hasActiveFilters ? "Ajuste os filtros ou amplie os critérios de busca." : "Aguarde novos cadastros no ecossistema ou convide parceiros."}
+            ctaLabel={hasActiveFilters ? "Limpar Filtros" : undefined}
+            onCtaClick={hasActiveFilters ? clearFilters : undefined}
+          />
         </div>
       ) : (
         <div className="space-y-4">

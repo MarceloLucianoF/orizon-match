@@ -1,170 +1,115 @@
-# Orizon Match
+# 🌌 Orizon Match
 
 <p align="center">
-  <strong>Plataforma de matchmaking inteligente para inovação aberta.</strong><br/>
-  Conectando inventores, investidores, ICTs e indústrias com precisão baseada em dados.
+  <img src="https://raw.githubusercontent.com/lucide-react/lucide/main/icons/rocket.svg" width="80" height="80" />
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white" />
-  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white" />
-  <img src="https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white" />
-  <img src="https://img.shields.io/badge/Firebase-Backend-FFCA28?logo=firebase&logoColor=black" />
-  <img src="https://img.shields.io/badge/Tailwind-v4-06B6D4?logo=tailwindcss&logoColor=white" />
+  <strong>A Inteligência por trás da Inovação Aberta.</strong><br/>
+  Plataforma SaaS B2B para conexão estratégica entre Ecossistemas de Inovação, Indústrias e Capital.
+</p>
+
+<p align="center">
+  <a href="https://orizon-match.web.app"><img src="https://img.shields.io/badge/🌐_Acesse_Online-orizon--match.web.app-4F46E5?style=for-the-badge&logo=google-chrome&logoColor=white" /></a>
+  <img src="https://img.shields.io/badge/Versão-Stage_3_Alpha-indigo?style=for-the-badge" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/React_19-61DAFB?logo=react&logoColor=black" />
+  <img src="https://img.shields.io/badge/TypeScript_5-3178C6?logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/Firebase_9-FFCA28?logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Tailwind_4-06B6D4?logo=tailwindcss&logoColor=white" />
+  <img src="https://img.shields.io/badge/NVIDIA_NIM-IA-76B900?logo=nvidia&logoColor=white" />
 </p>
 
 ---
 
-## O Problema
+## 🚀 Visão Geral
 
-**94% das patentes brasileiras nunca chegam ao mercado.** O problema não é a falta de ideias — é a falta de conexão estratégica entre quem possui a solução, quem possui a demanda e quem possui o capital.
+O **Orizon Match** não é apenas um diretório de projetos; é um ecossistema de **Deal-Making**. Utilizamos algoritmos de alta fidelidade para cruzar a maturidade tecnológica (TRL) de patentes e ideias com as demandas reais da indústria e interesses de fundos de Venture Capital.
 
-O **Orizon Match** elimina esse gap usando algoritmos de compatibilidade e dados de maturidade tecnológica (TRL/IRL) para conectar automaticamente os agentes certos no momento certo.
-
----
-
-## Funcionalidades
-
-### Matchmaking de Precisão
-- Algoritmo de compatibilidade com **5 variáveis**: Segmento FIESC, TRL, IRL/VDR, Necessidades, Localização
-- Score de 0–100 com classificação visual (TOP FIT, BOM FIT)
-- Explicações textuais diferenciadas por nível de compatibilidade
-- **Página Explorar** (`/explore`): busca com filtros avançados e botão "Iniciar Conexão"
-
-### Dashboards Especializados
-
-| Perfil | Dashboard | Foco |
-|--------|-----------|------|
-| **Inventor** | Painel do Inventor | TRL/IRL, matches, radar de mercado, Data Room |
-| **Empresa / Investidor** | Pipeline de Investimentos | Kanban de Deal Flow (Triagem → Fechado) |
-| **Jurídico (Curadoria)** | Curadoria Jurídica | Validação de VDR, monitoramento INPI |
-| **Admin** | Painel Admin | Gestão global de usuários e plataforma |
-
-### Deal Flow e Comunicação
-- Chat com mensagens de texto, NDA e reunião
-- Smart Prompts contextuais (envio automático de NDA, abertura de VDR)
-- Double opt-in para conexões
-
-### Data Room Virtual (VDR)
-- Estrutura de pastas temáticas (Patente, Finanças, Pitch)
-- Bloqueio por NDA digital
-- Checklist de Due Diligence
-- Convite funcional de escritório jurídico parceiro
-
-### Criação de Projeto (3 jornadas)
-- **Inventor / Startup**: Segmento → Proteção IP → P&D → TRL → Resumo com IA → Cadastro
-- **ICT / Universidade**: Segmento → Infraestrutura → Linhas de Pesquisa → Cadastro
-- **Empresa / Prestador**: Segmento → Serviços → Capacidade Produtiva → Cadastro
-
-### Responsividade
-- Sidebar colapsável com hamburger menu em mobile
-- Grids adaptativos em todos os dashboards
-- Kanban com scroll horizontal em telas pequenas
+### O Modelo de Tríplice Hélice 🧬
+Conectamos os três pilares fundamentais da inovação:
+1. **Academia (ICTs):** Universidades e centros de pesquisa (ex: UFSC, EMBRAPII).
+2. **Mercado (Indústrias):** Gigantes e PMEs buscando eficiência (ex: WEG, Engie).
+3. **Estado/Capital:** Fomento e investimento estratégico.
 
 ---
 
-## Stack Técnica
+## 💎 Funcionalidades Premium
 
-| Camada | Tecnologia |
-|--------|-----------|
-| Frontend | React 19 + TypeScript |
-| Bundler | Vite 8 |
-| Estilização | Tailwind CSS v4 |
-| Backend | Firebase (Auth, Firestore, Functions) |
-| Ícones | Lucide React |
-| Tipografia | Google Fonts (Sora) |
-| IA | NVIDIA NIM (via Firebase Functions) |
+### 🧠 Matchmaking por IA & Heurística
+- **Score 360°:** Avaliação baseada em Segmento, TRL, IRL, Localização e Necessidades.
+- **Executive Summary:** Transformação de dados técnicos em pitches comerciais via NVIDIA NIM.
 
----
+### 🛡️ Deal-Making Seguro (Clickwrap NDA)
+- **VDR Protegido:** Sala de dados virtual com pastas sensíveis (Jurídico, Financeiro) bloqueadas.
+- **Clickwrap NDA:** Aceite digital de termos de confidencialidade com registro jurídico de timestamp.
+- **Due Diligence:** Checklist interativo para auditoria de projetos.
 
-## Estrutura do Projeto
-
-```
-src/
-├── components/          # TRLCalculator, VDRRoom, DueDiligenceChecklist
-├── context/             # AuthContext (provider global)
-├── firebase/            # Configuração Firebase
-├── hooks/               # useAuth
-├── layout/              # MainLayout, Sidebar (responsiva), Topbar
-├── lib/                 # matching.ts (algoritmo + utilitários de classificação)
-├── pages/
-│   ├── admin/           # AdminDashboard
-│   ├── auth/            # Login
-│   ├── company/         # CompanyDashboard (Kanban Deal Flow)
-│   ├── inventor/        # InventorDashboard, Projects, CreateProject
-│   ├── legal/           # LegalDashboard (Curadoria)
-│   ├── marketing/       # Home, About, PublicOnboarding
-│   └── shared/          # Dashboard, Matches, Explore, Chat, Profile
-├── routes/              # AppRoutes (protegidas + públicas)
-└── services/            # matchService, chatService, projectService,
-                         # exploreService, adminService, inpiService
-```
+### 📊 Dashboards de Alto Impacto
+- **Pipeline de Investimento:** Kanban dinâmico para gestão de Deal Flow.
+- **Radar de Mercado:** Visualização de compatibilidade em tempo real.
+- **Curadoria Jurídica:** Painel exclusivo para validação de documentação.
 
 ---
 
-## Executando Localmente
+## 🛠️ Stack Tecnológica
+
+| Componente | Tecnologia | Diferencial |
+|------------|------------|-------------|
+| **Framework** | React 19 | Performance de ponta com suporte a hooks modernos. |
+| **Back-end** | Firebase | Serverless robusto com Firestore e Cloud Functions. |
+| **Estilização** | Tailwind CSS v4 | Design System moderno, dark-mode nativo e responsividade total. |
+| **Inteligência** | NVIDIA NIM / Llama 3 | Processamento de linguagem natural para sumários executivos. |
+| **UX/UI** | Lucide React | Biblioteca de ícones consistente e minimalista. |
+
+---
+
+## 📦 Estrutura do Ecossistema
 
 ```bash
-# Instalar dependências
+src/
+├── components/          # Componentes reutilizáveis (VDRRoom, SecureNDA, TRLCalculator)
+├── context/             # Estado global e autenticação (AuthContext)
+├── firebase/            # Camada de dados e segurança (Firestore Rules, Cloud Functions)
+├── hooks/               # Custom hooks para lógica de negócio (useAuth)
+├── layout/              # Arquitetura de interface (Sidebar responsiva, MainLayout)
+├── lib/                 # O "Cérebro": Algoritmos de matching e validadores Zod
+├── pages/               # Views organizadas por Persona (Inventor, Company, Legal, Admin)
+└── services/            # Integrações: INPI, Chat, AI, Analytics
+```
+
+---
+
+## 🏗️ Guia de Implementação
+
+### Configuração Inicial
+```bash
+# 1. Instalar dependências
 npm install
 
-# Servidor de desenvolvimento
+# 2. Configurar Firebase (Functions)
+cd functions && npm install && cd ..
+
+# 3. Rodar localmente
 npm run dev
-
-# Build de produção
-npm run build
 ```
 
-### Variáveis de Ambiente
+### Comandos de Gestão (Makefile)
+Utilize o `Makefile` para agilizar o fluxo de trabalho:
 
-Crie um arquivo `.env` na raiz:
-
-```env
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-```
-
-### Deploy de Regras Firestore
-
-```bash
-firebase deploy --only firestore:rules
-```
+- `make build`: Gera o pacote de produção otimizado.
+- `make seed`: Alimenta o banco com dados realistas (EMBRAPII, SENAI, etc).
+- `make deploy`: Deploy completo (Hosting + Regras).
+- `make deploy-all`: Deploy total (incluindo Cloud Functions).
 
 ---
 
-## Convenções do Projeto
-
-- **Ícones**: Exclusivamente `lucide-react`. Emojis proibidos em toda a interface.
-- **Estilo**: Dark mode first, paleta `slate` / `indigo` / `cyan`.
-- **Estrutura**: Páginas organizadas por role em `src/pages/{role}/`.
-- **Dados sensíveis**: `.env` e `serviceAccountKey.json` fora do versionamento.
-- **Importações Firebase**: Sempre estáticas (sem `await import()`).
-
----
-
-## Modelo de Negócio
-
-O Orizon Match opera no modelo **Tríplice Hélice**:
-
-```
-    Inventor ──── Orizon Match ──── Empresa / Investidor
-                      │
-                ICT / Universidade
-                      │
-                Jurídico (Curadoria)
-```
-
-- **Inventores** cadastram inovações e recebem matches automáticos
-- **Empresas/Investidores** filtram por TRL e gerenciam Deal Flow
-- **Jurídicos** validam documentação via convite (modelo curadoria)
-- **ICTs** conectam pesquisa acadêmica ao mercado
-
----
+## 📜 Licença e Propriedade
+Projeto desenvolvido para a plataforma **Orizon Match**. Todos os direitos reservados.
+Desenvolvido com ❤️ pelo time de Inovação.
 
 <p align="center">
-  <strong>Orizon Match</strong> · Ecossistema de Inovação Aberta · 2025
+  <a href="https://orizon-match.web.app">orizon-match.web.app</a>
 </p>

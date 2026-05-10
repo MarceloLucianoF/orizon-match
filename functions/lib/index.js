@@ -1,16 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.enhancePitch = exports.onProjectCreated = exports.previewMatches = void 0;
+exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onProjectCreated = exports.previewMatches = void 0;
 const functions = require("firebase-functions");
+const admin = require("firebase-admin");
 const match_service_1 = require("./services/match.service");
 const preview_service_1 = require("./services/preview.service");
+const analytics_service_1 = require("./services/analytics.service");
 const openai_1 = require("openai");
+if (!admin.apps.length) {
+    admin.initializeApp();
+}
+const db = admin.firestore();
+// Secrets
+// Note: functions.runWith() is used in the exports themselves to specify secrets
 exports.previewMatches = functions.https.onCall(async (data, context) => {
     try {
         return await (0, preview_service_1.getPreviewMatches)(data);
     }
     catch (error) {
-        console.error("Erro no previewMatches:", error);
+        console.error("Error on previewMatches:", error);
         throw new functions.https.HttpsError("internal", "Erro ao gerar preview de matches");
     }
 });
@@ -19,23 +27,54 @@ exports.onProjectCreated = functions.firestore
     .onCreate(async (snap) => {
     const data = snap.data();
     const project = Object.assign({ id: snap.id }, data);
-    console.log("🚀 Novo projeto:", project.id);
+    console.log("New project created:", project.id);
     await (0, match_service_1.generateMatches)(project);
-    console.log("✅ Matches gerados");
+    // Record analytics
+    await (0, analytics_service_1.recordMatchCreated)(snap.id);
+    console.log("Matches generated successfully");
 });
-exports.enhancePitch = functions.https.onCall(async (data, context) => {
-    var _a, _b;
+exports.recordView = functions.region("us-central1").https.onCall(async (data, context) => {
+    const { projectId } = data;
+    if (!projectId)
+        throw new functions.https.HttpsError("invalid-argument", "projectId is required");
+    try {
+        await (0, analytics_service_1.recordProjectView)(projectId);
+        return { success: true };
+    }
+    catch (error) {
+        console.error("Error recording view:", error);
+        throw new functions.https.HttpsError("internal", "Erro ao registrar visualização");
+    }
+});
+exports.enhancePitch = functions.region("us-central1").runWith({
+    secrets: ["NVIDIA_NIM_API_KEY"],
+    timeoutSeconds: 60,
+    memory: "256MB"
+}).https.onCall(async (data, context) => {
+    var _a, _b, _c, _d;
     const { problem, solution, difference } = data;
+    const timestamp = admin.firestore.FieldValue.serverTimestamp();
+    const userId = ((_a = context.auth) === null || _a === void 0 ? void 0 : _a.uid) || "anonymous";
     if (!problem || !solution || !difference) {
+        await db.collection("logs_ai").add({
+            userId,
+            timestamp,
+            error: "Dados incompletos",
+            input: { problem, solution, difference }
+        });
         throw new functions.https.HttpsError("invalid-argument", "Dados incompletos");
     }
     try {
+        const apiKey = process.env.NVIDIA_NIM_API_KEY;
+        if (!apiKey) {
+            throw new functions.https.HttpsError("failed-precondition", "API Key da NVIDIA não configurada.");
+        }
         const openai = new openai_1.default({
-            apiKey: process.env.NVIDIA_NIM_API_KEY || "dummy",
+            apiKey,
             baseURL: "https://integrate.api.nvidia.com/v1",
         });
         const completion = await openai.chat.completions.create({
-            model: "meta/llama3-70b-instruct",
+            model: "meta/llama-3.1-70b-instruct",
             messages: [
                 {
                     role: "system",
@@ -50,13 +89,76 @@ exports.enhancePitch = functions.https.onCall(async (data, context) => {
             max_tokens: 1024,
             top_p: 1,
         });
-        return {
-            summary: ((_b = (_a = completion.choices[0]) === null || _a === void 0 ? void 0 : _a.message) === null || _b === void 0 ? void 0 : _b.content) || "",
-        };
+        const summary = ((_c = (_b = completion.choices[0]) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.content) || "";
+        // Log success
+        await db.collection("logs_ai").add({
+            userId,
+            timestamp,
+            status: "success",
+            input: { problem, solution, difference },
+            output: summary
+        });
+        return { summary };
     }
     catch (error) {
-        console.error("Erro ao gerar pitch:", error);
-        throw new functions.https.HttpsError("internal", "Erro ao comunicar com a IA");
+        console.error("Error generating pitch:", error);
+        // Log error
+        await db.collection("logs_ai").add({
+            userId,
+            timestamp,
+            status: "error",
+            error: error.message || "Unknown error",
+            stack: error.stack,
+            input: { problem, solution, difference }
+        });
+        if (error.status === 401 || ((_d = error.message) === null || _d === void 0 ? void 0 : _d.includes("API key"))) {
+            throw new functions.https.HttpsError("unauthenticated", "Chave de API da NVIDIA não configurada ou inválida. Verifique os Secrets no Firebase.");
+        }
+        throw new functions.https.HttpsError("internal", error.message || "Erro ao comunicar com a IA");
+    }
+});
+// ====================================================
+// B2: Email transacional — Convite Jurídico via Resend
+// ====================================================
+const resend_1 = require("resend");
+const emailTemplates_1 = require("./emailTemplates");
+exports.onLegalInviteCreated = functions.runWith({
+    secrets: ["RESEND_API_KEY"]
+}).firestore
+    .document("legal_invites/{inviteId}")
+    .onCreate(async (snap) => {
+    var _a;
+    const invite = snap.data();
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+        console.warn("RESEND_API_KEY not configured. Skipping email.");
+        return;
+    }
+    try {
+        // Fetch inviter profile
+        const inviterDoc = await db.collection("users").doc(invite.invitedBy).get();
+        const inviterName = ((_a = inviterDoc.data()) === null || _a === void 0 ? void 0 : _a.name) || "Um inventor";
+        const inviteLink = `https://orizon-match.web.app/onboarding?ref=legal&invite=${snap.id}`;
+        const { subject, html } = (0, emailTemplates_1.legalInviteEmail)({
+            inviterName,
+            projectTitle: invite.projectTitle || "Projeto Confidencial",
+            message: invite.message,
+            inviteLink,
+        });
+        const resend = new resend_1.Resend(resendApiKey);
+        await resend.emails.send({
+            from: "Orizon Match <onboarding@resend.dev>",
+            to: invite.email,
+            subject,
+            html,
+        });
+        // Mark invite as email_sent
+        await snap.ref.update({ emailSent: true, emailSentAt: admin.firestore.FieldValue.serverTimestamp() });
+        console.log(`Legal invite email sent to ${invite.email}`);
+    }
+    catch (error) {
+        console.error("Error sending legal invite email:", error);
+        await snap.ref.update({ emailError: error.message || "Unknown error" });
     }
 });
 //# sourceMappingURL=index.js.map

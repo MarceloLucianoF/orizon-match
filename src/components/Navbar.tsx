@@ -12,6 +12,8 @@ interface NavbarProps {
   onLogout?: () => void;
 }
 
+import { NotificationBell } from "./NotificationBell";
+
 interface NavItem {
   label: string;
   to: string;
@@ -96,15 +98,20 @@ export default function Navbar({
           ))}
 
           {user && (
-            <li>
-              <button
-                type="button"
-                onClick={onLogout}
-                className="rounded-xl border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-200 dark:hover:bg-rose-500/10"
-              >
-                Sair
-              </button>
-            </li>
+            <>
+              <li className="mr-2">
+                <NotificationBell />
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  className="rounded-xl border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 dark:border-rose-500/30 dark:text-rose-200 dark:hover:bg-rose-500/10"
+                >
+                  Sair
+                </button>
+              </li>
+            </>
           )}
         </ul>
 

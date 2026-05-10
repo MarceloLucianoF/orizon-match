@@ -13,6 +13,9 @@ import { TRLCalculator } from "../../components/TRLCalculator";
 import { VDRRoom } from "../../components/VDRRoom";
 import { DueDiligenceChecklist } from "../../components/DueDiligenceChecklist";
 import { updateProject } from "../../services/projectService";
+import { StatsCard } from "../../components/analytics/StatsCard";
+import { ProjectPerformanceChart } from "../../components/analytics/ProjectPerformanceChart";
+import { MarketTrendsChart } from "../../components/analytics/MarketTrendsChart";
 
 export function InventorDashboard() {
   const { user } = useAuth();
@@ -169,7 +172,7 @@ export function InventorDashboard() {
       {activeTab === 'vdr' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2">
-            <VDRRoom />
+            <VDRRoom inpiStatus={primaryProject?.inpiStatus} />
           </div>
           <div className="space-y-6">
             <DueDiligenceChecklist />
@@ -193,18 +196,31 @@ export function InventorDashboard() {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
           <div className="lg:col-span-2 space-y-4 md:space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
-              <StatCard icon={Eye} label="Visualizações" value={stats.views} color="text-indigo-400" bg="bg-indigo-400/10" />
-              <StatCard icon={Heart} label="Salvos por Investidores" value={stats.saves} color="text-pink-400" bg="bg-pink-400/10" />
-              <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 md:p-6 flex flex-col items-center justify-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 relative z-10 text-center">Tempo de Resposta</p>
-                <div className="relative flex flex-col items-center justify-center z-10 mt-1">
-                   <span className="text-lg md:text-2xl font-bold text-slate-500">--</span>
-                   <span className="text-[10px] text-slate-600 mt-1">Aguardando dados</span>
-                </div>
-              </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <StatsCard 
+                label="Visualizações" 
+                value={stats.views} 
+                icon={Eye} 
+                trend={12} 
+                color="indigo"
+              />
+              <StatsCard 
+                label="Salvos" 
+                value={stats.saves} 
+                icon={Heart} 
+                trend={5} 
+                color="emerald"
+              />
+              <StatsCard 
+                label="Matches" 
+                value={stats.matches} 
+                icon={Star} 
+                trend={8} 
+                color="amber"
+              />
             </div>
+
+            <ProjectPerformanceChart title="Alcance do Projeto" />
 
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-4 md:mb-6">
@@ -267,6 +283,8 @@ export function InventorDashboard() {
           </div>
 
           <div className="space-y-4 md:space-y-6">
+            <MarketTrendsChart title="Tendências de Mercado" />
+
             <div className="bg-gradient-to-br from-indigo-900/40 to-cyan-900/20 border border-indigo-500/30 rounded-2xl p-5 md:p-6 relative overflow-hidden">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl" />
               <h3 className="text-sm font-semibold text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-2">
@@ -278,7 +296,7 @@ export function InventorDashboard() {
                 <>
                   <p className="text-3xl font-black text-white my-2">{radarCount}</p>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    empresas e investidores buscando inovações compatíveis com seus segmentos neste momento.
+                    empresas e investidores buscando inovações em **{primaryProject?.segment}** no ecossistema FIESC agora.
                   </p>
                 </>
               ) : (
@@ -464,20 +482,6 @@ export function InventorDashboard() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-function StatCard({ icon: Icon, label, value, color, bg }: any) {
-  return (
-    <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 md:p-6 flex items-center gap-3 md:gap-4 hover:border-slate-700 transition-all">
-      <div className={`w-11 h-11 md:w-14 md:h-14 rounded-xl flex items-center justify-center flex-shrink-0 ${bg} ${color}`}>
-        <Icon size={22} />
-      </div>
-      <div className="min-w-0">
-        <p className="text-[10px] md:text-xs font-semibold text-slate-400 uppercase tracking-wider mb-0.5">{label}</p>
-        <p className="text-xl md:text-2xl font-bold text-slate-100">{value}</p>
-      </div>
     </div>
   );
 }

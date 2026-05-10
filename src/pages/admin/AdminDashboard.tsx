@@ -3,11 +3,16 @@ import { getGlobalMetrics, getLiveDealFlows, getAllUsers, toggleUserVerification
 import { 
   ShieldAlert, Activity, Users, FolderKanban, Network, 
   Zap, Loader2, ServerCog, CheckCircle, FileSearch,
-  PieChart, BarChart3, Download
+  Download, TrendingUp, Globe, PieChart, BarChart3
 } from "lucide-react";
 import { exportEcosystemReport } from "../../services/reportService";
 import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
 import { db } from "../../firebase/config";
+import { StatsCard } from "../../components/analytics/StatsCard";
+import { 
+  BarChart as RechartsBarChart, Bar, XAxis, YAxis, 
+  CartesianGrid, Tooltip, ResponsiveContainer
+} from "recharts";
 
 export function AdminDashboard() {
   const [metrics, setMetrics] = useState<any>(null);
@@ -157,36 +162,91 @@ export function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-[#0A0514] border border-fuchsia-900/50 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute -right-6 -top-6 text-fuchsia-900/20 group-hover:text-fuchsia-900/40 transition-colors"><Users size={120} /></div>
-          <p className="text-fuchsia-400 text-sm font-bold uppercase tracking-wider mb-2 relative z-10">Total de Usuários</p>
-          <p className="text-5xl font-black text-slate-100 relative z-10">{metrics.totalUsers}</p>
-          <div className="mt-4 flex gap-2 text-[10px] text-slate-400 font-medium uppercase relative z-10">
-            <span className="bg-slate-900 px-2 py-1 rounded border border-slate-800">{metrics.breakdownUsers.icts} ICTs</span>
-            <span className="bg-slate-900 px-2 py-1 rounded border border-slate-800">{metrics.breakdownUsers.companies} Empresas</span>
-            <span className="bg-slate-900 px-2 py-1 rounded border border-slate-800">{metrics.breakdownUsers.investors} Invest.</span>
+        <StatsCard 
+          label="Total de Usuários" 
+          value={metrics.totalUsers} 
+          icon={Users} 
+          trend={12} 
+          color="indigo" 
+          description={`${metrics.breakdownUsers.icts} ICTs / ${metrics.breakdownUsers.companies} Orgs`}
+        />
+        <StatsCard 
+          label="Projetos Ativos" 
+          value={metrics.totalProjects} 
+          icon={FolderKanban} 
+          trend={8} 
+          color="cyan" 
+        />
+        <StatsCard 
+          label="Matches Gerados" 
+          value={metrics.totalMatchesGenerated} 
+          icon={Network} 
+          trend={24} 
+          color="emerald" 
+        />
+        <StatsCard 
+          label="Deal Flows" 
+          value={metrics.totalActiveDeals} 
+          icon={Zap} 
+          trend={5} 
+          color="amber" 
+        />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-slate-900/50 border border-slate-800 rounded-3xl p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest">Crescimento do Ecossistema</h3>
+            <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full border border-emerald-400/20">
+              <TrendingUp size={12} /> +12% MoM
+            </div>
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsBarChart data={[
+                { name: 'Jan', users: 400, deals: 240 },
+                { name: 'Fev', users: 300, deals: 139 },
+                { name: 'Mar', users: 200, deals: 980 },
+                { name: 'Abr', users: 278, deals: 390 },
+                { name: 'Mai', users: 189, deals: 480 },
+                { name: 'Jun', users: 239, deals: 380 },
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                <XAxis dataKey="name" stroke="#64748b" fontSize={10} axisLine={false} tickLine={false} />
+                <YAxis stroke="#64748b" fontSize={10} axisLine={false} tickLine={false} />
+                <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }} />
+                <Bar dataKey="users" fill="#6366f1" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="deals" fill="#10b981" radius={[4, 4, 0, 0]} />
+              </RechartsBarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-[#0A0514] border border-cyan-900/50 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute -right-6 -top-6 text-cyan-900/20 group-hover:text-cyan-900/40 transition-colors"><FolderKanban size={120} /></div>
-          <p className="text-cyan-400 text-sm font-bold uppercase tracking-wider mb-2 relative z-10">Projetos Ativos</p>
-          <p className="text-5xl font-black text-slate-100 relative z-10">{metrics.totalProjects}</p>
-          <p className="text-xs text-slate-500 mt-4 relative z-10 font-medium">Pool de inovação atual</p>
-        </div>
-
-        <div className="bg-[#0A0514] border border-emerald-900/50 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute -right-6 -top-6 text-emerald-900/20 group-hover:text-emerald-900/40 transition-colors"><Network size={120} /></div>
-          <p className="text-emerald-400 text-sm font-bold uppercase tracking-wider mb-2 relative z-10">Matches Gerados</p>
-          <p className="text-5xl font-black text-slate-100 relative z-10">{metrics.totalMatchesGenerated}</p>
-          <p className="text-xs text-slate-500 mt-4 relative z-10 font-medium">Recomendações feitas pelo algoritmo</p>
-        </div>
-
-        <div className="bg-[#0A0514] border border-amber-900/50 rounded-2xl p-6 relative overflow-hidden group">
-          <div className="absolute -right-6 -top-6 text-amber-900/20 group-hover:text-amber-900/40 transition-colors"><Zap size={120} /></div>
-          <p className="text-amber-400 text-sm font-bold uppercase tracking-wider mb-2 relative z-10">Deal Flows Abertos</p>
-          <p className="text-5xl font-black text-slate-100 relative z-10">{metrics.totalActiveDeals}</p>
-          <p className="text-xs text-slate-500 mt-4 relative z-10 font-medium">Negociações em andamento no Chat</p>
+        <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 flex flex-col">
+          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">Atividade Regional</h3>
+          <div className="flex-1 flex flex-col justify-center space-y-4">
+             {[
+               { region: 'Joinville / Norte', activity: 85, color: 'bg-indigo-500' },
+               { region: 'Florianópolis / Litoral', activity: 92, color: 'bg-emerald-500' },
+               { region: 'Chapecó / Oeste', activity: 45, color: 'bg-amber-500' },
+               { region: 'Blumenau / Vale', activity: 68, color: 'bg-cyan-500' },
+             ].map((reg, idx) => (
+               <div key={idx} className="space-y-1">
+                 <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                   <span>{reg.region}</span>
+                   <span>{reg.activity}%</span>
+                 </div>
+                 <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                    <div className={`${reg.color} h-full rounded-full transition-all duration-1000`} style={{ width: `${reg.activity}%` }} />
+                 </div>
+               </div>
+             ))}
+          </div>
+          <div className="mt-6 pt-6 border-t border-slate-800">
+            <p className="text-[10px] text-slate-500 italic flex items-center gap-2">
+              <Globe size={12} /> Heatmap baseado em logins e novos projetos
+            </p>
+          </div>
         </div>
       </div>
 

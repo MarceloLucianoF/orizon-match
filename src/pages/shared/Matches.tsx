@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { getMatches, updateMatchAction } from "../../services/matchService";
 import { createOrGetConversation } from "../../services/chatService";
 import { explainMatch } from "../../lib/matching";
 import { 
   Loader2, ArrowRight, Search, Filter, 
-  Zap, Lock, Heart, X, ShieldCheck 
+  Zap, Lock, Heart, X, ShieldCheck, FolderOpen 
 } from "lucide-react";
+import { EmptyState } from "../../components/EmptyState";
 
 export function Matches() {
   const { user } = useAuth();
@@ -72,12 +73,14 @@ export function Matches() {
 
   if (!projectId) {
     return (
-      <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-12 text-center">
-        <h2 className="text-xl font-semibold text-slate-200 mb-2">Selecione um projeto</h2>
-        <p className="text-slate-400 mb-6">Você precisa selecionar um projeto para ver seus matches.</p>
-        <Link to="/projects" className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2 rounded-lg font-medium">
-          Ir para Meus Projetos
-        </Link>
+      <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl">
+        <EmptyState
+          icon={FolderOpen}
+          title="Selecione um projeto"
+          description="Você precisa selecionar um projeto para ver seus matches de compatibilidade."
+          ctaLabel="Ir para Meus Projetos"
+          ctaLink="/projects"
+        />
       </div>
     );
   }
@@ -140,10 +143,14 @@ export function Matches() {
           <Loader2 className="animate-spin text-indigo-500" size={32} />
         </div>
       ) : filteredMatches.length === 0 ? (
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-12 text-center">
-          <Search className="mx-auto text-slate-600 mb-4" size={48} />
-          <h2 className="text-xl font-semibold text-slate-300 mb-2">Nenhum match na visão atual</h2>
-          <p className="text-slate-500">Tente ajustar os filtros ou aguarde novas conexões.</p>
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl">
+          <EmptyState
+            icon={Search}
+            title="Nenhum match na visão atual"
+            description="Enriqueça seu VDR com mais detalhes de maturidade comercial para atrair investidores. Ou ajuste os filtros acima."
+            ctaLabel="Explorar Oportunidades"
+            ctaLink="/explore"
+          />
         </div>
       ) : (
         <div className="space-y-4">

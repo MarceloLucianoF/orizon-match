@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   FolderOpen, FileText, Lock, 
   ShieldCheck, Upload, Download, 
   MoreVertical, ChevronRight, Eye,
   FileBadge, Briefcase, TrendingUp
 } from "lucide-react";
+import { SecureNDA } from "./SecureNDA";
+import { useAuth } from "../hooks/useAuth";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 interface VDRFile {
   id: string;
@@ -23,8 +27,51 @@ interface VDRFolder {
   isLocked: boolean;
 }
 
-export function VDRRoom({ isPublic = false, hasSignedNDA = false }) {
+export function VDRRoom({ 
+  projectId, 
+  projectTitle,
+  isPublic = false, 
+  inpiStatus 
+}: { 
+  projectId?: string; 
+  projectTitle?: string;
+  isPublic?: boolean; 
+  inpiStatus?: string 
+}) {
+  const { user } = useAuth();
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
+  const [hasSignedNDA, setHasSignedNDA] = useState(false);
+  const [showNDAModal, setShowNDAModal] = useState(false);
+  const [checkingNDA, setCheckingNDA] = useState(true);
+
+  useEffect(() => {
+    async function checkNDA() {
+      if (!user || !projectId || !isPublic) {
+        setCheckingNDA(false);
+        return;
+      }
+      try {
+        const q = query(
+          collection(db, 'ndas'), 
+          where('projectId', '==', projectId),
+          where('investorId', '==', user.uid)
+        );
+        const snap = await getDocs(q);
+        setHasSignedNDA(!snap.empty);
+      } catch (err) {
+        console.error("Erro ao checar NDA", err);
+      } finally {
+        setCheckingNDA(false);
+      }
+    }
+    checkNDA();
+  }, [user, projectId, isPublic, checkingNDA]);
+
+  const inpiBadge = inpiStatus ? {
+    'depositada': { label: 'Patente Depositada', color: 'bg-amber-500/10 text-amber-400 border-amber-500/20' },
+    'concedida': { label: 'Patente Concedida', color: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' },
+    'expirada': { label: 'Patente Expirada', color: 'bg-red-500/10 text-red-400 border-red-500/20' },
+  }[inpiStatus.toLowerCase()] || { label: `INPI: ${inpiStatus}`, color: 'bg-slate-800 text-slate-400 border-slate-700' } : null;
 
   const folders: VDRFolder[] = [
     {
@@ -72,11 +119,16 @@ export function VDRRoom({ isPublic = false, hasSignedNDA = false }) {
   const currentFolder = folders.find(f => f.id === activeFolder);
 
   return (
-    <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px]">
-      <div className="p-6 border-b border-slate-800 bg-slate-900/80 flex justify-between items-center">
+    <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[600px] relative">
+      <div className="p-6 border-b border-slate-800 bg-slate-900/80 flex flex-wrap justify-between items-center gap-3">
         <div>
           <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
             <FolderOpen className="text-indigo-400" size={20} /> Virtual Data Room (VDR)
+            {inpiBadge && (
+              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ml-2 flex items-center gap-1 ${inpiBadge.color}`}>
+                <ShieldCheck size={10} /> {inpiBadge.label}
+              </span>
+            )}
           </h3>
           <p className="text-xs text-slate-500 mt-0.5">Ambiente seguro para compartilhamento de documentação estratégica.</p>
         </div>
@@ -127,7 +179,10 @@ export function VDRRoom({ isPublic = false, hasSignedNDA = false }) {
                   Para visualizar a pasta <strong>{currentFolder.name}</strong>, é necessário a assinatura do Acordo de Confidencialidade (NDA).
                 </p>
               </div>
-              <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all">
+              <button 
+                onClick={() => setShowNDAModal(true)}
+                className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all"
+              >
                 Solicitar Acesso / Assinar NDA
               </button>
             </div>
@@ -177,6 +232,17 @@ export function VDRRoom({ isPublic = false, hasSignedNDA = false }) {
           )}
         </div>
       </div>
+
+      {showNDAModal && projectId && (
+        <SecureNDA 
+          projectId={projectId} 
+          projectTitle={projectTitle || "Projeto"} 
+          onAccept={() => {
+            setHasSignedNDA(true);
+            setShowNDAModal(false);
+          }} 
+        />
+      )}
     </div>
   );
 }

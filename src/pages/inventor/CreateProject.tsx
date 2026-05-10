@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { createProject } from "../../services/projectService";
@@ -12,6 +12,7 @@ import { searchPatentsInpi } from "../../services/inpiService";
 import type { INPIPatent } from "../../services/inpiService";
 import { functions } from "../../firebase/config";
 import { httpsCallable } from "firebase/functions";
+import { registrationSchema, maskCpfCnpj, maskPhone, validateForm } from "../../lib/validators";
 
 const FIESC_CHAMBERS = [
   "Agroindústria",
@@ -43,16 +44,46 @@ type Step =
   | 'SUMMARY_METHOD' 
   | 'SUMMARY_CONTENT' 
   | 'CADASTRO' 
-  | 'REVIEW';
+  | 'REVIEW'
+  | 'ICT_RESEARCH'
+  | 'ICT_INFRA'
+  | 'PROVIDER_SERVICES'
+  | 'PROVIDER_CAPACITY';
 
 export function CreateProject() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>('ROLE');
   const [loading, setLoading] = useState(false);
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
+  const [aiStatus, setAiStatus] = useState("");
   const [inpiLoading, setInpiLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [inpiResults, setInpiResults] = useState<INPIPatent[]>([]);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  // Hydration from sessionStorage (Lead Capture)
+  useEffect(() => {
+    const cachedLead = sessionStorage.getItem('@orizon:lead_data');
+    if (cachedLead) {
+      try {
+        const leadData = JSON.parse(cachedLead);
+        setFormData(prev => ({ 
+          ...prev, 
+          ...leadData,
+          registration: {
+            ...prev.registration,
+            ...(leadData.registration || {})
+          }
+        }));
+        // If it comes from lead capture, it probably already has role and segment
+        if (leadData.role) setStep('SEGMENT');
+        sessionStorage.removeItem('@orizon:lead_data');
+      } catch (e) {
+        console.error("Erro ao recuperar dados do lead", e);
+      }
+    }
+  }, []);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -76,6 +107,12 @@ export function CreateProject() {
     trl: 1,
     irl: 0,
     trlChecklist: {},
+    // ICT fields
+    researchLines: [] as string[],
+    infrastructure: [] as string[],
+    // Provider fields
+    services: [] as string[],
+    productionCapacity: "",
     // Cadastro data
     registration: {
       name: "",
@@ -123,9 +160,9 @@ export function CreateProject() {
         type: formData.role,
         segment: formData.segment,
         needs: {
-          investment: true,
+          investment: formData.role === 'idea',
           research: formData.needsResearch === 'sim',
-          industry: true,
+          industry: formData.role === 'idea',
         },
         location: {
           region: formData.location.region,
@@ -137,7 +174,17 @@ export function CreateProject() {
         summary: finalSummary,
         trlChecklist: formData.trlChecklist,
         irlScore: formData.irl,
-        maturity: formData.trl || 1
+        maturity: formData.trl || 1,
+        // ICT fields
+        ...(formData.role === 'ict' && {
+          researchLines: formData.researchLines,
+          infrastructure: formData.infrastructure,
+        }),
+        // Provider fields
+        ...(formData.role === 'provider' && {
+          services: formData.services,
+          productionCapacity: formData.productionCapacity,
+        }),
       } as any);
 
       navigate(`/matches?project=${projectId}`);
@@ -268,8 +315,175 @@ export function CreateProject() {
             <div className="pt-6 border-t border-slate-800 flex justify-between">
               <button onClick={() => prevStep('ROLE')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={() => nextStep('PROTECTION')} 
+                onClick={() => {
+                  if (formData.role === 'ict') nextStep('ICT_RESEARCH');
+                  else if (formData.role === 'provider') nextStep('PROVIDER_SERVICES');
+                  else nextStep('PROTECTION');
+                }} 
                 disabled={!formData.segment}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: ICT_RESEARCH — Linhas de Pesquisa */}
+        {step === 'ICT_RESEARCH' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Linhas de Pesquisa</h2>
+              <p className="text-slate-400">Selecione as áreas de pesquisa do seu ICT.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {['Biotecnologia', 'Nanotecnologia', 'Engenharia de Materiais', 'Inteligência Artificial', 
+                'Automação Industrial', 'Energia Renovável', 'Agrociência', 'Química Fina', 
+                'Robótica', 'Saúde e Biomedicina', 'Ciência de Dados', 'Meio Ambiente'].map(line => (
+                <button
+                  key={line}
+                  onClick={() => {
+                    const current = formData.researchLines;
+                    const updated = current.includes(line) ? current.filter(l => l !== line) : [...current, line];
+                    updateField('researchLines', updated);
+                  }}
+                  className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
+                    formData.researchLines.includes(line)
+                      ? 'bg-blue-500/20 border-blue-500 text-blue-300'
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  {line}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('SEGMENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('ICT_INFRA')} 
+                disabled={formData.researchLines.length === 0}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: ICT_INFRA — Infraestrutura */}
+        {step === 'ICT_INFRA' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Infraestrutura Disponível</h2>
+              <p className="text-slate-400">Quais recursos seu ICT pode oferecer a parceiros?</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {['Laboratório de P&D', 'Prototipagem Rápida', 'Certificação e Ensaios', 'Análise Laboratorial', 
+                'Testes em Campo', 'Simulação Computacional', 'Planta Piloto', 'Metrologia'].map(item => (
+                <button
+                  key={item}
+                  onClick={() => {
+                    const current = formData.infrastructure;
+                    const updated = current.includes(item) ? current.filter(i => i !== item) : [...current, item];
+                    updateField('infrastructure', updated);
+                  }}
+                  className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
+                    formData.infrastructure.includes(item)
+                      ? 'bg-blue-500/20 border-blue-500 text-blue-300'
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('ICT_RESEARCH')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('LOCATION')} 
+                disabled={formData.infrastructure.length === 0}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: PROVIDER_SERVICES — Serviços */}
+        {step === 'PROVIDER_SERVICES' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Serviços Oferecidos</h2>
+              <p className="text-slate-400">Quais serviços sua empresa pode prestar?</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {['Consultoria Técnica', 'Fabricação / Usinagem', 'Design de Produto', 'Testes e Ensaios',
+                'Logística e Distribuição', 'Montagem Industrial', 'Embalagem', 'Certificação',
+                'Manutenção Industrial', 'Engenharia de Processos'].map(svc => (
+                <button
+                  key={svc}
+                  onClick={() => {
+                    const current = formData.services;
+                    const updated = current.includes(svc) ? current.filter(s => s !== svc) : [...current, svc];
+                    updateField('services', updated);
+                  }}
+                  className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
+                    formData.services.includes(svc)
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  {svc}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('SEGMENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('PROVIDER_CAPACITY')} 
+                disabled={formData.services.length === 0}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: PROVIDER_CAPACITY — Capacidade Produtiva */}
+        {step === 'PROVIDER_CAPACITY' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Capacidade Produtiva</h2>
+              <p className="text-slate-400">Qual a sua escala de operação?</p>
+            </div>
+
+            <div className="grid gap-4">
+              {[
+                { id: 'prototipagem', label: 'Prototipagem', desc: 'Produção unitária ou lotes muito pequenos para validação.' },
+                { id: 'lotes_pequenos', label: 'Lotes Pequenos', desc: 'Produção de 10 a 500 unidades por ciclo.' },
+                { id: 'escala_media', label: 'Escala Média', desc: 'Produção de 500 a 10.000 unidades por ciclo.' },
+                { id: 'escala_industrial', label: 'Escala Industrial', desc: 'Produção acima de 10.000 unidades. Linha de produção dedicada.' },
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => updateField('productionCapacity', opt.id)}
+                  className={`p-5 rounded-2xl text-left transition-all border ${
+                    formData.productionCapacity === opt.id
+                      ? 'bg-emerald-500/10 border-emerald-500 text-emerald-300'
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="font-bold text-base mb-1">{opt.label}</div>
+                  <div className="text-xs text-slate-500">{opt.desc}</div>
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('PROVIDER_SERVICES')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('LOCATION')} 
+                disabled={!formData.productionCapacity}
                 className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
@@ -506,9 +720,21 @@ export function CreateProject() {
             </div>
 
             <div className="pt-6 border-t border-slate-800 flex justify-between">
-              <button onClick={() => prevStep('INNOVATION_TYPE')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={() => nextStep('MATURITY')} 
+                onClick={() => {
+                  if (formData.role === 'ict') prevStep('ICT_INFRA');
+                  else if (formData.role === 'provider') prevStep('PROVIDER_CAPACITY');
+                  else prevStep('INNOVATION_TYPE');
+                }} 
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition"
+              >
+                <ArrowLeft size={18} /> Voltar
+              </button>
+              <button 
+                onClick={() => {
+                  if (formData.role === 'idea') nextStep('MATURITY');
+                  else nextStep('CADASTRO');
+                }} 
                 className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
               >Próximo</button>
             </div>
@@ -637,25 +863,33 @@ export function CreateProject() {
                         setError("Preencha as três perguntas para que a IA possa lapidar seu pitch.");
                         return;
                       }
-                      setLoading(true);
+                      
+                      setIsAiProcessing(true);
+                      setAiStatus("Analisando sua inovação...");
                       setError(null);
+                      
                       try {
+                        setTimeout(() => setAiStatus("Estruturando proposta de valor..."), 1500);
+                        setTimeout(() => setAiStatus("Lapidando tom de voz executivo..."), 3000);
+
                         const enhancePitchFn = httpsCallable(functions, 'enhancePitch');
                         const result = await enhancePitchFn(formData.summaryQuestions);
                         const summary = (result.data as any).summary;
                         updateField('summary', summary);
-                        updateField('summaryMethod', 'text'); // Switch to text view to see and edit the result
-                      } catch (error) {
-                        console.error(error);
-                        setError("Falha na comunicação com a IA. Você pode prosseguir com o texto manual.");
+                        updateField('summaryMethod', 'text');
+                      } catch (err: any) {
+                        console.error(err);
+                        const msg = err.message || "Falha na comunicação com a IA.";
+                        setError(`${msg} Você pode prosseguir com o texto manual abaixo.`);
+                        updateField('summaryMethod', 'text');
                       } finally {
-                        setLoading(false);
+                        setIsAiProcessing(false);
                       }
                     }}
-                    disabled={loading}
+                    disabled={isAiProcessing}
                     className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {loading ? <Loader2 className="animate-spin" size={20} /> : <><Zap size={18} /> Lapidar Pitch com IA</>}
+                    {isAiProcessing ? <Loader2 className="animate-spin" size={20} /> : <><Zap size={18} /> Lapidar Pitch com IA</>}
                   </button>
                   <p className="text-center text-xs text-slate-500 mt-3">Powered by NVIDIA NIM</p>
                 </div>
@@ -673,7 +907,15 @@ export function CreateProject() {
             )}
 
             <div className="pt-6 border-t border-slate-800 flex justify-between">
-              <button onClick={() => prevStep('SUMMARY_METHOD')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => {
+                  if (formData.role === 'idea') prevStep('SUMMARY_METHOD');
+                  else prevStep('LOCATION');
+                }} 
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition"
+              >
+                <ArrowLeft size={18} /> Voltar
+              </button>
               <button 
                 onClick={() => nextStep('CADASTRO')} 
                 className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
@@ -696,36 +938,44 @@ export function CreateProject() {
                 <input
                   type="text"
                   value={formData.registration.name}
-                  onChange={(e) => updateRegistration('name', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                  onChange={(e) => { updateRegistration('name', e.target.value); setFieldErrors(prev => ({ ...prev, name: '' })); }}
+                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none transition ${fieldErrors.name ? 'border-red-500' : 'border-slate-800'}`}
+                  placeholder="Nome completo ou razão social"
                 />
+                {fieldErrors.name && <p className="text-red-400 text-xs mt-1">{fieldErrors.name}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-400 mb-1">CNPJ / CPF</label>
                 <input
                   type="text"
                   value={formData.registration.idNumber}
-                  onChange={(e) => updateRegistration('idNumber', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                  onChange={(e) => { updateRegistration('idNumber', maskCpfCnpj(e.target.value)); setFieldErrors(prev => ({ ...prev, idNumber: '' })); }}
+                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none transition ${fieldErrors.idNumber ? 'border-red-500' : 'border-slate-800'}`}
+                  placeholder="000.000.000-00"
                 />
+                {fieldErrors.idNumber && <p className="text-red-400 text-xs mt-1">{fieldErrors.idNumber}</p>}
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-400 mb-1">Telefone</label>
                 <input
                   type="text"
                   value={formData.registration.phone}
-                  onChange={(e) => updateRegistration('phone', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                  onChange={(e) => { updateRegistration('phone', maskPhone(e.target.value)); setFieldErrors(prev => ({ ...prev, phone: '' })); }}
+                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none transition ${fieldErrors.phone ? 'border-red-500' : 'border-slate-800'}`}
+                  placeholder="(00) 00000-0000"
                 />
+                {fieldErrors.phone && <p className="text-red-400 text-xs mt-1">{fieldErrors.phone}</p>}
               </div>
               <div className="col-span-full">
                 <label className="block text-sm font-medium text-slate-400 mb-1">E-mail</label>
                 <input
                   type="email"
                   value={formData.registration.email}
-                  onChange={(e) => updateRegistration('email', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                  onChange={(e) => { updateRegistration('email', e.target.value); setFieldErrors(prev => ({ ...prev, email: '' })); }}
+                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none transition ${fieldErrors.email ? 'border-red-500' : 'border-slate-800'}`}
+                  placeholder="seu@email.com"
                 />
+                {fieldErrors.email && <p className="text-red-400 text-xs mt-1">{fieldErrors.email}</p>}
               </div>
               {!user && (
                 <>
@@ -736,6 +986,7 @@ export function CreateProject() {
                       value={formData.registration.password}
                       onChange={(e) => updateRegistration('password', e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                      placeholder="Min. 6 caracteres"
                     />
                   </div>
                   <div>
@@ -745,6 +996,7 @@ export function CreateProject() {
                       value={formData.registration.confirmPassword}
                       onChange={(e) => updateRegistration('confirmPassword', e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                      placeholder="Repita a senha"
                     />
                   </div>
                 </>
@@ -752,9 +1004,21 @@ export function CreateProject() {
             </div>
 
             <div className="pt-6 border-t border-slate-800 flex justify-between">
-              <button onClick={() => prevStep('SUMMARY_CONTENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={() => nextStep('REVIEW')} 
+                onClick={() => {
+                  if (formData.role === 'idea') prevStep('SUMMARY_CONTENT');
+                  else prevStep('LOCATION');
+                }} 
+                className="flex items-center gap-2 text-slate-400 hover:text-white transition"
+              >
+                <ArrowLeft size={18} /> Voltar
+              </button>
+              <button 
+                onClick={() => {
+                  const errors = validateForm(registrationSchema, formData.registration);
+                  setFieldErrors(errors);
+                  if (Object.keys(errors).length === 0) nextStep('REVIEW');
+                }} 
                 className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
               >Próximo</button>
             </div>
@@ -805,6 +1069,28 @@ export function CreateProject() {
         )}
 
       </div>
+
+      {/* IA Processing Overlay */}
+      {isAiProcessing && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
+          <div className="bg-slate-900 border border-indigo-500/30 p-8 rounded-3xl shadow-[0_0_50px_rgba(79,70,229,0.2)] max-w-sm w-full text-center space-y-6">
+            <div className="relative w-20 h-20 mx-auto">
+              <div className="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping" />
+              <div className="relative bg-indigo-600 w-20 h-20 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(79,70,229,0.5)]">
+                <Zap size={40} className="animate-pulse" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-white">IA Refinando seu Pitch</h3>
+              <p className="text-indigo-400 text-sm font-medium animate-pulse">{aiStatus}</p>
+            </div>
+            <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+               <div className="bg-indigo-500 h-full w-1/2 animate-[shimmer_2s_infinite] rounded-full" />
+            </div>
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Aguarde alguns segundos...</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

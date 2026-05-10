@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { getUserProjects, updateProject } from "../../services/projectService";
 import { Plus, Loader2, FolderKanban, Activity, BarChart3, Pause, Play, Settings2, X, Save } from "lucide-react";
+import { EmptyState } from "../../components/EmptyState";
 
 export function Projects() {
   const { user } = useAuth();
@@ -107,20 +108,14 @@ export function Projects() {
           <Loader2 className="animate-spin text-indigo-500" size={32} />
         </div>
       ) : projects.length === 0 ? (
-        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-16 text-center shadow-2xl">
-          <div className="w-20 h-20 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
-            <FolderKanban className="text-indigo-400" size={32} />
-          </div>
-          <h2 className="text-2xl font-bold text-slate-200 mb-3">Nenhum projeto rodando</h2>
-          <p className="text-slate-400 mb-8 max-w-md mx-auto">
-            O algoritmo precisa de pelo menos um projeto mapeado para poder escannear o ecossistema e encontrar os melhores parceiros.
-          </p>
-          <Link 
-            to="/projects/new"
-            className="inline-block bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)]"
-          >
-            Cadastrar Primeiro Projeto
-          </Link>
+        <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-8">
+          <EmptyState
+            icon={FolderKanban}
+            title="Nenhum projeto rodando"
+            description="O algoritmo precisa de pelo menos um projeto mapeado para poder escannear o ecossistema e encontrar os melhores parceiros."
+            ctaLabel="Cadastrar Primeiro Projeto"
+            ctaLink="/projects/new"
+          />
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -178,6 +173,12 @@ export function Projects() {
 
               {/* Lado Direito: Ações */}
               <div className="flex-shrink-0 flex md:flex-col gap-2 w-full md:w-auto pt-4 md:pt-0 md:pl-4 md:border-l border-slate-800 justify-center md:justify-start">
+                <Link 
+                  to={`/projects/${project.id}`} 
+                  className="flex-1 md:flex-none text-center bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Ver Detalhes
+                </Link>
                 <Link 
                   to={`/matches?project=${project.id}`} 
                   className="flex-1 md:flex-none text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"

@@ -2,10 +2,16 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import { generateMatches } from "./services/match.service";
 import { getPreviewMatches } from "./services/preview.service";
+import { recordProjectView, recordMatchCreated } from "./services/analytics.service";
 import OpenAI from "openai";
 
-admin.initializeApp();
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 const db = admin.firestore();
+
+// Secrets
+// Note: functions.runWith() is used in the exports themselves to specify secrets
 
 export const previewMatches = functions.https.onCall(async (data, context) => {
   try {
@@ -16,24 +22,75 @@ export const previewMatches = functions.https.onCall(async (data, context) => {
   }
 });
 
+import { createNotification } from "./services/notifications.service";
+
 export const onProjectCreated = functions.firestore
   .document("projects/{projectId}")
   .onCreate(async (snap) => {
     const data = snap.data();
-
-    const project = {
-      id: snap.id,
-      ...data,
-    } as any;
-
-    console.log("New project created:", project.id);
+    const project = { id: snap.id, ...data } as any;
 
     await generateMatches(project);
+    await recordMatchCreated(snap.id);
 
-    console.log("Matches generated successfully");
+    // Notificar o admin (opcional) ou o próprio inventor confirmando
+    await createNotification({
+      userId: project.userId,
+      title: "Projeto Criado! 🚀",
+      message: `Seu projeto "${project.title}" foi publicado. Estamos buscando matches industriais agora mesmo.`,
+      type: "system",
+      link: "/app/dashboard"
+    });
   });
 
-export const enhancePitch = functions.https.onCall(async (data, context) => {
+export const onMatchCreated = functions.firestore
+  .document("matches/{matchId}")
+  .onCreate(async (snap) => {
+    const match = snap.data();
+    
+    // Notificar o dono do projeto
+    // Precisamos buscar o userId do dono do projeto se não estiver no match
+    const projectDoc = await db.collection("projects").doc(match.ownerProjectId).get();
+    const projectData = projectDoc.data();
+
+    if (projectData) {
+      await createNotification({
+        userId: projectData.userId,
+        title: "Novo Match Identificado! ⚡",
+        message: `Encontramos uma oportunidade com ${match.score}% de afinidade para o seu projeto.`,
+        type: "match",
+        link: "/app/match-history"
+      });
+    }
+
+    // Notificar a empresa alvo
+    await createNotification({
+      userId: match.targetProjectId, // assumindo que targetProjectId é o UID da empresa/investidor
+      title: "Novo Projeto no seu Radar! 🎯",
+      message: `Um novo projeto alinhado com sua tese de investimento acaba de entrar na plataforma.`,
+      type: "match",
+      link: "/app/match-history"
+    });
+  });
+
+export const recordView = functions.region("us-central1").https.onCall(async (data, context) => {
+  const { projectId } = data;
+  if (!projectId) throw new functions.https.HttpsError("invalid-argument", "projectId is required");
+  
+  try {
+    await recordProjectView(projectId);
+    return { success: true };
+  } catch (error) {
+    console.error("Error recording view:", error);
+    throw new functions.https.HttpsError("internal", "Erro ao registrar visualização");
+  }
+});
+
+export const enhancePitch = functions.region("us-central1").runWith({ 
+  secrets: ["NVIDIA_NIM_API_KEY"],
+  timeoutSeconds: 60,
+  memory: "256MB" 
+}).https.onCall(async (data, context) => {
   const { problem, solution, difference } = data;
   const timestamp = admin.firestore.FieldValue.serverTimestamp();
   const userId = context.auth?.uid || "anonymous";
@@ -49,13 +106,18 @@ export const enhancePitch = functions.https.onCall(async (data, context) => {
   }
 
   try {
+    const apiKey = process.env.NVIDIA_NIM_API_KEY;
+    if (!apiKey) {
+      throw new functions.https.HttpsError("failed-precondition", "API Key da NVIDIA não configurada.");
+    }
+
     const openai = new OpenAI({
-      apiKey: process.env.NVIDIA_NIM_API_KEY || "dummy", 
+      apiKey, 
       baseURL: "https://integrate.api.nvidia.com/v1",
     });
 
     const completion = await openai.chat.completions.create({
-      model: "meta/llama3-70b-instruct",
+      model: "meta/llama-3.1-70b-instruct",
       messages: [
         {
           role: "system",
@@ -92,9 +154,76 @@ export const enhancePitch = functions.https.onCall(async (data, context) => {
       timestamp,
       status: "error",
       error: error.message || "Unknown error",
+      stack: error.stack,
       input: { problem, solution, difference }
     });
 
-    throw new functions.https.HttpsError("internal", "Erro ao comunicar com a IA");
+    if (error.status === 401 || error.message?.includes("API key")) {
+      throw new functions.https.HttpsError("unauthenticated", "Chave de API da NVIDIA não configurada ou inválida. Verifique os Secrets no Firebase.");
+    }
+
+    throw new functions.https.HttpsError("internal", error.message || "Erro ao comunicar com a IA");
   }
 });
+
+// ====================================================
+// B2: Email transacional — Convite Jurídico via Resend
+// ====================================================
+import { Resend } from "resend";
+import { legalInviteEmail } from "./emailTemplates";
+
+export const onLegalInviteCreated = functions.runWith({
+  secrets: ["RESEND_API_KEY"]
+}).firestore
+  .document("legal_invites/{inviteId}")
+  .onCreate(async (snap) => {
+    const invite = snap.data();
+    const resendApiKey = process.env.RESEND_API_KEY;
+
+    if (!resendApiKey) {
+      console.warn("RESEND_API_KEY not configured. Skipping email.");
+      return;
+    }
+
+    try {
+      // Fetch inviter profile
+      const inviterDoc = await db.collection("users").doc(invite.invitedBy).get();
+      const inviterName = inviterDoc.data()?.name || "Um inventor";
+
+      const inviteLink = `https://orizon-match.web.app/onboarding?ref=legal&invite=${snap.id}`;
+
+      const { subject, html } = legalInviteEmail({
+        inviterName,
+        projectTitle: invite.projectTitle || "Projeto Confidencial",
+        message: invite.message,
+        inviteLink,
+      });
+
+      const resend = new Resend(resendApiKey);
+
+      await resend.emails.send({
+        from: "Orizon Match <onboarding@resend.dev>",
+        to: invite.email,
+        subject,
+        html,
+      });
+
+      // Mark invite as email_sent
+      await snap.ref.update({ emailSent: true, emailSentAt: admin.firestore.FieldValue.serverTimestamp() });
+
+      // NOTIFICATION for the invited office (if they are already in system)
+      // This is a placeholder since we don't have their UID yet, but we could notify the admin
+      await createNotification({
+        userId: "nqBV3Da1iqPbU46jGvO1ljBbIze2", // Admin UID
+        title: "Novo Convite Jurídico ⚖️",
+        message: `${inviterName} enviou um convite para ${invite.email}`,
+        type: "invite",
+        link: "/app/admin-panel"
+      });
+
+      console.log(`Legal invite email sent to ${invite.email}`);
+    } catch (error: any) {
+      console.error("Error sending legal invite email:", error);
+      await snap.ref.update({ emailError: error.message || "Unknown error" });
+    }
+  });

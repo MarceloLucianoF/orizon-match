@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { functions } from "../../firebase/config";
 import { httpsCallable } from "firebase/functions";
 import { explainMatch } from "../../lib/matching";
+import { fullRegistrationSchema, maskCpfCnpj, maskPhone } from "../../lib/validators";
 
 const FIESC_CHAMBERS = [
   "Agroindústria",
@@ -70,6 +71,7 @@ export default function PublicOnboarding() {
     password: '',
     confirmPassword: ''
   });
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const nextStep = (next: Step) => setStep(next);
   const prevStep = (prev: Step) => setStep(prev);
@@ -107,8 +109,19 @@ export default function PublicOnboarding() {
         location: { region: "sudeste" }
       };
       
+      // Lead Capture: Save data to sessionStorage for hydration after login
+      sessionStorage.setItem('@orizon:lead_data', JSON.stringify({
+        ...dataForBackend,
+        role: formData.role,
+        registration: {
+          name: formData.name,
+          idNumber: formData.idNumber,
+          phone: formData.phone
+        }
+      }));
+
       const result = await previewMatchesFn(dataForBackend);
-      setPreviewResult(result.data);
+      setPreviewResult(result.data as any);
     } catch (error) {
       console.error("Error generating preview:", error);
       setPreviewResult({
@@ -506,49 +519,83 @@ export default function PublicOnboarding() {
             
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
-                <input 
-                  type="text" 
-                  value={formData.name} 
-                  onChange={(e) => updateField('name', e.target.value)} 
-                  placeholder="Razão Social / Nome" 
-                  className="col-span-2 w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
-                />
-                <input 
-                  type="text" 
-                  value={formData.idNumber} 
-                  onChange={(e) => updateField('idNumber', e.target.value)} 
-                  placeholder="CNPJ / CPF" 
-                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
-                />
-                <input 
-                  type="text" 
-                  value={formData.phone} 
-                  onChange={(e) => updateField('phone', e.target.value)} 
-                  placeholder="Telefone" 
-                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
-                />
-                <input 
-                  type="password" 
-                  value={formData.password} 
-                  onChange={(e) => updateField('password', e.target.value)} 
-                  placeholder="Senha" 
-                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
-                />
-                <input 
-                  type="password" 
-                  value={formData.confirmPassword} 
-                  onChange={(e) => updateField('confirmPassword', e.target.value)} 
-                  placeholder="Confirmar" 
-                  className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500" 
-                />
+                <div className="col-span-2">
+                  <input 
+                    type="text" 
+                    value={formData.name} 
+                    onChange={(e) => { updateField('name', e.target.value); setFieldErrors(p => ({ ...p, name: '' })); }} 
+                    placeholder="Razão Social / Nome" 
+                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.name ? 'border-red-500' : 'border-slate-800'}`} 
+                  />
+                  {fieldErrors.name && <p className="text-red-400 text-xs mt-1">{fieldErrors.name}</p>}
+                </div>
+                <div>
+                  <input 
+                    type="text" 
+                    value={formData.idNumber} 
+                    onChange={(e) => { updateField('idNumber', maskCpfCnpj(e.target.value)); setFieldErrors(p => ({ ...p, idNumber: '' })); }} 
+                    placeholder="000.000.000-00" 
+                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.idNumber ? 'border-red-500' : 'border-slate-800'}`} 
+                  />
+                  {fieldErrors.idNumber && <p className="text-red-400 text-xs mt-1">{fieldErrors.idNumber}</p>}
+                </div>
+                <div>
+                  <input 
+                    type="text" 
+                    value={formData.phone} 
+                    onChange={(e) => { updateField('phone', maskPhone(e.target.value)); setFieldErrors(p => ({ ...p, phone: '' })); }} 
+                    placeholder="(00) 00000-0000" 
+                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.phone ? 'border-red-500' : 'border-slate-800'}`} 
+                  />
+                  {fieldErrors.phone && <p className="text-red-400 text-xs mt-1">{fieldErrors.phone}</p>}
+                </div>
+                <div>
+                  <input 
+                    type="password" 
+                    value={formData.password} 
+                    onChange={(e) => { updateField('password', e.target.value); setFieldErrors(p => ({ ...p, password: '' })); }} 
+                    placeholder="Senha (min. 6 chars)" 
+                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.password ? 'border-red-500' : 'border-slate-800'}`} 
+                  />
+                  {fieldErrors.password && <p className="text-red-400 text-xs mt-1">{fieldErrors.password}</p>}
+                </div>
+                <div>
+                  <input 
+                    type="password" 
+                    value={formData.confirmPassword} 
+                    onChange={(e) => { updateField('confirmPassword', e.target.value); setFieldErrors(p => ({ ...p, confirmPassword: '' })); }} 
+                    placeholder="Confirmar senha" 
+                    className={`w-full p-3 rounded-xl bg-slate-950 border text-slate-200 outline-none focus:border-indigo-500 transition ${fieldErrors.confirmPassword ? 'border-red-500' : 'border-slate-800'}`} 
+                  />
+                  {fieldErrors.confirmPassword && <p className="text-red-400 text-xs mt-1">{fieldErrors.confirmPassword}</p>}
+                </div>
               </div>
             </div>
 
             <div className="flex gap-4 pt-4 border-t border-slate-800">
               <button onClick={() => prevStep('SUMMARY_CONTENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={handleGeneratePreview}
-                disabled={!formData.name || !formData.idNumber || !formData.password || formData.password !== formData.confirmPassword}
+                onClick={() => {
+                  const result = fullRegistrationSchema.safeParse({
+                    name: formData.name,
+                    idNumber: formData.idNumber,
+                    phone: formData.phone,
+                    email: formData.idNumber + '@placeholder.com', // email not in public form
+                    password: formData.password,
+                    confirmPassword: formData.confirmPassword,
+                  });
+                  if (!result.success) {
+                    const errs: Record<string, string> = {};
+                    for (const issue of result.error.issues) {
+                      const field = issue.path[0] as string;
+                      if (!errs[field]) errs[field] = issue.message;
+                    }
+                    setFieldErrors(errs);
+                    return;
+                  }
+                  setFieldErrors({});
+                  handleGeneratePreview();
+                }}
                 className="flex-1 p-4 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold transition shadow-[0_0_20px_rgba(79,70,229,0.4)] disabled:opacity-50 flex items-center justify-center gap-2"
               >Gerar Matches Agora <Rocket size={20} /></button>
             </div>
