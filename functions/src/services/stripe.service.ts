@@ -35,6 +35,26 @@ export async function createCheckoutSession(userId: string, email: string, price
   return { sessionId: session.id, url: session.url };
 }
 
+export async function createPortalSession(userId: string) {
+  const stripe = getStripe();
+  
+  // Buscar o stripeCustomerId no Firestore
+  const userDoc = await db.collection("users").doc(userId).get();
+  const userData = userDoc.data();
+  const customerId = userData?.stripeCustomerId;
+
+  if (!customerId) {
+    throw new Error("Usuário não possui um Customer ID do Stripe.");
+  }
+
+  const session = await stripe.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: 'https://orizon-match.web.app/billing',
+  });
+
+  return { url: session.url };
+}
+
 export async function handleWebhook(body: any, signature: string) {
   const stripe = getStripe();
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;

@@ -2,15 +2,29 @@ import { useAuth } from "../../hooks/useAuth";
 import { 
   CreditCard, Calendar, CheckCircle2, 
   ArrowUpCircle, ExternalLink, ShieldCheck,
-  Receipt, Download, Zap
+  Receipt, Download, Zap, Loader2
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { openCustomerPortal } from "../../services/stripeService";
+import { useState } from "react";
 
 export function Billing() {
   const { userProfile } = useAuth();
   
   const isPremium = userProfile?.subscriptionStatus === 'premium';
   const planName = userProfile?.plan === 'pro' ? 'Orizon Pro' : (userProfile?.plan === 'enterprise' ? 'Enterprise' : 'Orizon Free');
+  const [loading, setLoading] = useState(false);
+
+  const handleManageBilling = async () => {
+    setLoading(true);
+    try {
+      await openCustomerPortal();
+    } catch (e) {
+      alert("Erro ao abrir portal de faturamento. Verifique sua conexão.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // MOCK de faturas
   const mockInvoices = [
@@ -70,9 +84,11 @@ export function Billing() {
                 </Link>
               ) : (
                 <button 
-                  className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border border-slate-700"
+                  onClick={handleManageBilling}
+                  disabled={loading}
+                  className="bg-slate-800 hover:bg-slate-700 text-white px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all border border-slate-700 disabled:opacity-50"
                 >
-                  <ExternalLink size={18} /> Gerenciar no Stripe
+                  {loading ? <Loader2 className="animate-spin" size={18} /> : <><ExternalLink size={18} /> Gerenciar no Stripe</>}
                 </button>
               )}
               <p className="text-[10px] text-slate-500 flex items-center justify-center text-center px-4">

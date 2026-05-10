@@ -6,7 +6,7 @@ import { recordProjectView, recordMatchCreated } from "./services/analytics.serv
 import OpenAI from "openai";
 import cors from "cors";
 const corsHandler = cors({ origin: true });
-// import { createCheckoutSession as createStripeSession, handleWebhook } from "./services/stripe.service";
+import { createCheckoutSession as createStripeSession, createPortalSession as createStripePortal, handleWebhook } from "./services/stripe.service";
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -249,7 +249,6 @@ export const onLegalInviteCreated = functions.region("us-central1").runWith({
 // FASE B: Monetização com Stripe
 // ====================================================
 
-/*
 export const createCheckoutSession = functions.region("us-central1").runWith({
   secrets: ["STRIPE_SECRET_KEY"]
 }).https.onCall(async (data, context) => {
@@ -266,6 +265,21 @@ export const createCheckoutSession = functions.region("us-central1").runWith({
     return await createStripeSession(context.auth.uid, context.auth.token.email || "", priceId);
   } catch (error: any) {
     console.error("Error creating checkout session:", error);
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+});
+
+export const createPortalSession = functions.region("us-central1").runWith({
+  secrets: ["STRIPE_SECRET_KEY"]
+}).https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Apenas usuários logados podem gerenciar faturamento.");
+  }
+
+  try {
+    return await createStripePortal(context.auth.uid);
+  } catch (error: any) {
+    console.error("Error creating portal session:", error);
     throw new functions.https.HttpsError("internal", error.message);
   }
 });
@@ -288,5 +302,4 @@ export const stripeWebhook = functions.region("us-central1").runWith({
     res.status(400).send(`Webhook Error: ${err.message}`);
   }
 });
-*/
 
