@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onProjectCreated = exports.previewMatches = void 0;
+exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.previewMatches = void 0;
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const match_service_1 = require("./services/match.service");
@@ -22,16 +22,48 @@ exports.previewMatches = functions.https.onCall(async (data, context) => {
         throw new functions.https.HttpsError("internal", "Erro ao gerar preview de matches");
     }
 });
+const notifications_service_1 = require("./services/notifications.service");
 exports.onProjectCreated = functions.firestore
     .document("projects/{projectId}")
     .onCreate(async (snap) => {
     const data = snap.data();
     const project = Object.assign({ id: snap.id }, data);
-    console.log("New project created:", project.id);
     await (0, match_service_1.generateMatches)(project);
-    // Record analytics
     await (0, analytics_service_1.recordMatchCreated)(snap.id);
-    console.log("Matches generated successfully");
+    // Notificar o admin (opcional) ou o próprio inventor confirmando
+    await (0, notifications_service_1.createNotification)({
+        userId: project.userId,
+        title: "Projeto Criado! 🚀",
+        message: `Seu projeto "${project.title}" foi publicado. Estamos buscando matches industriais agora mesmo.`,
+        type: "system",
+        link: "/app/dashboard"
+    });
+});
+exports.onMatchCreated = functions.firestore
+    .document("matches/{matchId}")
+    .onCreate(async (snap) => {
+    const match = snap.data();
+    // Notificar o dono do projeto
+    // Precisamos buscar o userId do dono do projeto se não estiver no match
+    const projectDoc = await db.collection("projects").doc(match.ownerProjectId).get();
+    const projectData = projectDoc.data();
+    if (projectData) {
+        await (0, notifications_service_1.createNotification)({
+            userId: projectData.userId,
+            title: "Novo Match Identificado! ⚡",
+            message: `Encontramos uma oportunidade com ${match.score}% de afinidade para o seu projeto.`,
+            type: "match",
+            link: "/app/match-history"
+        });
+    }
+    // Notificar a empresa alvo
+    await (0, notifications_service_1.createNotification)({
+        userId: match.targetProjectId, // assumindo que targetProjectId é o UID da empresa/investidor
+        title: "Novo Projeto no seu Radar! 🎯",
+        message: `Um novo projeto alinhado com sua tese de investimento acaba de entrar na plataforma.`,
+        type: "match",
+        link: "/app/match-history"
+    });
 });
 exports.recordView = functions.region("us-central1").https.onCall(async (data, context) => {
     const { projectId } = data;
@@ -154,6 +186,15 @@ exports.onLegalInviteCreated = functions.runWith({
         });
         // Mark invite as email_sent
         await snap.ref.update({ emailSent: true, emailSentAt: admin.firestore.FieldValue.serverTimestamp() });
+        // NOTIFICATION for the invited office (if they are already in system)
+        // This is a placeholder since we don't have their UID yet, but we could notify the admin
+        await (0, notifications_service_1.createNotification)({
+            userId: "nqBV3Da1iqPbU46jGvO1ljBbIze2", // Admin UID
+            title: "Novo Convite Jurídico ⚖️",
+            message: `${inviterName} enviou um convite para ${invite.email}`,
+            type: "invite",
+            link: "/app/admin-panel"
+        });
         console.log(`Legal invite email sent to ${invite.email}`);
     }
     catch (error) {
