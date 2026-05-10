@@ -76,3 +76,16 @@ export async function toggleUserVerification(userId: string, isVerified: boolean
     throw error;
   }
 }
+
+export async function updateUserSubscription(userId: string, status: 'free' | 'premium' | 'enterprise') {
+  try {
+    await updateDoc(doc(db, "users", userId), { 
+      subscriptionStatus: status,
+      plan: status === 'free' ? 'starter' : (status === 'premium' ? 'pro' : 'enterprise'),
+      updatedAt: new Date()
+    });
+  } catch (error) {
+    console.error("Erro ao atualizar assinatura do usuário:", error);
+    throw error;
+  }
+}

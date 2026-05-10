@@ -11,11 +11,12 @@ export function Sidebar({ onClose }: SidebarProps) {
   const { pathname } = useLocation();
   const { logout, user, userProfile } = useAuth();
   const isAdmin = userProfile?.role === 'admin' || user?.uid === SUPER_ADMIN_UID;
-  const isLegal = userProfile?.role === 'legal';
+
 
   const links = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/projects", icon: isLegal ? Gavel : FolderKanban, label: isLegal ? "Ativos de PI" : "Meus Projetos" },
+    { to: "/projects", icon: FolderKanban, label: "Meus Projetos" },
+    { to: "/assets", icon: Gavel, label: "Ativos de PI" },
     { to: "/explore", icon: Compass, label: "Explorar" },
     { to: "/matches", icon: Users, label: "Matches" },
     { to: "/chat", icon: MessageSquare, label: "Deal Flow" },

@@ -5,8 +5,9 @@ import { doc, updateDoc } from "firebase/firestore";
 import { 
   User, Building2, Mail, Phone, 
   ShieldCheck, Bell, Save, Loader2,
-  CheckCircle2, CreditCard, Newspaper
+  CheckCircle2, CreditCard, Newspaper, Zap, ArrowUpCircle
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import { registrationSchema, maskCpfCnpj, maskPhone, validateForm } from "../../lib/validators";
 
 function ToggleSwitch({ active, onToggle, label, icon: Icon }: { active: boolean; onToggle: () => void; label: string; icon: any }) {
@@ -233,6 +234,29 @@ export function Profile() {
                  </div>
                )}
             </div>
+          </div>
+
+          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl md:rounded-3xl p-5 md:p-6">
+            <h3 className="text-sm font-bold text-slate-200 mb-5 uppercase tracking-widest">Plano de Assinatura</h3>
+            <div className="flex items-center justify-between p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 mb-4">
+              <div className="flex items-center gap-3">
+                <Zap size={20} className={userProfile?.subscriptionStatus === 'premium' ? 'text-indigo-400' : 'text-slate-600'} />
+                <div>
+                  <p className="text-sm font-bold text-slate-200">{userProfile?.subscriptionStatus === 'premium' ? 'Orizon Pro' : 'Orizon Free'}</p>
+                  <p className="text-[10px] text-slate-500 uppercase font-black">Plano Atual</p>
+                </div>
+              </div>
+              {userProfile?.subscriptionStatus === 'premium' && (
+                <CheckCircle2 size={16} className="text-emerald-500" />
+              )}
+            </div>
+            
+            <Link 
+              to="/billing"
+              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all border border-slate-700"
+            >
+              {userProfile?.subscriptionStatus === 'premium' ? 'Gerenciar Assinatura' : <><ArrowUpCircle size={14} /> Fazer Upgrade</>}
+            </Link>
           </div>
 
           <div className="bg-slate-900/50 border border-slate-800 rounded-2xl md:rounded-3xl p-5 md:p-6">

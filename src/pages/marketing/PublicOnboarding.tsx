@@ -4,8 +4,7 @@ import {
   Loader2, Star, Lock, Zap, Rocket, Info 
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { functions } from "../../firebase/config";
-import { httpsCallable } from "firebase/functions";
+
 import { explainMatch } from "../../lib/matching";
 import { maskPhone } from "../../lib/validators";
 import { useAuth } from '../../hooks/useAuth';
@@ -76,17 +75,26 @@ export default function PublicOnboarding() {
     setError(null);
     
     try {
-      const previewMatchesFn = httpsCallable(functions, 'previewMatches');
-      
-      const dataForBackend = {
-        title: "Projeto em Definição",
-        type: formData.role === 'idea' ? 'startup' : formData.role,
-        segment: formData.segment,
-        summary: `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}`,
-        location: { region: "Sul" }
-      };
+      const response = await fetch('https://us-central1-orizon-match.cloudfunctions.net/getMatchesPreview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: {
+            title: "Projeto em Definição",
+            type: formData.role === 'idea' ? 'startup' : formData.role,
+            segment: formData.segment,
+            summary: `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}`,
+            location: { region: "Sul" }
+          }
+        })
+      });
 
-      const result = await previewMatchesFn(dataForBackend);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error?.message || "Falha na comunicação com o servidor.");
+      }
+
+      const result = await response.json();
       setPreviewResult(result.data as any);
       setStep('RESULTS');
     } catch (err: any) {

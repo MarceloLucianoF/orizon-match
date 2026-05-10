@@ -4,7 +4,9 @@ import { generateMatches } from "./services/match.service";
 import { getPreviewMatches } from "./services/preview.service";
 import { recordProjectView, recordMatchCreated } from "./services/analytics.service";
 import OpenAI from "openai";
-import { createCheckoutSession as createStripeSession, handleWebhook } from "./services/stripe.service";
+import cors from "cors";
+const corsHandler = cors({ origin: true });
+// import { createCheckoutSession as createStripeSession, handleWebhook } from "./services/stripe.service";
 
 if (!admin.apps.length) {
   admin.initializeApp();
@@ -14,13 +16,27 @@ const db = admin.firestore();
 // Secrets
 // Note: functions.runWith() is used in the exports themselves to specify secrets
 
-export const previewMatches = functions.region("us-central1").https.onCall(async (data, context) => {
-  try {
-    return await getPreviewMatches(data);
-  } catch (error: any) {
-    console.error("Error on previewMatches:", error);
-    throw new functions.https.HttpsError("internal", error.message || "Erro ao gerar preview de matches");
-  }
+export const getMatchesPreview = functions.region("us-central1").https.onRequest((req, res) => {
+  return corsHandler(req, res, async () => {
+    if (req.method !== "POST") {
+      res.status(405).send("Method Not Allowed");
+      return;
+    }
+
+    try {
+      // No onRequest, o corpo vem em req.body diretamente
+      const result = await getPreviewMatches(req.body.data || req.body);
+      res.status(200).json({ data: result });
+    } catch (error: any) {
+      console.error("Error on previewMatches:", error);
+      res.status(500).json({ 
+        error: {
+          message: error.message || "Erro ao gerar preview de matches",
+          status: "INTERNAL"
+        }
+      });
+    }
+  });
 });
 
 import { createNotification } from "./services/notifications.service";
@@ -233,6 +249,7 @@ export const onLegalInviteCreated = functions.region("us-central1").runWith({
 // FASE B: Monetização com Stripe
 // ====================================================
 
+/*
 export const createCheckoutSession = functions.region("us-central1").runWith({
   secrets: ["STRIPE_SECRET_KEY"]
 }).https.onCall(async (data, context) => {
@@ -271,4 +288,5 @@ export const stripeWebhook = functions.region("us-central1").runWith({
     res.status(400).send(`Webhook Error: ${err.message}`);
   }
 });
+*/
 

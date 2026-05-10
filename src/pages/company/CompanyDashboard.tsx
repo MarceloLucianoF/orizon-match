@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
-import { Loader2, AlertCircle, Filter, TrendingUp, LayoutGrid, Target, Zap, Briefcase, ChevronRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Loader2, AlertCircle, Filter, TrendingUp, LayoutGrid, Target, Zap, Briefcase } from "lucide-react";
 import { EmptyState } from "../../components/EmptyState";
 import { StatsCard } from "../../components/analytics/StatsCard";
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, 
   Tooltip as RechartsTooltip, Legend 
 } from "recharts";
+import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { ProRadarMap } from "../../components/analytics/ProRadarMap";
+import { LayoutDashboard, Map as MapIcon } from "lucide-react";
 
 type DealStatus = 'triagem' | 'avaliacao' | 'due_diligence' | 'negociacao' | 'fechado';
 
@@ -28,11 +31,19 @@ const COLUMNS: { id: DealStatus; title: string; color: string }[] = [
 ];
 
 export function CompanyDashboard() {
+  const { userProfile } = useAuth();
+  const navigate = useNavigate();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [smartPrompt, setSmartPrompt] = useState<{ dealId: string, message: string, action: string } | null>(null);
   const [trlFilter, setTrlFilter] = useState<number | null>(null);
-  const [irlFilter, setIrlFilter] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'overview' | 'radar'>('overview');
+
+  const isPremium = userProfile?.subscriptionStatus === 'premium';
+
+  const handleUpgradeClick = () => {
+    navigate('/pricing');
+  };
 
   useEffect(() => {
     // Dados demonstrativos do pipeline - em produção, busca da collection "deals"
@@ -83,221 +94,215 @@ export function CompanyDashboard() {
 
   return (
     <div className="space-y-6 md:space-y-8 flex flex-col">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* Header com Abas */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-100">Pipeline de Investimentos</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-100">Dashboard do Investidor</h1>
           <p className="text-slate-400 mt-1 text-sm">Gerencie seu pipeline de negociações e acompanhe cada oportunidade.</p>
         </div>
-        <div className="flex flex-wrap gap-2 md:gap-3">
-          <Link to="/explore" className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 md:px-5 py-2 rounded-xl font-medium transition-all text-xs md:text-sm shadow-[0_0_10px_rgba(79,70,229,0.2)]">
-            Explorar Mercado
-          </Link>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatsCard 
-          label="Em Triagem" 
-          value={deals.filter(d => d.status === 'triagem').length} 
-          icon={Zap} 
-          color="indigo" 
-        />
-        <StatsCard 
-          label="Due Diligence" 
-          value={deals.filter(d => d.status === 'due_diligence').length} 
-          icon={Target} 
-          color="amber" 
-        />
-        <StatsCard 
-          label="Deals Fechados" 
-          value={deals.filter(d => d.status === 'fechado').length} 
-          icon={Briefcase} 
-          color="emerald" 
-        />
-        <StatsCard 
-          label="Ticket Médio" 
-          value="R$ 450k" 
-          icon={TrendingUp} 
-          trend={15} 
-          color="cyan" 
-        />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-slate-900/50 border border-slate-800 rounded-3xl p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest">Distribuição do Pipeline</h3>
-            <div className="flex gap-4">
-              <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5">
-                <Filter size={14} className="text-slate-500" />
-                <select 
-                  value={trlFilter || ""} 
-                  onChange={e => setTrlFilter(e.target.value ? Number(e.target.value) : null)}
-                  className="bg-transparent text-xs text-slate-300 outline-none"
-                >
-                  <option value="">TRL (Todos)</option>
-                  {[1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>TRL {n}+</option>)}
-                </select>
-              </div>
-              <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5">
-                <TrendingUp size={14} className="text-slate-500" />
-                <select 
-                  value={irlFilter || ""} 
-                  onChange={e => setIrlFilter(e.target.value ? Number(e.target.value) : null)}
-                  className="bg-transparent text-xs text-slate-300 outline-none"
-                >
-                  <option value="">IRL (Todos)</option>
-                  {[1,2,3,4,5,6].map(n => <option key={n} value={n}>IRL {n}+</option>)}
-                </select>
-              </div>
-            </div>
-          </div>
+        <div className="flex bg-slate-900/50 p-1 rounded-2xl border border-slate-800 shadow-inner">
+          <button
+            onClick={() => setActiveTab('overview')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+              activeTab === 'overview' 
+                ? 'bg-slate-800 text-white shadow-xl border border-slate-700' 
+                : 'text-slate-500 hover:text-slate-300'
+            }`}
+          >
+            <LayoutDashboard size={14} />
+            Pipeline
+          </button>
           
-          <div className="flex-1 h-64 min-h-[250px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={funnelData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {funnelData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={FUNNEL_COLORS[index % FUNNEL_COLORS.length]} />
-                  ))}
-                </Pie>
-                <RechartsTooltip 
-                  contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }}
-                />
-                <Legend 
-                  verticalAlign="middle" 
-                  align="right" 
-                  layout="vertical"
-                  iconType="circle"
-                  wrapperStyle={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold' }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/20 rounded-3xl p-6">
-          <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">Market Match Score</h3>
-          <div className="flex flex-col items-center justify-center h-full pb-6">
-            <div className="relative w-32 h-32 flex items-center justify-center mb-4">
-              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                <path className="text-slate-800" strokeWidth="2.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                <path className="text-indigo-500" strokeWidth="2.5" strokeDasharray="88, 100" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-              </svg>
-              <div className="absolute flex flex-col items-center">
-                <span className="text-3xl font-black text-white">88%</span>
-              </div>
-            </div>
-            <p className="text-center text-xs text-slate-400 leading-relaxed px-4">
-              Sua tese de investimento tem um **alto alinhamento** com os projetos disponíveis na região Sul.
-            </p>
-            <Link to="/explore" className="mt-6 flex items-center gap-2 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition-colors">
-              Explorar Oportunidades <ChevronRight size={14} />
-            </Link>
-          </div>
+          <button
+            onClick={() => setActiveTab('radar')}
+            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+              activeTab === 'radar' 
+                ? 'bg-indigo-600/20 text-indigo-400 shadow-xl border border-indigo-500/30' 
+                : 'text-slate-500 hover:text-indigo-400'
+            }`}
+          >
+            <MapIcon size={14} />
+            Radar Pro
+          </button>
         </div>
       </div>
 
-      {smartPrompt && (
-        <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-3 md:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3 text-indigo-300">
-            <AlertCircle size={18} className="flex-shrink-0" />
-            <span className="font-medium text-sm">{smartPrompt.message}</span>
-          </div>
-          <div className="flex gap-2 flex-shrink-0">
-            <button onClick={() => setSmartPrompt(null)} className="text-slate-400 hover:text-slate-200 px-3 py-1.5 text-xs">Ignorar</button>
-            <button 
-              onClick={() => {
-                setSmartPrompt(null);
-              }} 
-              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(79,70,229,0.3)] transition-all"
-            >
-              {smartPrompt.action}
-            </button>
-          </div>
-        </div>
-      )}
-
-
-
-      {/* Kanban Board */}
-      <div className="flex-1 overflow-x-auto pb-4 custom-scrollbar">
-        {deals.length === 0 ? (
-          <div className="h-full bg-slate-900/30 border border-slate-800 rounded-2xl flex items-center justify-center">
-            <EmptyState
-              icon={LayoutGrid}
-              title="Pipeline Vazio"
-              description="Você ainda não possui projetos em negociação. Explore o mercado para encontrar oportunidades."
-              ctaLabel="Explorar Projetos"
-              ctaLink="/explore"
+      {activeTab === 'overview' ? (
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatsCard 
+              label="Em Triagem" 
+              value={deals.filter(d => d.status === 'triagem').length} 
+              icon={Zap} 
+              color="indigo" 
+            />
+            <StatsCard 
+              label="Due Diligence" 
+              value={deals.filter(d => d.status === 'due_diligence').length} 
+              icon={Target} 
+              color="amber" 
+            />
+            <StatsCard 
+              label="Deals Fechados" 
+              value={deals.filter(d => d.status === 'fechado').length} 
+              icon={Briefcase} 
+              color="emerald" 
+            />
+            <StatsCard 
+              label="Ticket Médio" 
+              value="R$ 450k" 
+              icon={TrendingUp} 
+              trend={15} 
+              color="cyan" 
             />
           </div>
-        ) : (
-          <div className="flex gap-4 md:gap-6 h-full min-w-max">
-            {COLUMNS.map(column => {
-              const columnDeals = deals.filter(d => d.status === column.id);
-              return (
-                <div key={column.id} className={`w-64 md:w-72 lg:w-80 flex flex-col rounded-2xl border ${column.color} p-3 md:p-4`}>
-                  <div className="flex items-center justify-between mb-3 md:mb-4">
-                    <h3 className="font-bold text-slate-200 text-sm">{column.title}</h3>
-                    <span className="bg-slate-900/50 text-slate-400 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-700/50">
-                      {columnDeals.length}
-                    </span>
-                  </div>
-                  
-                  <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
-                    {columnDeals.map(deal => (
-                      <div key={deal.id} className="bg-slate-900 border border-slate-700/80 rounded-xl p-3 md:p-4 hover:border-indigo-500/50 transition-all shadow-lg">
-                        <div className="flex justify-between items-start mb-2">
-                          <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
-                            {deal.score}% FIT
-                          </span>
-                          <span className="text-[10px] text-slate-500">{deal.lastUpdate}</span>
-                        </div>
-                        <h4 className="font-bold text-slate-200 text-sm mb-3">{deal.projectName}</h4>
-                        
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="flex -space-x-2">
-                            <div className="w-6 h-6 rounded-full bg-indigo-600 border border-slate-900 flex items-center justify-center text-[10px] font-bold text-white">IN</div>
-                            <div className="w-6 h-6 rounded-full bg-slate-700 border border-slate-900 flex items-center justify-center text-[10px] font-bold text-white">VC</div>
-                          </div>
-                          <span className="text-[10px] text-slate-500 ml-1">Equipe ativa</span>
-                        </div>
 
-                        <div className="flex items-center gap-2 border-t border-slate-800 pt-3">
-                           <select 
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-slate-900/50 border border-slate-800 rounded-3xl p-6 flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest">Distribuição do Pipeline</h3>
+                <div className="flex gap-4">
+                  <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5">
+                    <Filter size={14} className="text-slate-500" />
+                    <select 
+                      value={trlFilter || ""} 
+                      onChange={e => setTrlFilter(e.target.value ? Number(e.target.value) : null)}
+                      className="bg-transparent text-xs text-slate-300 outline-none"
+                    >
+                      <option value="">TRL (Todos)</option>
+                      {[1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>TRL {n}+</option>)}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex-1 h-64 min-h-[250px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={funnelData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {funnelData.map((_, index) => (
+                        <Cell key={`cell-${index}`} fill={FUNNEL_COLORS[index % FUNNEL_COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip 
+                      contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px' }}
+                    />
+                    <Legend verticalAlign="middle" align="right" layout="vertical" iconType="circle" wrapperStyle={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 'bold' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/20 rounded-3xl p-6">
+              <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">Market Match Score</h3>
+              <div className="flex flex-col items-center justify-center h-full pb-6">
+                <div className="relative w-32 h-32 flex items-center justify-center mb-4">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    <path className="text-slate-800" strokeWidth="2.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path className="text-indigo-500" strokeWidth="2.5" strokeDasharray="88, 100" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                  </svg>
+                  <div className="absolute flex flex-col items-center">
+                    <span className="text-3xl font-black text-white">88%</span>
+                  </div>
+                </div>
+                <p className="text-center text-xs text-slate-400 leading-relaxed px-4">
+                  Sua tese de investimento tem um **alto alinhamento** com os projetos disponíveis na região Sul.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {smartPrompt && (
+            <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3 text-indigo-300">
+                <AlertCircle size={18} className="flex-shrink-0" />
+                <span className="font-medium text-sm">{smartPrompt.message}</span>
+              </div>
+              <div className="flex gap-2 flex-shrink-0">
+                <button onClick={() => setSmartPrompt(null)} className="text-slate-400 hover:text-slate-200 px-3 py-1.5 text-xs">Ignorar</button>
+                <button onClick={() => setSmartPrompt(null)} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(79,70,229,0.3)] transition-all">
+                  {smartPrompt.action}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Kanban Board */}
+          <div className="overflow-x-auto pb-4 custom-scrollbar">
+            {deals.length === 0 ? (
+              <div className="h-64 bg-slate-900/30 border border-slate-800 rounded-2xl flex items-center justify-center">
+                <EmptyState icon={LayoutGrid} title="Pipeline Vazio" description="Você ainda não possui projetos em negociação." ctaLabel="Explorar Projetos" ctaLink="/explore" />
+              </div>
+            ) : (
+              <div className="flex gap-6 min-w-max">
+                {COLUMNS.map(column => {
+                  const columnDeals = deals.filter(d => d.status === column.id);
+                  return (
+                    <div key={column.id} className={`w-80 flex flex-col rounded-2xl border ${column.color} p-4`}>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="font-bold text-slate-200 text-sm">{column.title}</h3>
+                        <span className="bg-slate-900/50 text-slate-400 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-700/50">{columnDeals.length}</span>
+                      </div>
+                      <div className="space-y-3">
+                        {columnDeals.map(deal => (
+                          <div key={deal.id} className="bg-slate-900 border border-slate-700/80 rounded-xl p-4 hover:border-indigo-500/50 transition-all shadow-lg">
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">{deal.score}% FIT</span>
+                              <span className="text-[10px] text-slate-500">{deal.lastUpdate}</span>
+                            </div>
+                            <h4 className="font-bold text-slate-200 text-sm mb-3">{deal.projectName}</h4>
+                            <select 
                               className="bg-slate-950 border border-slate-700 text-[11px] text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
                               value={deal.status}
                               onChange={(e) => moveDeal(deal.id, e.target.value as DealStatus)}
-                           >
-                               {COLUMNS.map(c => (
-                                   <option key={c.id} value={c.id}>Mover para {c.title}</option>
-                               ))}
-                           </select>
-                        </div>
+                            >
+                              {COLUMNS.map(c => <option key={c.id} value={c.id}>Mover para {c.title}</option>)}
+                            </select>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                    
-                    {columnDeals.length === 0 && (
-                      <div className="h-24 border-2 border-dashed border-slate-700/50 rounded-xl flex items-center justify-center text-slate-600 text-xs">
-                        Sem projetos nesta etapa
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+          <div className="flex justify-between items-center bg-slate-900/40 p-4 rounded-2xl border border-slate-800">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-indigo-500/10 rounded-xl">
+                <Target className="text-indigo-400" size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-white">Inteligência Geoespacial</h2>
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Mapeamento de Clusters Industriais e ICTs</p>
+              </div>
+            </div>
+            {isPremium && (
+              <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                <Zap size={12} fill="currentColor" /> Premium Ativo
+              </div>
+            )}
+          </div>
+          
+          <ProRadarMap 
+            isPremium={isPremium} 
+            onUpgradeClick={handleUpgradeClick} 
+          />
+        </div>
+      )}
     </div>
   );
 }

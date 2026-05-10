@@ -45,6 +45,7 @@ type Step =
   | 'SUMMARY_CONTENT' 
   | 'CADASTRO' 
   | 'REVIEW'
+  | 'LINK_ASSETS'
   | 'ICT_RESEARCH'
   | 'ICT_INFRA'
   | 'PROVIDER_SERVICES'
@@ -117,6 +118,7 @@ export function CreateProject() {
     // Provider fields
     services: [] as string[],
     productionCapacity: "",
+    linkedAssets: [] as string[],
     // Cadastro data
     registration: {
       name: "",
@@ -193,6 +195,7 @@ export function CreateProject() {
           services: formData.services,
           productionCapacity: formData.productionCapacity,
         }),
+        linkedAssets: formData.linkedAssets,
       } as any);
 
       navigate(`/matches?project=${projectId}`);
@@ -205,7 +208,7 @@ export function CreateProject() {
   };
 
   const renderProgressBar = () => {
-    const steps: Step[] = ['ROLE', 'SEGMENT', 'PROTECTION', 'RESEARCH', 'INNOVATION_TYPE', 'LOCATION', 'MATURITY', 'SUMMARY_METHOD', 'SUMMARY_CONTENT', 'CADASTRO', 'REVIEW'];
+    const steps: Step[] = ['ROLE', 'SEGMENT', 'PROTECTION', 'LINK_ASSETS', 'RESEARCH', 'INNOVATION_TYPE', 'LOCATION', 'MATURITY', 'SUMMARY_METHOD', 'SUMMARY_CONTENT', 'CADASTRO', 'REVIEW'];
     const currentIndex = steps.indexOf(step);
     return (
       <div className="flex gap-1 mb-8">
@@ -622,10 +625,46 @@ export function CreateProject() {
             <div className="pt-6 border-t border-slate-800 flex justify-between">
               <button onClick={() => prevStep('SEGMENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={() => nextStep('RESEARCH')} 
+                onClick={() => {
+                  if (formData.isProtected === 'sim') nextStep('LINK_ASSETS');
+                  else nextStep('RESEARCH');
+                }} 
                 disabled={!formData.isProtected}
                 className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: LINK_ASSETS */}
+        {step === 'LINK_ASSETS' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Vincular Ativos de PI</h2>
+              <p className="text-slate-400">Selecione os ativos que você já registrou para este projeto.</p>
+            </div>
+
+            <AssetSelector 
+              selectedIds={formData.linkedAssets}
+              onToggle={(id) => {
+                const current = formData.linkedAssets;
+                const updated = current.includes(id) ? current.filter(i => i !== id) : [...current, id];
+                updateField('linkedAssets', updated);
+              }}
+            />
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('PROTECTION')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => nextStep('RESEARCH')} 
+                  className="px-6 py-3 rounded-xl text-slate-400 hover:text-white font-medium transition"
+                >Pular Vínculo</button>
+                <button 
+                  onClick={() => nextStep('RESEARCH')} 
+                  className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                >Próximo</button>
+              </div>
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getGlobalMetrics, getLiveDealFlows, getAllUsers, toggleUserVerification } from "../../services/adminService";
+import { getGlobalMetrics, getLiveDealFlows, getAllUsers, toggleUserVerification, updateUserSubscription } from "../../services/adminService";
 import { 
   ShieldAlert, Activity, Users, FolderKanban, Network, 
   Zap, Loader2, ServerCog, CheckCircle, FileSearch,
@@ -49,6 +49,16 @@ export function AdminDashboard() {
       setUsers(users.map(u => u.id === userId ? { ...u, verified: !currentStatus } : u));
     } catch (error) {
       alert("Erro ao alterar verificação do usuário.");
+    }
+  };
+
+  const handleUpdateSubscription = async (userId: string, currentStatus: string) => {
+    try {
+      const nextStatus = currentStatus === 'premium' ? 'free' : 'premium';
+      await updateUserSubscription(userId, nextStatus as any);
+      setUsers(users.map(u => u.id === userId ? { ...u, subscriptionStatus: nextStatus } : u));
+    } catch (error) {
+      alert("Erro ao atualizar assinatura.");
     }
   };
 
@@ -364,8 +374,8 @@ export function AdminDashboard() {
               <tr className="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-500 bg-slate-900/80">
                 <th className="p-4 font-medium">Nome / Email</th>
                 <th className="p-4 font-medium">Papel (Role)</th>
-                <th className="p-4 font-medium">Status</th>
-                <th className="p-4 font-medium text-right">Ações</th>
+                <th className="p-4 font-medium">Selo / Plano</th>
+                <th className="p-4 font-medium text-right">Ações Rápidas</th>
               </tr>
             </thead>
             <tbody>
@@ -393,23 +403,46 @@ export function AdminDashboard() {
                       </span>
                     </td>
                     <td className="p-4">
-                      {u.verified ? (
-                         <span className="flex items-center gap-1 text-emerald-400 text-xs font-bold"><CheckCircle size={14} /> Verificado</span>
-                      ) : (
-                         <span className="text-slate-500 text-xs font-bold">Pendente</span>
-                      )}
+                      <div className="flex flex-col gap-1.5">
+                        {u.verified ? (
+                           <span className="flex items-center gap-1 text-emerald-400 text-[10px] font-black uppercase"><CheckCircle size={12} /> Verificado</span>
+                        ) : (
+                           <span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">Não Verificado</span>
+                        )}
+                        
+                        <span className={`w-fit px-2 py-0.5 rounded-full text-[9px] font-black uppercase border ${
+                          u.subscriptionStatus === 'premium' 
+                            ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' 
+                            : 'bg-slate-800 text-slate-500 border-slate-700'
+                        }`}>
+                          {u.subscriptionStatus || 'free'}
+                        </span>
+                      </div>
                     </td>
                     <td className="p-4 text-right">
-                      <button 
-                        onClick={() => handleToggleVerification(u.id, u.verified)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                          u.verified 
-                            ? 'bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20' 
-                            : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
-                        }`}
-                      >
-                        {u.verified ? "Remover Selo" : "Verificar Perfil"}
-                      </button>
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => handleToggleVerification(u.id, u.verified)}
+                          className={`px-2 py-1 rounded text-[10px] font-bold transition-all border ${
+                            u.verified 
+                              ? 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white' 
+                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'
+                          }`}
+                        >
+                          {u.verified ? "Desverificar" : "Verificar"}
+                        </button>
+                        
+                        <button 
+                          onClick={() => handleUpdateSubscription(u.id, u.subscriptionStatus)}
+                          className={`px-2 py-1 rounded text-[10px] font-bold transition-all border ${
+                            u.subscriptionStatus === 'premium'
+                              ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20'
+                              : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20'
+                          }`}
+                        >
+                          {u.subscriptionStatus === 'premium' ? "Downgrade Free" : "Dar Premium"}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

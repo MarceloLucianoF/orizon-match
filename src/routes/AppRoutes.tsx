@@ -11,10 +11,13 @@ import { Explore } from "../pages/shared/Explore";
 import { Chat } from "../pages/shared/Chat";
 import { Profile } from "../pages/shared/Profile";
 import { AdminDashboard } from "../pages/admin/AdminDashboard";
+import { AssetRegistry } from "../pages/legal/AssetRegistry";
 import { SUPER_ADMIN_UID } from "../services/adminService";
 import Home from "../pages/marketing/Home";
 import About from "../pages/marketing/About";
 import PublicOnboarding from "../pages/marketing/PublicOnboarding";
+import { Billing } from "../pages/billing/Billing";
+import Pricing from "../pages/billing/Pricing";
 import { Loader2 } from "lucide-react";
 
 function PrivateRoute() {
@@ -56,6 +59,7 @@ export function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/sobre" element={<About />} />
       <Route path="/onboarding" element={<PublicOnboarding />} />
+      <Route path="/pricing" element={<Pricing />} />
       <Route path="/login" element={<Login />} />
       
       {/* Protected App Routes */}
@@ -70,6 +74,8 @@ export function AppRoutes() {
           <Route path="/matches" element={<Matches />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/billing" element={<Billing />} />
+          <Route path="/assets" element={<AssetRegistry />} />
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminDashboard />} />
           </Route>

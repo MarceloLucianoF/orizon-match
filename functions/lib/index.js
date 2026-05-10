@@ -1,26 +1,78 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.previewMatches = void 0;
-const functions = require("firebase-functions");
-const admin = require("firebase-admin");
+exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
+const functions = __importStar(require("firebase-functions"));
+const admin = __importStar(require("firebase-admin"));
 const match_service_1 = require("./services/match.service");
 const preview_service_1 = require("./services/preview.service");
 const analytics_service_1 = require("./services/analytics.service");
-const openai_1 = require("openai");
+const openai_1 = __importDefault(require("openai"));
+const cors_1 = __importDefault(require("cors"));
+const corsHandler = (0, cors_1.default)({ origin: true });
+// import { createCheckoutSession as createStripeSession, handleWebhook } from "./services/stripe.service";
 if (!admin.apps.length) {
     admin.initializeApp();
 }
 const db = admin.firestore();
 // Secrets
 // Note: functions.runWith() is used in the exports themselves to specify secrets
-exports.previewMatches = functions.region("us-central1").https.onCall(async (data, context) => {
-    try {
-        return await (0, preview_service_1.getPreviewMatches)(data);
-    }
-    catch (error) {
-        console.error("Error on previewMatches:", error);
-        throw new functions.https.HttpsError("internal", error.message || "Erro ao gerar preview de matches");
-    }
+exports.getMatchesPreview = functions.region("us-central1").https.onRequest((req, res) => {
+    return corsHandler(req, res, async () => {
+        if (req.method !== "POST") {
+            res.status(405).send("Method Not Allowed");
+            return;
+        }
+        try {
+            // No onRequest, o corpo vem em req.body diretamente
+            const result = await (0, preview_service_1.getPreviewMatches)(req.body.data || req.body);
+            res.status(200).json({ data: result });
+        }
+        catch (error) {
+            console.error("Error on previewMatches:", error);
+            res.status(500).json({
+                error: {
+                    message: error.message || "Erro ao gerar preview de matches",
+                    status: "INTERNAL"
+                }
+            });
+        }
+    });
 });
 const notifications_service_1 = require("./services/notifications.service");
 exports.onProjectCreated = functions.region("us-central1").firestore
@@ -202,4 +254,47 @@ exports.onLegalInviteCreated = functions.region("us-central1").runWith({
         await snap.ref.update({ emailError: error.message || "Unknown error" });
     }
 });
+// ====================================================
+// FASE B: Monetização com Stripe
+// ====================================================
+/*
+export const createCheckoutSession = functions.region("us-central1").runWith({
+  secrets: ["STRIPE_SECRET_KEY"]
+}).https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError("unauthenticated", "Apenas usuários logados podem assinar.");
+  }
+
+  const { priceId } = data;
+  if (!priceId) {
+    throw new functions.https.HttpsError("invalid-argument", "priceId é obrigatório.");
+  }
+
+  try {
+    return await createStripeSession(context.auth.uid, context.auth.token.email || "", priceId);
+  } catch (error: any) {
+    console.error("Error creating checkout session:", error);
+    throw new functions.https.HttpsError("internal", error.message);
+  }
+});
+
+export const stripeWebhook = functions.region("us-central1").runWith({
+  secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
+}).https.onRequest(async (req, res) => {
+  const sig = req.headers["stripe-signature"];
+
+  if (!sig) {
+    res.status(400).send("Webhook Error: Missing signature");
+    return;
+  }
+
+  try {
+    const result = await handleWebhook(req.rawBody, sig as string);
+    res.status(200).json(result);
+  } catch (err: any) {
+    console.error("Webhook Error:", err.message);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+});
+*/
 //# sourceMappingURL=index.js.map
