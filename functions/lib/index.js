@@ -37,7 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.stripeWebhook = exports.createPortalSession = exports.createCheckoutSession = exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
-const functions = __importStar(require("firebase-functions"));
+const functions = __importStar(require("firebase-functions/v1"));
 const admin = __importStar(require("firebase-admin"));
 const match_service_1 = require("./services/match.service");
 const preview_service_1 = require("./services/preview.service");
@@ -52,7 +52,7 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 // Secrets
 // Note: functions.runWith() is used in the exports themselves to specify secrets
-exports.getMatchesPreview = functions.region("us-central1").https.onRequest((req, res) => {
+exports.getMatchesPreview = functions.region("southamerica-east1").https.onRequest((req, res) => {
     return corsHandler(req, res, async () => {
         if (req.method !== "POST") {
             res.status(405).send("Method Not Allowed");
@@ -75,7 +75,7 @@ exports.getMatchesPreview = functions.region("us-central1").https.onRequest((req
     });
 });
 const notifications_service_1 = require("./services/notifications.service");
-exports.onProjectCreated = functions.region("us-central1").firestore
+exports.onProjectCreated = functions.region("southamerica-east1").firestore
     .document("projects/{projectId}")
     .onCreate(async (snap) => {
     const data = snap.data();
@@ -91,7 +91,7 @@ exports.onProjectCreated = functions.region("us-central1").firestore
         link: "/app/dashboard"
     });
 });
-exports.onMatchCreated = functions.region("us-central1").firestore
+exports.onMatchCreated = functions.region("southamerica-east1").firestore
     .document("matches/{matchId}")
     .onCreate(async (snap) => {
     const match = snap.data();
@@ -117,7 +117,7 @@ exports.onMatchCreated = functions.region("us-central1").firestore
         link: "/app/match-history"
     });
 });
-exports.recordView = functions.region("us-central1").https.onCall(async (data, context) => {
+exports.recordView = functions.region("southamerica-east1").https.onCall(async (data, context) => {
     const { projectId } = data;
     if (!projectId)
         throw new functions.https.HttpsError("invalid-argument", "projectId is required");
@@ -130,7 +130,7 @@ exports.recordView = functions.region("us-central1").https.onCall(async (data, c
         throw new functions.https.HttpsError("internal", "Erro ao registrar visualização");
     }
 });
-exports.enhancePitch = functions.region("us-central1").runWith({
+exports.enhancePitch = functions.region("southamerica-east1").runWith({
     secrets: ["NVIDIA_NIM_API_KEY"],
     timeoutSeconds: 60,
     memory: "256MB"
@@ -206,7 +206,7 @@ exports.enhancePitch = functions.region("us-central1").runWith({
 // ====================================================
 const resend_1 = require("resend");
 const emailTemplates_1 = require("./emailTemplates");
-exports.onLegalInviteCreated = functions.region("us-central1").runWith({
+exports.onLegalInviteCreated = functions.region("southamerica-east1").runWith({
     secrets: ["RESEND_API_KEY"]
 }).firestore
     .document("legal_invites/{inviteId}")
@@ -257,7 +257,7 @@ exports.onLegalInviteCreated = functions.region("us-central1").runWith({
 // ====================================================
 // FASE B: Monetização com Stripe
 // ====================================================
-exports.createCheckoutSession = functions.region("us-central1").runWith({
+exports.createCheckoutSession = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY"]
 }).https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -275,7 +275,7 @@ exports.createCheckoutSession = functions.region("us-central1").runWith({
         throw new functions.https.HttpsError("internal", error.message);
     }
 });
-exports.createPortalSession = functions.region("us-central1").runWith({
+exports.createPortalSession = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY"]
 }).https.onCall(async (data, context) => {
     if (!context.auth) {
@@ -289,7 +289,7 @@ exports.createPortalSession = functions.region("us-central1").runWith({
         throw new functions.https.HttpsError("internal", error.message);
     }
 });
-exports.stripeWebhook = functions.region("us-central1").runWith({
+exports.stripeWebhook = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
 }).https.onRequest(async (req, res) => {
     const sig = req.headers["stripe-signature"];

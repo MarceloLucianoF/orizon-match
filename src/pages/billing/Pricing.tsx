@@ -44,7 +44,7 @@ const PLANS = [
     buttonText: 'Assinar Agora',
     premium: true,
     highlight: true,
-    priceId: 'price_placeholder_b2b_pro' // O usuário deve substituir pela dele
+    priceId: 'price_1TVPrI44i38VVUUzGbTXJkzB' // ID real do Stripe do usuário
   }
 ];
 

@@ -32,6 +32,6 @@ const app = initializeApp(firebaseConfig);
 // Export services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const functions = getFunctions(app, "us-central1");
+export const functions = getFunctions(app, "southamerica-east1");
 
 export default app;
