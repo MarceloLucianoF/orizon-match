@@ -9,6 +9,9 @@ import {
   ShieldCheck, Code, Lock, ArrowRight
 } from "lucide-react";
 import { VDRRoom } from "../../components/VDRRoom";
+import { SmartNDAModal } from "../../components/legal/SmartNDAModal";
+import { checkExistingNDA } from "../../services/ndaService";
+import { useAuth } from "../../hooks/useAuth";
 
 interface ProjectData {
   id: string;
@@ -34,6 +37,9 @@ export function ProjectDetails() {
   const [project, setProject] = useState<ProjectData | null>(null);
   const [linkedAssets, setLinkedAssets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showNDAModal, setShowNDAModal] = useState(false);
+  const [hasSignedNDA, setHasSignedNDA] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     async function load() {
@@ -54,6 +60,11 @@ export function ProjectDetails() {
           // Record view analytics
           const recordViewFn = httpsCallable(functions, 'recordView');
           recordViewFn({ projectId: id }).catch(err => console.error("Analytics error:", err));
+
+          // Check for existing NDA
+          if (user) {
+            checkExistingNDA(user.uid, id).then(setHasSignedNDA);
+          }
         } else {
           navigate("/projects");
         }
@@ -158,12 +169,33 @@ export function ProjectDetails() {
                <div className="flex items-center gap-2 text-[10px] text-slate-500">
                  <Lock size={12} className="text-slate-600" /> Documentos sensíveis protegidos por criptografia
                </div>
-               <button className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all group/btn">
-                 Assinar NDA e Acessar VDR
-                 <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-all" />
-               </button>
+               
+               {hasSignedNDA ? (
+                 <div className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                   <ShieldCheck size={14} /> NDA Assinado • VDR Liberado
+                 </div>
+               ) : (
+                 <button 
+                  onClick={() => setShowNDAModal(true)}
+                  className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all group/btn"
+                 >
+                   Assinar NDA e Acessar VDR
+                   <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-all" />
+                 </button>
+               )}
             </div>
           </div>
+
+          <SmartNDAModal 
+            isOpen={showNDAModal}
+            onClose={() => setShowNDAModal(false)}
+            onSigned={() => {
+              setHasSignedNDA(true);
+              setShowNDAModal(false);
+            }}
+            project={project}
+            linkedAssets={linkedAssets}
+          />
 
           <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8">
             <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
