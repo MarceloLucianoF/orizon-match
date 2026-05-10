@@ -1,18 +1,38 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { db, functions } from "../../firebase/config";
 import { httpsCallable } from "firebase/functions";
 import { 
   ArrowLeft, Eye, Star, Zap, 
-  Shield, FileText
+  Shield, FileText, Gavel, Briefcase, 
+  ShieldCheck, Code, Lock, ArrowRight
 } from "lucide-react";
 import { VDRRoom } from "../../components/VDRRoom";
+
+interface ProjectData {
+  id: string;
+  title: string;
+  summary: string;
+  segment: string;
+  maturity: number;
+  linkedAssets?: string[];
+  type?: string;
+  innovationType?: string;
+  isProtected?: boolean;
+  patentNumber?: string;
+  stats?: {
+    views?: number;
+    saves?: number;
+  };
+  [key: string]: any;
+}
 
 export function ProjectDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [project, setProject] = useState<any>(null);
+  const [project, setProject] = useState<ProjectData | null>(null);
+  const [linkedAssets, setLinkedAssets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,8 +41,16 @@ export function ProjectDetails() {
       try {
         const snap = await getDoc(doc(db, "projects", id));
         if (snap.exists()) {
-          setProject({ id: snap.id, ...snap.data() });
+          const projectData = { id: snap.id, ...snap.data() } as ProjectData;
+          setProject(projectData);
           
+          // Fetch Linked Assets
+          if (projectData.linkedAssets && projectData.linkedAssets.length > 0) {
+            const q = query(collection(db, "assets_ip"), where("__name__", "in", projectData.linkedAssets));
+            const assetsSnap = await getDocs(q);
+            setLinkedAssets(assetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+          }
+
           // Record view analytics
           const recordViewFn = httpsCallable(functions, 'recordView');
           recordViewFn({ projectId: id }).catch(err => console.error("Analytics error:", err));
@@ -43,6 +71,8 @@ export function ProjectDetails() {
       <Zap className="animate-spin" size={48} />
     </div>
   );
+
+  if (!project) return null;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500 pb-20">
@@ -78,6 +108,61 @@ export function ProjectDetails() {
             <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
               {project.summary}
             </p>
+          </div>
+
+          {/* Garantia Jurídica / IP Section */}
+          <div className="bg-gradient-to-br from-indigo-900/20 to-slate-900 border border-indigo-500/30 rounded-3xl p-8 space-y-6 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-1000" />
+            
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+              <div className="space-y-1">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Gavel className="text-indigo-400" size={20} />
+                  Garantia Jurídica (IP Check)
+                </h3>
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-black">Ativos de Propriedade Intelectual Vinculados</p>
+              </div>
+              
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                <ShieldCheck size={14} className="text-indigo-400" />
+                <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Auditado via INPI</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+              {linkedAssets.length > 0 ? (
+                linkedAssets.map(asset => (
+                  <div key={asset.id} className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 flex items-center gap-4 hover:border-indigo-500/40 transition-all">
+                    <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
+                      {asset.type === 'patent' ? <Briefcase className="text-amber-400" size={18} /> :
+                       asset.type === 'software' ? <Code className="text-emerald-400" size={18} /> :
+                       <ShieldCheck className="text-indigo-400" size={18} />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-xs font-bold text-slate-200 truncate">{asset.title}</h4>
+                      <p className="text-[9px] text-slate-500 font-mono mt-1">{asset.inpiNumber || 'Nº Pendente'}</p>
+                    </div>
+                    <span className="text-[8px] font-black uppercase bg-slate-900 px-2 py-1 rounded text-slate-500 border border-slate-800">
+                      {asset.status}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div className="col-span-full py-6 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl">
+                   <p className="text-xs text-slate-600 italic">Nenhum ativo formal vinculado ainda.</p>
+                </div>
+              )}
+            </div>
+
+            <div className="pt-4 border-t border-slate-800/50 flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+               <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                 <Lock size={12} className="text-slate-600" /> Documentos sensíveis protegidos por criptografia
+               </div>
+               <button className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all group/btn">
+                 Assinar NDA e Acessar VDR
+                 <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-all" />
+               </button>
+            </div>
           </div>
 
           <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8">
