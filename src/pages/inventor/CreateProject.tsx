@@ -8,6 +8,7 @@ import {
   HelpCircle, MessageSquare, Info, Video, MapPin, Zap, Rocket, Search
 } from "lucide-react";
 import { TRLCalculator } from "../../components/TRLCalculator";
+import { AssetSelector } from "../../components/legal/AssetSelector";
 import { searchPatentsInpi } from "../../services/inpiService";
 import type { INPIPatent } from "../../services/inpiService";
 import { functions } from "../../firebase/config";
