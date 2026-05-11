@@ -11,6 +11,8 @@ import { VDRRoom } from "../../components/VDRRoom";
 import { SmartNDAModal } from "../../components/legal/SmartNDAModal";
 import { checkExistingNDA } from "../../services/ndaService";
 import { useAuth } from "../../hooks/useAuth";
+import ReactMarkdown from 'react-markdown';
+import { Loader2, Printer } from "lucide-react";
 
 interface ProjectData {
   id: string;
@@ -36,6 +38,8 @@ export function ProjectDetails() {
   const [project, setProject] = useState<ProjectData | null>(null);
   const [linkedAssets, setLinkedAssets] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [generatingReport, setGeneratingReport] = useState(false);
+  const [aiReport, setAiReport] = useState<string | null>(null);
   const [showNDAModal, setShowNDAModal] = useState(false);
   const [hasSignedNDA, setHasSignedNDA] = useState(false);
   const { user } = useAuth();
@@ -54,6 +58,10 @@ export function ProjectDetails() {
             const q = query(collection(db, "assets_ip"), where("__name__", "in", projectData.linkedAssets));
             const assetsSnap = await getDocs(q);
             setLinkedAssets(assetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+          }
+
+          if (projectData.lastAiReport) {
+            setAiReport(projectData.lastAiReport.content);
           }
 
           // Record view analytics via fetch para evitar problemas de CORS em southamerica-east1
@@ -77,7 +85,32 @@ export function ProjectDetails() {
       }
     }
     load();
-  }, [id, navigate]);
+  }, [id, navigate, user]);
+
+  const handleGenerateReport = async () => {
+    if (!id) return;
+    setGeneratingReport(true);
+    try {
+      const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/generateProjectReport', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ data: { projectId: id } })
+      });
+
+      if (!response.ok) throw new Error("Erro ao gerar relatório");
+      const result = await response.json();
+      setAiReport(result.data.report);
+    } catch (err) {
+      console.error(err);
+      alert("Falha ao gerar inteligência. Tente novamente em instantes.");
+    } finally {
+      setGeneratingReport(false);
+    }
+  };
+
+  const handlePrint = () => {
+    window.print();
+  };
 
   if (loading) return (
     <div className="flex justify-center p-20 text-indigo-500">
@@ -103,7 +136,15 @@ export function ProjectDetails() {
             </div>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-3 no-print">
+          <button 
+            onClick={handleGenerateReport}
+            disabled={generatingReport}
+            className="bg-slate-900 border border-slate-800 text-indigo-400 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 hover:bg-slate-800"
+          >
+            {generatingReport ? <Loader2 className="animate-spin" size={18} /> : <Zap size={18} />} 
+            {aiReport ? "Atualizar Inteligência" : "Gerar Inteligência"}
+          </button>
           <Link to={`/matches?project=${project.id}`} className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
             <Zap size={18} /> Ver Matches
           </Link>
@@ -206,6 +247,55 @@ export function ProjectDetails() {
             </h3>
             <VDRRoom inpiStatus={project.inpiStatus} />
           </div>
+
+          {/* AI INTELLIGENCE REPORT SECTION */}
+          {aiReport && (
+            <div className="bg-slate-900 border border-indigo-500/30 rounded-3xl overflow-hidden print-container">
+              <div className="bg-gradient-to-r from-indigo-900/40 to-slate-900 p-8 border-b border-indigo-500/20 flex justify-between items-center no-print">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                    <Zap size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Executive Briefing</h3>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">AI-Powered Intelligence by LLaMA 3.1</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={handlePrint}
+                    className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition flex items-center gap-2 text-xs font-bold"
+                  >
+                    <Printer size={16} /> 
+                    <span className="hidden sm:inline">Imprimir / PDF</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Print Only Header */}
+              <div className="print-only print-header">
+                <div className="flex justify-between items-start">
+                   <div>
+                      <h1 className="text-2xl font-black text-indigo-900">ORIZON MATCH</h1>
+                      <p className="text-xs text-slate-500 uppercase tracking-widest">Executive Intelligence Briefing</p>
+                   </div>
+                   <div className="text-right">
+                      <p className="text-[10px] font-bold text-slate-400">PROJETO: {project.title.toUpperCase()}</p>
+                      <p className="text-[10px] text-slate-400">DATA: {new Date().toLocaleDateString()}</p>
+                   </div>
+                </div>
+              </div>
+
+              <div className="p-8 prose prose-invert max-w-none prose-sm prose-headings:text-white prose-p:text-slate-300 prose-strong:text-indigo-400">
+                <ReactMarkdown>{aiReport}</ReactMarkdown>
+              </div>
+
+              <div className="print-only print-footer">
+                Este relatório foi gerado automaticamente pela Inteligência Artificial da Orizon Match.
+                Acesse orizon-match.web.app para mais detalhes.
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar Info */}

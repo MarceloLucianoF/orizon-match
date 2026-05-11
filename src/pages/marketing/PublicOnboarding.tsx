@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { 
   Lightbulb, Factory, ArrowRight, 
-  Loader2, Star, Lock, Zap, Rocket, Info 
+  Loader2, Star, Lock, Zap, Rocket, Info, GraduationCap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-import { explainMatch } from "../../lib/matching";
 import { maskPhone } from "../../lib/validators";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
@@ -81,7 +80,7 @@ export default function PublicOnboarding() {
         body: JSON.stringify({
           data: {
             title: "Projeto em Definição",
-            type: formData.role === 'idea' ? 'startup' : formData.role,
+            type: formData.role === 'idea' ? 'inventor' : formData.role as any,
             segment: formData.segment,
             summary: `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}`,
             location: { region: "Sul" }
@@ -170,7 +169,8 @@ export default function PublicOnboarding() {
             <div className="grid gap-3">
               {[
                 { id: 'idea', label: 'Inventor / Pesquisador', desc: 'Tenho uma ideia ou patente', icon: <Lightbulb className="text-amber-400"/> },
-                { id: 'provider', label: 'Empresa / Investidor', desc: 'Busco inovações para investir', icon: <Factory className="text-emerald-400"/> }
+                { id: 'ict', label: 'Sou uma ICT / Universidade', desc: 'Ofereço infraestrutura e pesquisa', icon: <GraduationCap className="text-indigo-400"/> },
+                { id: 'provider', label: 'Empresa / Investidor', desc: 'Busco inovações ou ofereço serviços', icon: <Factory className="text-emerald-400"/> }
               ].map((opt) => (
                 <button
                   key={opt.id}
@@ -214,29 +214,70 @@ export default function PublicOnboarding() {
         {step === 'PITCH' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
             <div className="text-center space-y-2">
-              <h2 className="text-3xl font-bold text-white tracking-tight">A Ideia</h2>
-              <p className="text-slate-400 text-sm">Resuma para nossa IA buscar matches preliminares.</p>
+              <h2 className="text-3xl font-bold text-white tracking-tight">
+                {formData.role === 'idea' ? 'A Ideia' : 
+                 formData.role === 'ict' ? 'A Expertise' : 'A Tese'}
+              </h2>
+              <p className="text-slate-400 text-sm">
+                {formData.role === 'idea' ? 'Resuma para nossa IA buscar matches preliminares.' :
+                 formData.role === 'ict' ? 'Descreva seus laboratórios e linhas de pesquisa.' :
+                 'O que sua empresa busca ou oferece ao ecossistema?'}
+              </p>
             </div>
             
             <div className="space-y-4">
-              <textarea
-                value={formData.summaryQuestions.problem}
-                onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
-                placeholder="Qual o problema que você resolve?"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
-              />
-              <textarea
-                value={formData.summaryQuestions.solution}
-                onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
-                placeholder="Como sua solução funciona?"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
-              />
-              <textarea
-                value={formData.summaryQuestions.difference}
-                onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
-                placeholder="Qual o seu grande diferencial?"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
-              />
+              {formData.role === 'idea' ? (
+                <>
+                  <textarea
+                    value={formData.summaryQuestions.problem}
+                    onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
+                    placeholder="Qual o problema que você resolve?"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                  />
+                  <textarea
+                    value={formData.summaryQuestions.solution}
+                    onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
+                    placeholder="Como sua solução funciona?"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                  />
+                  <textarea
+                    value={formData.summaryQuestions.difference}
+                    onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
+                    placeholder="Qual o seu grande diferencial?"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                  />
+                </>
+              ) : formData.role === 'ict' ? (
+                <>
+                  <textarea
+                    value={formData.summaryQuestions.problem}
+                    onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
+                    placeholder="Quais suas principais linhas de pesquisa?"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                  />
+                  <textarea
+                    value={formData.summaryQuestions.solution}
+                    onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
+                    placeholder="Descreva sua infraestrutura e laboratórios..."
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                  />
+                </>
+              ) : (
+                <>
+                  <textarea
+                    value={formData.summaryQuestions.problem}
+                    onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
+                    placeholder="O que sua empresa busca resolver (Tese de Inovação)?"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                  />
+                  <textarea
+                    value={formData.summaryQuestions.solution}
+                    onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
+                    placeholder="Quais capacidades produtivas ou serviços você oferece?"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                  />
+                </>
+              )}
             </div>
 
             <button 
@@ -269,9 +310,14 @@ export default function PublicOnboarding() {
                   </div>
                   <div className="flex-1">
                     <h4 className="font-bold text-white text-sm flex items-center gap-2">
-                      <Lock size={14} className="text-slate-600" /> Confidencial
+                      <Lock size={14} className="text-slate-600" /> 
+                      {match.name || "Confidencial"}
                     </h4>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-tighter mt-1">{explainMatch(match.breakdown)}</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-tighter mt-1">
+                      {match.role === 'ict' ? 'Expertise em Pesquisa' : 
+                       match.role === 'company' ? 'Capacidade Industrial' : 
+                       match.role === 'investor' ? 'Aporte de Capital' : 'Parceiro Estratégico'}
+                    </p>
                   </div>
                 </div>
               ))}

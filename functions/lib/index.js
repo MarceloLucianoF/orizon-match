@@ -36,15 +36,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stripeWebhook = exports.createPortalSession = exports.createCheckoutSession = exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
+exports.generateProjectReport = exports.stripeWebhook = exports.createPortalSession = exports.createCheckoutSession = exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
 const functions = __importStar(require("firebase-functions/v1"));
 const admin = __importStar(require("firebase-admin"));
 const match_service_1 = require("./services/match.service");
 const preview_service_1 = require("./services/preview.service");
 const analytics_service_1 = require("./services/analytics.service");
+const report_service_1 = require("./services/report.service");
 const openai_1 = __importDefault(require("openai"));
-const cors_1 = __importDefault(require("cors"));
-const corsHandler = (0, cors_1.default)({ origin: true });
 const stripe_service_1 = require("./services/stripe.service");
 if (!admin.apps.length) {
     admin.initializeApp();
@@ -52,27 +51,32 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 // Secrets
 // Note: functions.runWith() is used in the exports themselves to specify secrets
-exports.getMatchesPreview = functions.region("southamerica-east1").https.onRequest((req, res) => {
-    return corsHandler(req, res, async () => {
-        if (req.method !== "POST") {
-            res.status(405).send("Method Not Allowed");
-            return;
-        }
-        try {
-            // No onRequest, o corpo vem em req.body diretamente
-            const result = await (0, preview_service_1.getPreviewMatches)(req.body.data || req.body);
-            res.status(200).json({ data: result });
-        }
-        catch (error) {
-            console.error("Error on previewMatches:", error);
-            res.status(500).json({
-                error: {
-                    message: error.message || "Erro ao gerar preview de matches",
-                    status: "INTERNAL"
-                }
-            });
-        }
-    });
+exports.getMatchesPreview = functions.region("southamerica-east1").https.onRequest(async (req, res) => {
+    // Configuração manual de CORS para máxima compatibilidade em southamerica-east1
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+    if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+    }
+    try {
+        const result = await (0, preview_service_1.getPreviewMatches)(req.body.data || req.body);
+        res.status(200).json({ data: result });
+    }
+    catch (error) {
+        console.error("Error on previewMatches:", error);
+        res.status(500).json({
+            error: {
+                message: error.message || "Erro ao gerar preview de matches",
+                status: "INTERNAL"
+            }
+        });
+    }
 });
 const notifications_service_1 = require("./services/notifications.service");
 exports.onProjectCreated = functions.region("southamerica-east1").firestore
@@ -117,106 +121,116 @@ exports.onMatchCreated = functions.region("southamerica-east1").firestore
         link: "/app/match-history"
     });
 });
-exports.recordView = functions.region("southamerica-east1").https.onRequest((req, res) => {
-    return corsHandler(req, res, async () => {
-        if (req.method !== "POST") {
-            res.status(405).send("Method Not Allowed");
+exports.recordView = functions.region("southamerica-east1").https.onRequest(async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+    if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+    }
+    try {
+        const { projectId } = req.body.data || req.body;
+        if (!projectId) {
+            res.status(400).json({ error: { message: "projectId is required" } });
             return;
         }
-        try {
-            const { projectId } = req.body.data || req.body;
-            if (!projectId) {
-                res.status(400).json({ error: { message: "projectId is required" } });
-                return;
-            }
-            await (0, analytics_service_1.recordProjectView)(projectId);
-            res.status(200).json({ data: { success: true } });
-        }
-        catch (error) {
-            console.error("Error recording view:", error);
-            res.status(500).json({ error: { message: "Erro ao registrar visualização" } });
-        }
-    });
+        await (0, analytics_service_1.recordProjectView)(projectId);
+        res.status(200).json({ data: { success: true } });
+    }
+    catch (error) {
+        console.error("Error recording view:", error);
+        res.status(500).json({ error: { message: "Erro ao registrar visualização" } });
+    }
 });
 exports.enhancePitch = functions.region("southamerica-east1").runWith({
     secrets: ["NVIDIA_NIM_API_KEY"],
     timeoutSeconds: 60,
     memory: "256MB"
-}).https.onRequest((req, res) => {
-    return corsHandler(req, res, async () => {
-        var _a, _b, _c;
-        if (req.method !== "POST") {
-            res.status(405).send("Method Not Allowed");
+}).https.onRequest(async (req, res) => {
+    var _a, _b, _c;
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+    if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+    }
+    const { problem, solution, difference, userId: providedUserId } = req.body.data || req.body;
+    const timestamp = admin.firestore.FieldValue.serverTimestamp();
+    const userId = providedUserId || "anonymous";
+    if (!problem || !solution || !difference) {
+        await db.collection("logs_ai").add({
+            userId,
+            timestamp,
+            error: "Dados incompletos",
+            input: { problem, solution, difference }
+        });
+        res.status(400).json({ error: { message: "Dados incompletos" } });
+        return;
+    }
+    try {
+        const apiKey = process.env.NVIDIA_NIM_API_KEY;
+        if (!apiKey) {
+            res.status(500).json({ error: { message: "API Key da NVIDIA não configurada." } });
             return;
         }
-        const { problem, solution, difference, userId: providedUserId } = req.body.data || req.body;
-        const timestamp = admin.firestore.FieldValue.serverTimestamp();
-        const userId = providedUserId || "anonymous";
-        if (!problem || !solution || !difference) {
-            await db.collection("logs_ai").add({
-                userId,
-                timestamp,
-                error: "Dados incompletos",
-                input: { problem, solution, difference }
-            });
-            res.status(400).json({ error: { message: "Dados incompletos" } });
+        const openai = new openai_1.default({
+            apiKey,
+            baseURL: "https://integrate.api.nvidia.com/v1",
+        });
+        const completion = await openai.chat.completions.create({
+            model: "meta/llama-3.1-70b-instruct",
+            messages: [
+                {
+                    role: "system",
+                    content: "Você é um especialista em inovação B2B. Sua tarefa é transformar as respostas do inventor em um 'Executive Summary' de alto impacto, profissional e objetivo, adequado para investidores e empresas parceiras. Não use jargões desnecessários. Crie um texto único, coeso e persuasivo (máximo de 3 parágrafos). Não inclua saudações, vá direto ao texto.",
+                },
+                {
+                    role: "user",
+                    content: `Problema: ${problem}\nSolução: ${solution}\nDiferencial: ${difference}`,
+                },
+            ],
+            temperature: 0.5,
+            max_tokens: 1024,
+            top_p: 1,
+        });
+        const summary = ((_b = (_a = completion.choices[0]) === null || _a === void 0 ? void 0 : _a.message) === null || _b === void 0 ? void 0 : _b.content) || "";
+        // Log success
+        await db.collection("logs_ai").add({
+            userId,
+            timestamp,
+            status: "success",
+            input: { problem, solution, difference },
+            output: summary
+        });
+        res.status(200).json({ data: { summary } });
+    }
+    catch (error) {
+        console.error("Error generating pitch:", error);
+        // Log error
+        await db.collection("logs_ai").add({
+            userId,
+            timestamp,
+            status: "error",
+            error: error.message || "Unknown error",
+            stack: error.stack,
+            input: { problem, solution, difference }
+        });
+        if (error.status === 401 || ((_c = error.message) === null || _c === void 0 ? void 0 : _c.includes("API key"))) {
+            res.status(401).json({ error: { message: "Chave de API da NVIDIA não configurada ou inválida." } });
             return;
         }
-        try {
-            const apiKey = process.env.NVIDIA_NIM_API_KEY;
-            if (!apiKey) {
-                res.status(500).json({ error: { message: "API Key da NVIDIA não configurada." } });
-                return;
-            }
-            const openai = new openai_1.default({
-                apiKey,
-                baseURL: "https://integrate.api.nvidia.com/v1",
-            });
-            const completion = await openai.chat.completions.create({
-                model: "meta/llama-3.1-70b-instruct",
-                messages: [
-                    {
-                        role: "system",
-                        content: "Você é um especialista em inovação B2B. Sua tarefa é transformar as respostas do inventor em um 'Executive Summary' de alto impacto, profissional e objetivo, adequado para investidores e empresas parceiras. Não use jargões desnecessários. Crie um texto único, coeso e persuasivo (máximo de 3 parágrafos). Não inclua saudações, vá direto ao texto.",
-                    },
-                    {
-                        role: "user",
-                        content: `Problema: ${problem}\nSolução: ${solution}\nDiferencial: ${difference}`,
-                    },
-                ],
-                temperature: 0.5,
-                max_tokens: 1024,
-                top_p: 1,
-            });
-            const summary = ((_b = (_a = completion.choices[0]) === null || _a === void 0 ? void 0 : _a.message) === null || _b === void 0 ? void 0 : _b.content) || "";
-            // Log success
-            await db.collection("logs_ai").add({
-                userId,
-                timestamp,
-                status: "success",
-                input: { problem, solution, difference },
-                output: summary
-            });
-            res.status(200).json({ data: { summary } });
-        }
-        catch (error) {
-            console.error("Error generating pitch:", error);
-            // Log error
-            await db.collection("logs_ai").add({
-                userId,
-                timestamp,
-                status: "error",
-                error: error.message || "Unknown error",
-                stack: error.stack,
-                input: { problem, solution, difference }
-            });
-            if (error.status === 401 || ((_c = error.message) === null || _c === void 0 ? void 0 : _c.includes("API key"))) {
-                res.status(401).json({ error: { message: "Chave de API da NVIDIA não configurada ou inválida." } });
-                return;
-            }
-            res.status(500).json({ error: { message: error.message || "Erro ao comunicar com a IA" } });
-        }
-    });
+        res.status(500).json({ error: { message: error.message || "Erro ao comunicar com a IA" } });
+    }
 });
 // ====================================================
 // B2: Email transacional — Convite Jurídico via Resend
@@ -276,49 +290,59 @@ exports.onLegalInviteCreated = functions.region("southamerica-east1").runWith({
 // ====================================================
 exports.createCheckoutSession = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY"]
-}).https.onRequest((req, res) => {
-    return corsHandler(req, res, async () => {
-        if (req.method !== "POST") {
-            res.status(405).send("Method Not Allowed");
+}).https.onRequest(async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+    if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+    }
+    try {
+        const { priceId, userId, email } = req.body.data || req.body;
+        if (!priceId) {
+            res.status(400).json({ error: { message: "priceId é obrigatório." } });
             return;
         }
-        try {
-            const { priceId, userId, email } = req.body.data || req.body;
-            if (!priceId) {
-                res.status(400).json({ error: { message: "priceId é obrigatório." } });
-                return;
-            }
-            const result = await (0, stripe_service_1.createCheckoutSession)(userId, email, priceId);
-            res.status(200).json({ data: result });
-        }
-        catch (error) {
-            console.error("Error creating checkout session:", error);
-            res.status(500).json({ error: { message: error.message } });
-        }
-    });
+        const result = await (0, stripe_service_1.createCheckoutSession)(userId, email, priceId);
+        res.status(200).json({ data: result });
+    }
+    catch (error) {
+        console.error("Error creating checkout session:", error);
+        res.status(500).json({ error: { message: error.message } });
+    }
 });
 exports.createPortalSession = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY"]
-}).https.onRequest((req, res) => {
-    return corsHandler(req, res, async () => {
-        if (req.method !== "POST") {
-            res.status(405).send("Method Not Allowed");
+}).https.onRequest(async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+    if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+    }
+    try {
+        const { userId } = req.body.data || req.body;
+        if (!userId) {
+            res.status(400).json({ error: { message: "userId é obrigatório." } });
             return;
         }
-        try {
-            const { userId } = req.body.data || req.body;
-            if (!userId) {
-                res.status(400).json({ error: { message: "userId é obrigatório." } });
-                return;
-            }
-            const result = await (0, stripe_service_1.createPortalSession)(userId);
-            res.status(200).json({ data: result });
-        }
-        catch (error) {
-            console.error("Error creating portal session:", error);
-            res.status(500).json({ error: { message: error.message } });
-        }
-    });
+        const result = await (0, stripe_service_1.createPortalSession)(userId);
+        res.status(200).json({ data: result });
+    }
+    catch (error) {
+        console.error("Error creating portal session:", error);
+        res.status(500).json({ error: { message: error.message } });
+    }
 });
 exports.stripeWebhook = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]
@@ -335,6 +359,36 @@ exports.stripeWebhook = functions.region("southamerica-east1").runWith({
     catch (err) {
         console.error("Webhook Error:", err.message);
         res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+});
+exports.generateProjectReport = functions.region("southamerica-east1").runWith({
+    secrets: ["NVIDIA_NIM_API_KEY"],
+    timeoutSeconds: 120,
+    memory: "512MB"
+}).https.onRequest(async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+    if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+    }
+    try {
+        const { projectId } = req.body.data || req.body;
+        if (!projectId) {
+            res.status(400).json({ error: { message: "projectId é obrigatório" } });
+            return;
+        }
+        const report = await (0, report_service_1.generateIntelligenceReport)(projectId);
+        res.status(200).json({ data: { report } });
+    }
+    catch (error) {
+        console.error("Error generating report:", error);
+        res.status(500).json({ error: { message: error.message || "Erro ao gerar relatório" } });
     }
 });
 //# sourceMappingURL=index.js.map

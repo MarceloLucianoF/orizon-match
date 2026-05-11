@@ -47,8 +47,12 @@ type Step =
   | 'LINK_ASSETS'
   | 'ICT_RESEARCH'
   | 'ICT_INFRA'
+  | 'ICT_FOMENTO'
+  | 'ICT_PI'
   | 'PROVIDER_SERVICES'
-  | 'PROVIDER_CAPACITY';
+  | 'PROVIDER_CAPACITY'
+  | 'PROVIDER_THESIS'
+  | 'PROVIDER_MODEL';
 
 export function CreateProject() {
   const { user } = useAuth();
@@ -114,9 +118,13 @@ export function CreateProject() {
     // ICT fields
     researchLines: [] as string[],
     infrastructure: [] as string[],
+    fomentoAccess: [] as string[],
+    piPolicy: "", // co-titularidade, licenciamento, outro
     // Provider fields
     services: [] as string[],
     productionCapacity: "",
+    innovationThesis: "",
+    partnershipModel: [] as string[],
     linkedAssets: [] as string[],
     // Cadastro data
     registration: {
@@ -188,11 +196,15 @@ export function CreateProject() {
         ...(formData.role === 'ict' && {
           researchLines: formData.researchLines,
           infrastructure: formData.infrastructure,
+          fomentoAccess: formData.fomentoAccess,
+          piPolicy: formData.piPolicy,
         }),
         // Provider fields
         ...(formData.role === 'provider' && {
           services: formData.services,
           productionCapacity: formData.productionCapacity,
+          innovationThesis: formData.innovationThesis,
+          partnershipModel: formData.partnershipModel,
         }),
         linkedAssets: formData.linkedAssets,
       } as any);
@@ -207,7 +219,19 @@ export function CreateProject() {
   };
 
   const renderProgressBar = () => {
-    const steps: Step[] = ['ROLE', 'SEGMENT', 'PROTECTION', 'LINK_ASSETS', 'RESEARCH', 'INNOVATION_TYPE', 'LOCATION', 'MATURITY', 'SUMMARY_METHOD', 'SUMMARY_CONTENT', 'CADASTRO', 'REVIEW'];
+    let steps: Step[] = ['ROLE', 'SEGMENT'];
+    
+    if (formData.role === 'idea') {
+      steps = [...steps, 'PROTECTION', 'LINK_ASSETS', 'RESEARCH', 'INNOVATION_TYPE', 'LOCATION', 'MATURITY', 'SUMMARY_METHOD', 'SUMMARY_CONTENT'];
+    } else if (formData.role === 'ict') {
+      steps = [...steps, 'ICT_RESEARCH', 'ICT_INFRA', 'ICT_FOMENTO', 'ICT_PI', 'LOCATION'];
+    } else if (formData.role === 'provider') {
+      steps = [...steps, 'PROVIDER_SERVICES', 'PROVIDER_CAPACITY', 'PROVIDER_THESIS', 'PROVIDER_MODEL', 'LOCATION'];
+    }
+
+    if (!user) steps = [...steps, 'CADASTRO'];
+    steps = [...steps, 'REVIEW'];
+
     const currentIndex = steps.indexOf(step);
     return (
       <div className="flex gap-1 mb-8">
@@ -410,8 +434,88 @@ export function CreateProject() {
             <div className="pt-6 border-t border-slate-800 flex justify-between">
               <button onClick={() => prevStep('ICT_RESEARCH')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={() => nextStep('LOCATION')} 
+                onClick={() => nextStep('ICT_FOMENTO')} 
                 disabled={formData.infrastructure.length === 0}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: ICT_FOMENTO — Acesso a Fomento */}
+        {step === 'ICT_FOMENTO' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Acesso a Fomento</h2>
+              <p className="text-slate-400">Quais linhas de financiamento seu ICT costuma operar?</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {['Unidade Embrapii', 'FINEP', 'FAPESP / FAPESC', 'BNDES', 'Recursos Próprios', 'Incentivos Fiscais', 'Editais Internos', 'Convênios'].map(item => (
+                <button
+                  key={item}
+                  onClick={() => {
+                    const current = formData.fomentoAccess;
+                    const updated = current.includes(item) ? current.filter(i => i !== item) : [...current, item];
+                    updateField('fomentoAccess', updated);
+                  }}
+                  className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
+                    formData.fomentoAccess.includes(item)
+                      ? 'bg-amber-500/20 border-amber-500 text-amber-300'
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('ICT_INFRA')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('ICT_PI')} 
+                disabled={formData.fomentoAccess.length === 0}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: ICT_PI — Política de PI */}
+        {step === 'ICT_PI' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Política de PI</h2>
+              <p className="text-slate-400">Como sua instituição lida com a co-titularidade?</p>
+            </div>
+
+            <div className="grid gap-3">
+              {[
+                { id: 'licenciamento', label: 'Licenciamento Exclusivo', desc: 'Permitimos o uso exclusivo pela empresa parceira via royalties.' },
+                { id: 'co_titularidade', label: 'Co-titularidade', desc: 'A patente é dividida entre o ICT e a empresa (mais comum).' },
+                { id: 'aberta', label: 'Inovação Aberta', desc: 'Foco em transferência rápida de tecnologia para o mercado.' },
+                { id: 'sob_demanda', label: 'Sob Demanda', desc: 'Políticas flexíveis de acordo com o contrato.' },
+              ].map(opt => (
+                <button
+                  key={opt.id}
+                  onClick={() => updateField('piPolicy', opt.id)}
+                  className={`p-5 rounded-2xl text-left transition-all border ${
+                    formData.piPolicy === opt.id
+                      ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300'
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  <div className="font-bold text-base mb-1">{opt.label}</div>
+                  <div className="text-xs text-slate-500">{opt.desc}</div>
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('ICT_FOMENTO')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('LOCATION')} 
+                disabled={!formData.piPolicy}
                 className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
@@ -492,8 +596,82 @@ export function CreateProject() {
             <div className="pt-6 border-t border-slate-800 flex justify-between">
               <button onClick={() => prevStep('PROVIDER_SERVICES')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
               <button 
-                onClick={() => nextStep('LOCATION')} 
+                onClick={() => nextStep('PROVIDER_THESIS')} 
                 disabled={!formData.productionCapacity}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: PROVIDER_THESIS — Tese de Inovação */}
+        {step === 'PROVIDER_THESIS' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Tese de Inovação</h2>
+              <p className="text-slate-400">O que sua empresa busca resolver no ecossistema?</p>
+            </div>
+
+            <div className="space-y-4">
+              <textarea
+                value={formData.innovationThesis}
+                onChange={(e) => updateField('innovationThesis', e.target.value)}
+                placeholder="Ex: Buscamos soluções de eficiência energética e novos materiais para o setor automotivo..."
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm text-slate-200 focus:border-indigo-500 outline-none h-48 transition-all resize-none"
+              />
+              <div className="p-4 bg-indigo-500/5 rounded-xl border border-indigo-500/20 flex gap-3 items-start">
+                <Zap size={20} className="text-indigo-400 mt-1" />
+                <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <strong>Dica Orizon:</strong> Descreva seus desafios atuais. Nossa IA usará este texto para encontrar inventores que tenham a solução exata para você.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('PROVIDER_CAPACITY')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('PROVIDER_MODEL')} 
+                disabled={!formData.innovationThesis}
+                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+              >Próximo</button>
+            </div>
+          </div>
+        )}
+
+        {/* STEP: PROVIDER_MODEL — Modelo de Parceria */}
+        {step === 'PROVIDER_MODEL' && (
+          <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
+            <div className="space-y-2">
+              <h2 className="text-2xl font-bold text-white">Modelo de Parceria</h2>
+              <p className="text-slate-400">Como você prefere atuar com parceiros?</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {['Co-desenvolvimento (P&D)', 'Licenciamento de Tecnologia', 'M&A / Aquisição', 'CVC (Investimento)', 
+                'Contratação Direta', 'Mentoria e Networking', 'Aceleração de Projetos', 'Joint Venture'].map(item => (
+                <button
+                  key={item}
+                  onClick={() => {
+                    const current = formData.partnershipModel;
+                    const updated = current.includes(item) ? current.filter(i => i !== item) : [...current, item];
+                    updateField('partnershipModel', updated);
+                  }}
+                  className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
+                    formData.partnershipModel.includes(item)
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300'
+                      : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-6 border-t border-slate-800 flex justify-between">
+              <button onClick={() => prevStep('PROVIDER_THESIS')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
+              <button 
+                onClick={() => nextStep('LOCATION')} 
+                disabled={formData.partnershipModel.length === 0}
                 className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
@@ -1100,21 +1278,44 @@ export function CreateProject() {
 
             <div className="grid gap-4 p-6 rounded-2xl bg-slate-950/50 border border-slate-800 text-sm">
               <div className="flex justify-between border-b border-slate-800 pb-2">
-                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Segmento</span>
-                <span className="text-slate-200 font-bold">{formData.segment}</span>
+                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Perfil</span>
+                <span className="text-slate-200 font-bold uppercase">{formData.role === 'idea' ? 'Inventor' : formData.role}</span>
               </div>
-              <div className="flex justify-between border-b border-slate-800 pb-2">
-                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Proteção</span>
-                <span className="text-slate-200 font-bold">{formData.isProtected === 'sim' ? 'Protegida (Patente)' : 'Não Protegida'}</span>
-              </div>
-              <div className="flex justify-between border-b border-slate-800 pb-2">
-                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Tipo</span>
-                <span className="text-slate-200 font-bold uppercase">{formData.innovationType}</span>
-              </div>
-              <div className="flex justify-between border-b border-slate-800 pb-2">
-                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">P&D</span>
-                <span className="text-slate-200 font-bold">{formData.needsResearch === 'sim' ? 'Necessário' : 'Não Necessário'}</span>
-              </div>
+              
+              {formData.role === 'idea' ? (
+                <>
+                  <div className="flex justify-between border-b border-slate-800 pb-2">
+                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Segmento</span>
+                    <span className="text-slate-200 font-bold">{formData.segment}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-800 pb-2">
+                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Proteção</span>
+                    <span className="text-slate-200 font-bold">{formData.isProtected === 'sim' ? 'Protegida' : 'Não Protegida'}</span>
+                  </div>
+                </>
+              ) : formData.role === 'ict' ? (
+                <>
+                  <div className="flex justify-between border-b border-slate-800 pb-2">
+                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Expertise</span>
+                    <span className="text-slate-200 font-bold">{formData.researchLines.length} Linhas</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-800 pb-2">
+                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Infraestrutura</span>
+                    <span className="text-slate-200 font-bold">{formData.infrastructure.length} Recursos</span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="flex justify-between border-b border-slate-800 pb-2">
+                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Serviços</span>
+                    <span className="text-slate-200 font-bold">{formData.services.length} Categorias</span>
+                  </div>
+                  <div className="flex justify-between border-b border-slate-800 pb-2">
+                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Capacidade</span>
+                    <span className="text-slate-200 font-bold uppercase">{formData.productionCapacity}</span>
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="pt-6 border-t border-slate-800 flex justify-between">

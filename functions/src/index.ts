@@ -3,9 +3,8 @@ import * as admin from "firebase-admin";
 import { generateMatches } from "./services/match.service";
 import { getPreviewMatches } from "./services/preview.service";
 import { recordProjectView, recordMatchCreated } from "./services/analytics.service";
+import { generateIntelligenceReport } from "./services/report.service";
 import OpenAI from "openai";
-import cors from "cors";
-const corsHandler = cors({ origin: true });
 import { createCheckoutSession as createStripeSession, createPortalSession as createStripePortal, handleWebhook } from "./services/stripe.service";
 
 if (!admin.apps.length) {
@@ -16,27 +15,34 @@ const db = admin.firestore();
 // Secrets
 // Note: functions.runWith() is used in the exports themselves to specify secrets
 
-export const getMatchesPreview = functions.region("southamerica-east1").https.onRequest((req, res) => {
-  return corsHandler(req, res, async () => {
-    if (req.method !== "POST") {
-      res.status(405).send("Method Not Allowed");
-      return;
-    }
+export const getMatchesPreview = functions.region("southamerica-east1").https.onRequest(async (req, res) => {
+  // Configuração manual de CORS para máxima compatibilidade em southamerica-east1
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    try {
-      // No onRequest, o corpo vem em req.body diretamente
-      const result = await getPreviewMatches(req.body.data || req.body);
-      res.status(200).json({ data: result });
-    } catch (error: any) {
-      console.error("Error on previewMatches:", error);
-      res.status(500).json({ 
-        error: {
-          message: error.message || "Erro ao gerar preview de matches",
-          status: "INTERNAL"
-        }
-      });
-    }
-  });
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  try {
+    const result = await getPreviewMatches(req.body.data || req.body);
+    res.status(200).json({ data: result });
+  } catch (error: any) {
+    console.error("Error on previewMatches:", error);
+    res.status(500).json({ 
+      error: {
+        message: error.message || "Erro ao gerar preview de matches",
+        status: "INTERNAL"
+      }
+    });
+  }
 });
 
 import { createNotification } from "./services/notifications.service";
@@ -90,15 +96,23 @@ export const onMatchCreated = functions.region("southamerica-east1").firestore
     });
   });
 
-export const recordView = functions.region("southamerica-east1").https.onRequest((req, res) => {
-  return corsHandler(req, res, async () => {
-    if (req.method !== "POST") {
-      res.status(405).send("Method Not Allowed");
-      return;
-    }
+export const recordView = functions.region("southamerica-east1").https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    try {
-      const { projectId } = req.body.data || req.body;
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  try {
+    const { projectId } = req.body.data || req.body;
       if (!projectId) {
         res.status(400).json({ error: { message: "projectId is required" } });
         return;
@@ -110,21 +124,28 @@ export const recordView = functions.region("southamerica-east1").https.onRequest
       console.error("Error recording view:", error);
       res.status(500).json({ error: { message: "Erro ao registrar visualização" } });
     }
-  });
 });
 
 export const enhancePitch = functions.region("southamerica-east1").runWith({ 
   secrets: ["NVIDIA_NIM_API_KEY"],
   timeoutSeconds: 60,
   memory: "256MB" 
-}).https.onRequest((req, res) => {
-  return corsHandler(req, res, async () => {
-    if (req.method !== "POST") {
-      res.status(405).send("Method Not Allowed");
-      return;
-    }
+}).https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    const { problem, solution, difference, userId: providedUserId } = req.body.data || req.body;
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  const { problem, solution, difference, userId: providedUserId } = req.body.data || req.body;
     const timestamp = admin.firestore.FieldValue.serverTimestamp();
     const userId = providedUserId || "anonymous";
 
@@ -200,7 +221,6 @@ export const enhancePitch = functions.region("southamerica-east1").runWith({
 
     res.status(500).json({ error: { message: error.message || "Erro ao comunicar com a IA" } });
   }
-  });
 });
 
 // ====================================================
@@ -271,15 +291,23 @@ export const onLegalInviteCreated = functions.region("southamerica-east1").runWi
 
 export const createCheckoutSession = functions.region("southamerica-east1").runWith({
   secrets: ["STRIPE_SECRET_KEY"]
-}).https.onRequest((req, res) => {
-  return corsHandler(req, res, async () => {
-    if (req.method !== "POST") {
-      res.status(405).send("Method Not Allowed");
-      return;
-    }
+}).https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    try {
-      const { priceId, userId, email } = req.body.data || req.body;
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  try {
+    const { priceId, userId, email } = req.body.data || req.body;
       
       if (!priceId) {
         res.status(400).json({ error: { message: "priceId é obrigatório." } });
@@ -292,20 +320,27 @@ export const createCheckoutSession = functions.region("southamerica-east1").runW
       console.error("Error creating checkout session:", error);
       res.status(500).json({ error: { message: error.message } });
     }
-  });
 });
 
 export const createPortalSession = functions.region("southamerica-east1").runWith({
   secrets: ["STRIPE_SECRET_KEY"]
-}).https.onRequest((req, res) => {
-  return corsHandler(req, res, async () => {
-    if (req.method !== "POST") {
-      res.status(405).send("Method Not Allowed");
-      return;
-    }
+}).https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-    try {
-      const { userId } = req.body.data || req.body;
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  try {
+    const { userId } = req.body.data || req.body;
       
       if (!userId) {
         res.status(400).json({ error: { message: "userId é obrigatório." } });
@@ -318,7 +353,6 @@ export const createPortalSession = functions.region("southamerica-east1").runWit
       console.error("Error creating portal session:", error);
       res.status(500).json({ error: { message: error.message } });
     }
-  });
 });
 
 export const stripeWebhook = functions.region("southamerica-east1").runWith({
@@ -340,3 +374,38 @@ export const stripeWebhook = functions.region("southamerica-east1").runWith({
   }
 });
 
+
+export const generateProjectReport = functions.region("southamerica-east1").runWith({ 
+  secrets: ["NVIDIA_NIM_API_KEY"],
+  timeoutSeconds: 120,
+  memory: "512MB" 
+}).https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  try {
+    const { projectId } = req.body.data || req.body;
+    
+    if (!projectId) {
+      res.status(400).json({ error: { message: "projectId é obrigatório" } });
+      return;
+    }
+
+    const report = await generateIntelligenceReport(projectId);
+    res.status(200).json({ data: { report } });
+  } catch (error: any) {
+    console.error("Error generating report:", error);
+    res.status(500).json({ error: { message: error.message || "Erro ao gerar relatório" } });
+  }
+});

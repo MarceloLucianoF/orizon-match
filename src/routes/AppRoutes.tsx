@@ -12,6 +12,7 @@ import { Chat } from "../pages/shared/Chat";
 import { Profile } from "../pages/shared/Profile";
 import { AdminDashboard } from "../pages/admin/AdminDashboard";
 import { AssetRegistry } from "../pages/legal/AssetRegistry";
+import OrganizationDashboard from "../pages/shared/OrganizationDashboard";
 import { SUPER_ADMIN_UID } from "../services/adminService";
 import Home from "../pages/marketing/Home";
 import About from "../pages/marketing/About";
@@ -76,6 +77,7 @@ export function AppRoutes() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/billing" element={<Billing />} />
           <Route path="/assets" element={<AssetRegistry />} />
+          <Route path="/organization" element={<OrganizationDashboard />} />
           <Route element={<AdminRoute />}>
             <Route path="/admin" element={<AdminDashboard />} />
           </Route>
