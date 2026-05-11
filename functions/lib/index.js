@@ -117,89 +117,106 @@ exports.onMatchCreated = functions.region("southamerica-east1").firestore
         link: "/app/match-history"
     });
 });
-exports.recordView = functions.region("southamerica-east1").https.onCall(async (data, context) => {
-    const { projectId } = data;
-    if (!projectId)
-        throw new functions.https.HttpsError("invalid-argument", "projectId is required");
-    try {
-        await (0, analytics_service_1.recordProjectView)(projectId);
-        return { success: true };
-    }
-    catch (error) {
-        console.error("Error recording view:", error);
-        throw new functions.https.HttpsError("internal", "Erro ao registrar visualização");
-    }
+exports.recordView = functions.region("southamerica-east1").https.onRequest((req, res) => {
+    return corsHandler(req, res, async () => {
+        if (req.method !== "POST") {
+            res.status(405).send("Method Not Allowed");
+            return;
+        }
+        try {
+            const { projectId } = req.body.data || req.body;
+            if (!projectId) {
+                res.status(400).json({ error: { message: "projectId is required" } });
+                return;
+            }
+            await (0, analytics_service_1.recordProjectView)(projectId);
+            res.status(200).json({ data: { success: true } });
+        }
+        catch (error) {
+            console.error("Error recording view:", error);
+            res.status(500).json({ error: { message: "Erro ao registrar visualização" } });
+        }
+    });
 });
 exports.enhancePitch = functions.region("southamerica-east1").runWith({
     secrets: ["NVIDIA_NIM_API_KEY"],
     timeoutSeconds: 60,
     memory: "256MB"
-}).https.onCall(async (data, context) => {
-    var _a, _b, _c, _d;
-    const { problem, solution, difference } = data;
-    const timestamp = admin.firestore.FieldValue.serverTimestamp();
-    const userId = ((_a = context.auth) === null || _a === void 0 ? void 0 : _a.uid) || "anonymous";
-    if (!problem || !solution || !difference) {
-        await db.collection("logs_ai").add({
-            userId,
-            timestamp,
-            error: "Dados incompletos",
-            input: { problem, solution, difference }
-        });
-        throw new functions.https.HttpsError("invalid-argument", "Dados incompletos");
-    }
-    try {
-        const apiKey = process.env.NVIDIA_NIM_API_KEY;
-        if (!apiKey) {
-            throw new functions.https.HttpsError("failed-precondition", "API Key da NVIDIA não configurada.");
+}).https.onRequest((req, res) => {
+    return corsHandler(req, res, async () => {
+        var _a, _b, _c;
+        if (req.method !== "POST") {
+            res.status(405).send("Method Not Allowed");
+            return;
         }
-        const openai = new openai_1.default({
-            apiKey,
-            baseURL: "https://integrate.api.nvidia.com/v1",
-        });
-        const completion = await openai.chat.completions.create({
-            model: "meta/llama-3.1-70b-instruct",
-            messages: [
-                {
-                    role: "system",
-                    content: "Você é um especialista em inovação B2B. Sua tarefa é transformar as respostas do inventor em um 'Executive Summary' de alto impacto, profissional e objetivo, adequado para investidores e empresas parceiras. Não use jargões desnecessários. Crie um texto único, coeso e persuasivo (máximo de 3 parágrafos). Não inclua saudações, vá direto ao texto.",
-                },
-                {
-                    role: "user",
-                    content: `Problema: ${problem}\nSolução: ${solution}\nDiferencial: ${difference}`,
-                },
-            ],
-            temperature: 0.5,
-            max_tokens: 1024,
-            top_p: 1,
-        });
-        const summary = ((_c = (_b = completion.choices[0]) === null || _b === void 0 ? void 0 : _b.message) === null || _c === void 0 ? void 0 : _c.content) || "";
-        // Log success
-        await db.collection("logs_ai").add({
-            userId,
-            timestamp,
-            status: "success",
-            input: { problem, solution, difference },
-            output: summary
-        });
-        return { summary };
-    }
-    catch (error) {
-        console.error("Error generating pitch:", error);
-        // Log error
-        await db.collection("logs_ai").add({
-            userId,
-            timestamp,
-            status: "error",
-            error: error.message || "Unknown error",
-            stack: error.stack,
-            input: { problem, solution, difference }
-        });
-        if (error.status === 401 || ((_d = error.message) === null || _d === void 0 ? void 0 : _d.includes("API key"))) {
-            throw new functions.https.HttpsError("unauthenticated", "Chave de API da NVIDIA não configurada ou inválida. Verifique os Secrets no Firebase.");
+        const { problem, solution, difference, userId: providedUserId } = req.body.data || req.body;
+        const timestamp = admin.firestore.FieldValue.serverTimestamp();
+        const userId = providedUserId || "anonymous";
+        if (!problem || !solution || !difference) {
+            await db.collection("logs_ai").add({
+                userId,
+                timestamp,
+                error: "Dados incompletos",
+                input: { problem, solution, difference }
+            });
+            res.status(400).json({ error: { message: "Dados incompletos" } });
+            return;
         }
-        throw new functions.https.HttpsError("internal", error.message || "Erro ao comunicar com a IA");
-    }
+        try {
+            const apiKey = process.env.NVIDIA_NIM_API_KEY;
+            if (!apiKey) {
+                res.status(500).json({ error: { message: "API Key da NVIDIA não configurada." } });
+                return;
+            }
+            const openai = new openai_1.default({
+                apiKey,
+                baseURL: "https://integrate.api.nvidia.com/v1",
+            });
+            const completion = await openai.chat.completions.create({
+                model: "meta/llama-3.1-70b-instruct",
+                messages: [
+                    {
+                        role: "system",
+                        content: "Você é um especialista em inovação B2B. Sua tarefa é transformar as respostas do inventor em um 'Executive Summary' de alto impacto, profissional e objetivo, adequado para investidores e empresas parceiras. Não use jargões desnecessários. Crie um texto único, coeso e persuasivo (máximo de 3 parágrafos). Não inclua saudações, vá direto ao texto.",
+                    },
+                    {
+                        role: "user",
+                        content: `Problema: ${problem}\nSolução: ${solution}\nDiferencial: ${difference}`,
+                    },
+                ],
+                temperature: 0.5,
+                max_tokens: 1024,
+                top_p: 1,
+            });
+            const summary = ((_b = (_a = completion.choices[0]) === null || _a === void 0 ? void 0 : _a.message) === null || _b === void 0 ? void 0 : _b.content) || "";
+            // Log success
+            await db.collection("logs_ai").add({
+                userId,
+                timestamp,
+                status: "success",
+                input: { problem, solution, difference },
+                output: summary
+            });
+            res.status(200).json({ data: { summary } });
+        }
+        catch (error) {
+            console.error("Error generating pitch:", error);
+            // Log error
+            await db.collection("logs_ai").add({
+                userId,
+                timestamp,
+                status: "error",
+                error: error.message || "Unknown error",
+                stack: error.stack,
+                input: { problem, solution, difference }
+            });
+            if (error.status === 401 || ((_c = error.message) === null || _c === void 0 ? void 0 : _c.includes("API key"))) {
+                res.status(401).json({ error: { message: "Chave de API da NVIDIA não configurada ou inválida." } });
+                return;
+            }
+            res.status(500).json({ error: { message: error.message || "Erro ao comunicar com a IA" } });
+        }
+    });
 });
 // ====================================================
 // B2: Email transacional — Convite Jurídico via Resend

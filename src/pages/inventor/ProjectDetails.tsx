@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
-import { db, functions } from "../../firebase/config";
-import { httpsCallable } from "firebase/functions";
+import { db } from "../../firebase/config";
 import { 
   ArrowLeft, Eye, Star, Zap, 
   Shield, FileText, Gavel, Briefcase, 
@@ -57,9 +56,12 @@ export function ProjectDetails() {
             setLinkedAssets(assetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
           }
 
-          // Record view analytics
-          const recordViewFn = httpsCallable(functions, 'recordView');
-          recordViewFn({ projectId: id }).catch(err => console.error("Analytics error:", err));
+          // Record view analytics via fetch para evitar problemas de CORS em southamerica-east1
+          fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/recordView', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ data: { projectId: id } })
+          }).catch(err => console.error("Analytics error:", err));
 
           // Check for existing NDA
           if (user) {

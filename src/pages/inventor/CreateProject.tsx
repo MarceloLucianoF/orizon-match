@@ -11,8 +11,6 @@ import { TRLCalculator } from "../../components/TRLCalculator";
 import { AssetSelector } from "../../components/legal/AssetSelector";
 import { searchPatentsInpi } from "../../services/inpiService";
 import type { INPIPatent } from "../../services/inpiService";
-import { functions } from "../../firebase/config";
-import { httpsCallable } from "firebase/functions";
 import { registrationSchema, maskCpfCnpj, maskPhone, validateForm } from "../../lib/validators";
 
 const FIESC_CHAMBERS = [
@@ -920,9 +918,25 @@ export function CreateProject() {
                         setTimeout(() => setAiStatus("Estruturando proposta de valor..."), 1500);
                         setTimeout(() => setAiStatus("Lapidando tom de voz executivo..."), 3000);
 
-                        const enhancePitchFn = httpsCallable(functions, 'enhancePitch');
-                        const result = await enhancePitchFn(formData.summaryQuestions);
-                        const summary = (result.data as any).summary;
+                        // Mudamos para fetch manual para evitar problemas de CORS em southamerica-east1
+                        const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/enhancePitch', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            data: {
+                              ...formData.summaryQuestions,
+                              userId: user?.uid
+                            }
+                          })
+                        });
+
+                        if (!response.ok) {
+                          const errorData = await response.json();
+                          throw new Error(errorData.error?.message || "Falha ao processar com IA.");
+                        }
+
+                        const result = await response.json();
+                        const summary = result.data.summary;
                         updateField('summary', summary);
                         updateField('summaryMethod', 'text');
                       } catch (err: any) {

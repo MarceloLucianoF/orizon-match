@@ -179,7 +179,7 @@ export const enhancePitch = functions.region("southamerica-east1").runWith({
       output: summary
     });
 
-    return { summary };
+    res.status(200).json({ data: { summary } });
   } catch (error: any) {
     console.error("Error generating pitch:", error);
     
@@ -194,11 +194,13 @@ export const enhancePitch = functions.region("southamerica-east1").runWith({
     });
 
     if (error.status === 401 || error.message?.includes("API key")) {
-      throw new functions.https.HttpsError("unauthenticated", "Chave de API da NVIDIA não configurada ou inválida. Verifique os Secrets no Firebase.");
+      res.status(401).json({ error: { message: "Chave de API da NVIDIA não configurada ou inválida." } });
+      return;
     }
 
-    throw new functions.https.HttpsError("internal", error.message || "Erro ao comunicar com a IA");
+    res.status(500).json({ error: { message: error.message || "Erro ao comunicar com a IA" } });
   }
+  });
 });
 
 // ====================================================
