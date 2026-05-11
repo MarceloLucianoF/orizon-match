@@ -5,9 +5,7 @@ import * as admin from "firebase-admin";
 const getStripe = () => {
   const apiKey = process.env.STRIPE_SECRET_KEY;
   if (!apiKey) throw new Error("STRIPE_SECRET_KEY not configured");
-  return new Stripe(apiKey, {
-    apiVersion: '2025-01-27' as any,
-  });
+  return new Stripe(apiKey);
 };
 
 const db = admin.firestore();
@@ -16,7 +14,7 @@ export async function createCheckoutSession(userId: string, email: string, price
   const stripe = getStripe();
 
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
+    // Removido payment_method_types para usar as configurações automáticas do Dashboard do Stripe
     line_items: [
       {
         price: priceId,

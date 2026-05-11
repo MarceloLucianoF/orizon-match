@@ -259,35 +259,49 @@ exports.onLegalInviteCreated = functions.region("southamerica-east1").runWith({
 // ====================================================
 exports.createCheckoutSession = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY"]
-}).https.onCall(async (data, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "Apenas usuários logados podem assinar.");
-    }
-    const { priceId } = data;
-    if (!priceId) {
-        throw new functions.https.HttpsError("invalid-argument", "priceId é obrigatório.");
-    }
-    try {
-        return await (0, stripe_service_1.createCheckoutSession)(context.auth.uid, context.auth.token.email || "", priceId);
-    }
-    catch (error) {
-        console.error("Error creating checkout session:", error);
-        throw new functions.https.HttpsError("internal", error.message);
-    }
+}).https.onRequest((req, res) => {
+    return corsHandler(req, res, async () => {
+        if (req.method !== "POST") {
+            res.status(405).send("Method Not Allowed");
+            return;
+        }
+        try {
+            const { priceId, userId, email } = req.body.data || req.body;
+            if (!priceId) {
+                res.status(400).json({ error: { message: "priceId é obrigatório." } });
+                return;
+            }
+            const result = await (0, stripe_service_1.createCheckoutSession)(userId, email, priceId);
+            res.status(200).json({ data: result });
+        }
+        catch (error) {
+            console.error("Error creating checkout session:", error);
+            res.status(500).json({ error: { message: error.message } });
+        }
+    });
 });
 exports.createPortalSession = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY"]
-}).https.onCall(async (data, context) => {
-    if (!context.auth) {
-        throw new functions.https.HttpsError("unauthenticated", "Apenas usuários logados podem gerenciar faturamento.");
-    }
-    try {
-        return await (0, stripe_service_1.createPortalSession)(context.auth.uid);
-    }
-    catch (error) {
-        console.error("Error creating portal session:", error);
-        throw new functions.https.HttpsError("internal", error.message);
-    }
+}).https.onRequest((req, res) => {
+    return corsHandler(req, res, async () => {
+        if (req.method !== "POST") {
+            res.status(405).send("Method Not Allowed");
+            return;
+        }
+        try {
+            const { userId } = req.body.data || req.body;
+            if (!userId) {
+                res.status(400).json({ error: { message: "userId é obrigatório." } });
+                return;
+            }
+            const result = await (0, stripe_service_1.createPortalSession)(userId);
+            res.status(200).json({ data: result });
+        }
+        catch (error) {
+            console.error("Error creating portal session:", error);
+            res.status(500).json({ error: { message: error.message } });
+        }
+    });
 });
 exports.stripeWebhook = functions.region("southamerica-east1").runWith({
     secrets: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET"]

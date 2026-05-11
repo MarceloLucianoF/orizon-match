@@ -46,15 +46,13 @@ const getStripe = () => {
     const apiKey = process.env.STRIPE_SECRET_KEY;
     if (!apiKey)
         throw new Error("STRIPE_SECRET_KEY not configured");
-    return new stripe_1.default(apiKey, {
-        apiVersion: '2025-01-27',
-    });
+    return new stripe_1.default(apiKey);
 };
 const db = admin.firestore();
 async function createCheckoutSession(userId, email, priceId) {
     const stripe = getStripe();
     const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
+        // Removido payment_method_types para usar as configurações automáticas do Dashboard do Stripe
         line_items: [
             {
                 price: priceId,

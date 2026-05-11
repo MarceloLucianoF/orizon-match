@@ -9,8 +9,6 @@ import {
   Shield
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { functions } from "../../firebase/config";
-import { httpsCallable } from "firebase/functions";
 import { useAuth } from '../../hooks/useAuth';
 
 const PLANS = [
@@ -61,8 +59,26 @@ export default function Pricing() {
 
     setLoading(priceId);
     try {
-      const createCheckoutSession = httpsCallable(functions, 'createCheckoutSession');
-      const result = await createCheckoutSession({ priceId });
+      // Mudamos de httpsCallable para fetch manual para resolver problemas de CORS persistentes
+      const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/createCheckoutSession', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: {
+            priceId,
+            userId: user.uid,
+            email: user.email
+          }
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        console.error("Erro detalhado do servidor:", result.error);
+        throw new Error(result.error?.message || "Erro interno no servidor de checkout.");
+      }
+
       const { url } = result.data as { url: string };
       
       if (url) {
