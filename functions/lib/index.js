@@ -477,7 +477,17 @@ exports.adminDeleteUser = functions.region("southamerica-east1").https.onRequest
             return;
         }
         // 1. Apagar no Firebase Auth
-        await admin.auth().deleteUser(targetUid);
+        try {
+            await admin.auth().deleteUser(targetUid);
+        }
+        catch (e) {
+            if (e.code === 'auth/user-not-found') {
+                console.warn(`User ${targetUid} not found in Auth, proceeding to delete Firestore data.`);
+            }
+            else {
+                throw e;
+            }
+        }
         // 2. Apagar no Firestore (Cascade Delete)
         const batch = db.batch();
         const userRef = db.collection("users").doc(targetUid);
