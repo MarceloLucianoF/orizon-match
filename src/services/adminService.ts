@@ -1,5 +1,5 @@
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { db, auth } from "../firebase/config";
 
 // UID do super admin (em um ambiente de prod seria uma custom claim)
 export const SUPER_ADMIN_UID = "nqBV3Da1iqPbU46jGvO1ljBbIze2";
@@ -86,6 +86,54 @@ export async function updateUserSubscription(userId: string, status: 'free' | 'p
     });
   } catch (error) {
     console.error("Erro ao atualizar assinatura do usuário:", error);
+    throw error;
+  }
+}
+
+export async function adminCreateUserAPI(data: { email: string; password?: string; displayName?: string; role?: string }) {
+  try {
+    const token = await auth.currentUser?.getIdToken();
+    const response = await fetch("https://southamerica-east1-orizon-match.cloudfunctions.net/adminCreateUser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ data })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || "Erro ao criar usuário via API");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Erro em adminCreateUserAPI:", error);
+    throw error;
+  }
+}
+
+export async function adminDeleteUserAPI(targetUid: string) {
+  try {
+    const token = await auth.currentUser?.getIdToken();
+    const response = await fetch("https://southamerica-east1-orizon-match.cloudfunctions.net/adminDeleteUser", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({ data: { targetUid } })
+    });
+
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || "Erro ao deletar usuário via API");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Erro em adminDeleteUserAPI:", error);
     throw error;
   }
 }

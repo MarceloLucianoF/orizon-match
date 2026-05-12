@@ -409,3 +409,142 @@ export const generateProjectReport = functions.region("southamerica-east1").runW
     res.status(500).json({ error: { message: error.message || "Erro ao gerar relatório" } });
   }
 });
+
+export const adminCreateUser = functions.region("southamerica-east1").https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ error: { message: "Não autorizado." } });
+      return;
+    }
+
+    const token = authHeader.split("Bearer ")[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    
+    const callerDoc = await db.collection("users").doc(decodedToken.uid).get();
+    if (!callerDoc.exists || callerDoc.data()?.role !== "admin") {
+      res.status(403).json({ error: { message: "Apenas administradores podem criar usuários." } });
+      return;
+    }
+
+    const { email, password, displayName, role } = req.body.data || req.body;
+    if (!email || !password) {
+      res.status(400).json({ error: { message: "Email e senha são obrigatórios." } });
+      return;
+    }
+
+    const userRecord = await admin.auth().createUser({
+      email,
+      password,
+      displayName,
+    });
+
+    await db.collection("users").doc(userRecord.uid).set({
+      uid: userRecord.uid,
+      name: displayName || "Novo Usuário",
+      email,
+      role: role || "user",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    res.status(200).json({ data: { uid: userRecord.uid, message: "Usuário criado com sucesso." } });
+  } catch (error: any) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: { message: error.message || "Erro ao criar usuário." } });
+  }
+});
+
+export const adminDeleteUser = functions.region("southamerica-east1").https.onRequest(async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send("Method Not Allowed");
+    return;
+  }
+
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      res.status(401).json({ error: { message: "Não autorizado." } });
+      return;
+    }
+
+    const token = authHeader.split("Bearer ")[1];
+    const decodedToken = await admin.auth().verifyIdToken(token);
+    
+    const callerDoc = await db.collection("users").doc(decodedToken.uid).get();
+    if (!callerDoc.exists || callerDoc.data()?.role !== "admin") {
+      res.status(403).json({ error: { message: "Apenas administradores podem deletar usuários." } });
+      return;
+    }
+
+    const { targetUid } = req.body.data || req.body;
+    if (!targetUid) {
+      res.status(400).json({ error: { message: "UID alvo é obrigatório." } });
+      return;
+    }
+
+    if (targetUid === decodedToken.uid) {
+      res.status(400).json({ error: { message: "Você não pode deletar a si mesmo por esta API." } });
+      return;
+    }
+
+    // 1. Apagar no Firebase Auth
+    try {
+      await admin.auth().deleteUser(targetUid);
+    } catch (e: any) {
+      if (e.code === 'auth/user-not-found') {
+        console.warn(`User ${targetUid} not found in Auth, proceeding to delete Firestore data.`);
+      } else {
+        throw e;
+      }
+    }
+
+    // 2. Apagar no Firestore (Cascade Delete)
+    const batch = db.batch();
+    
+    const userRef = db.collection("users").doc(targetUid);
+    batch.delete(userRef);
+
+    const projectsSnapshot = await db.collection("projects").where("userId", "==", targetUid).get();
+    projectsSnapshot.docs.forEach((doc) => batch.delete(doc.ref));
+
+    const assetsSnapshot = await db.collection("assets").where("userId", "==", targetUid).get();
+    assetsSnapshot.docs.forEach((doc) => batch.delete(doc.ref));
+
+    // Matches
+    const ownerMatches = await db.collection("matches").where("ownerUserId", "==", targetUid).get();
+    ownerMatches.docs.forEach((doc) => batch.delete(doc.ref));
+
+    const targetMatches = await db.collection("matches").where("targetUserId", "==", targetUid).get();
+    targetMatches.docs.forEach((doc) => batch.delete(doc.ref));
+
+    await batch.commit();
+
+    res.status(200).json({ data: { message: "Usuário deletado com sucesso." } });
+  } catch (error: any) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: { message: error.message || "Erro ao deletar usuário." } });
+  }
+});

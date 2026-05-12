@@ -4,7 +4,7 @@ import { MainLayout } from "../layout/MainLayout";
 import { Login } from "../pages/auth/Login";
 import { Dashboard } from "../pages/shared/Dashboard";
 import { Projects } from "../pages/inventor/Projects";
-import { CreateProject } from "../pages/inventor/CreateProject";
+import { CreateProjectWrapper } from "../pages/inventor/CreateProjectWrapper";
 import { ProjectDetails } from "../pages/inventor/ProjectDetails";
 import { Matches } from "../pages/shared/Matches";
 import { Explore } from "../pages/shared/Explore";
@@ -69,7 +69,7 @@ export function AppRoutes() {
           <Route path="/app" element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/new" element={<CreateProject />} />
+          <Route path="/projects/new" element={<CreateProjectWrapper />} />
           <Route path="/projects/:id" element={<ProjectDetails />} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/matches" element={<Matches />} />

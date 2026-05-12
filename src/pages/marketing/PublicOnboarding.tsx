@@ -113,7 +113,7 @@ export default function PublicOnboarding() {
         name: formData.name,
         idNumber: formData.idNumber,
         phone: formData.phone,
-        role: formData.role === 'provider' ? 'company' : 'user'
+        role: formData.role === 'idea' ? 'inventor' : formData.role === 'provider' ? 'company' : 'ict'
       });
 
       sessionStorage.setItem('@orizon:lead_data', JSON.stringify({
@@ -145,7 +145,7 @@ export default function PublicOnboarding() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
       </div>
 
-      <div className="max-w-xl w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative z-10">
+      <div className="max-w-xl w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 md:p-12 shadow-2xl relative z-10">
         
         <div className="flex justify-between items-center mb-10">
           <Link to="/" className="font-black text-2xl text-white tracking-tighter uppercase">ORIZON<span className="text-indigo-500">MATCH</span></Link>
@@ -196,7 +196,7 @@ export default function PublicOnboarding() {
               <p className="text-slate-400">Em qual área sua inovação atua?</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
               {FIESC_CHAMBERS.map(chamber => (
                 <button
                   key={chamber}

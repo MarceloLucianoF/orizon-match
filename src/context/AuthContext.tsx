@@ -19,6 +19,8 @@ interface AuthContextType {
   signUp: (email: string, pass: string, profile: any) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
+  setImpersonatedUid: (uid: string | null) => void;
+  impersonatingAdminId: string | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,6 +29,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [impersonatedUid, setImpersonatedUid] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -60,6 +63,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => unsubscribe();
   }, []);
+
+  // Effect to handle Impersonation
+  useEffect(() => {
+    async function loadImpersonatedProfile() {
+      if (impersonatedUid) {
+        try {
+          const userDoc = await getDoc(doc(db, "users", impersonatedUid));
+          if (userDoc.exists()) {
+            setUserProfile(userDoc.data());
+          }
+        } catch (error) {
+          console.error("Error fetching impersonated profile:", error);
+        }
+      } else if (user) {
+        // Reset to original profile
+        try {
+          const userDoc = await getDoc(doc(db, "users", user.uid));
+          if (userDoc.exists()) {
+            setUserProfile(userDoc.data());
+          }
+        } catch (error) {}
+      }
+    }
+    loadImpersonatedProfile();
+  }, [impersonatedUid, user]);
 
   const login = async (email: string, pass: string) => {
     await signInWithEmailAndPassword(auth, email, pass);
@@ -97,8 +125,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const actingUser = user && impersonatedUid 
+    ? new Proxy(user, { get: (target, prop) => prop === 'uid' ? impersonatedUid : target[prop as keyof User] }) 
+    : user;
+
   return (
-    <AuthContext.Provider value={{ user, userProfile, loading, login, signUp, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ 
+      user: actingUser, 
+      userProfile, 
+      loading, 
+      login, 
+      signUp, 
+      loginWithGoogle, 
+      logout,
+      setImpersonatedUid,
+      impersonatingAdminId: impersonatedUid && user ? user.uid : null
+    }}>
       {children}
     </AuthContext.Provider>
   );

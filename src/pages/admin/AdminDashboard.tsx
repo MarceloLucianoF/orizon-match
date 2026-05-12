@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { getGlobalMetrics, getLiveDealFlows, getAllUsers, toggleUserVerification, updateUserSubscription } from "../../services/adminService";
+import { 
+  getGlobalMetrics, getLiveDealFlows, getAllUsers, 
+  toggleUserVerification, updateUserSubscription,
+  adminCreateUserAPI, adminDeleteUserAPI
+} from "../../services/adminService";
+import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 import { 
   ShieldAlert, Activity, Users, FolderKanban, Network, 
   Zap, Loader2, ServerCog, CheckCircle, FileSearch,
@@ -21,6 +27,8 @@ export function AdminDashboard() {
   const [logs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
+  const { setImpersonatedUid } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadData() {
@@ -59,6 +67,35 @@ export function AdminDashboard() {
       setUsers(users.map(u => u.id === userId ? { ...u, subscriptionStatus: nextStatus } : u));
     } catch (error) {
       alert("Erro ao atualizar assinatura.");
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!window.confirm("ATENÇÃO: Excluir este usuário apagará TODOS os seus projetos, assets e histórico de matches (Cascade Delete). Deseja continuar?")) return;
+    try {
+      await adminDeleteUserAPI(userId);
+      setUsers(users.filter(u => u.id !== userId));
+      alert("Usuário e dados associados excluídos com sucesso.");
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
+  const handleCreateUser = async () => {
+    const email = window.prompt("Email do novo usuário:");
+    if (!email) return;
+    const password = window.prompt("Senha (mín. 6 caracteres):");
+    if (!password) return;
+    const role = window.prompt("Role (inventor, company, ict, admin, investor):", "inventor");
+    if (!role) return;
+
+    try {
+      await adminCreateUserAPI({ email, password, displayName: "Novo Usuário (Admin)", role });
+      alert("Usuário criado com sucesso!");
+      const u = await getAllUsers();
+      setUsers(u);
+    } catch (error: any) {
+      alert(error.message);
     }
   };
 
@@ -362,10 +399,18 @@ export function AdminDashboard() {
       {/* CONTROLE DE USUÁRIOS */}
       <div className="bg-[#0A0514] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
         <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
-          <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-            <Users className="text-indigo-500" size={20} /> Controle de Usuários
-          </h2>
-          <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5"><ServerCog size={14}/> Últimos 100</span>
+          <div className="flex items-center gap-4">
+            <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <Users className="text-indigo-500" size={20} /> Controle de Usuários
+            </h2>
+            <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5"><ServerCog size={14}/> Últimos 100</span>
+          </div>
+          <button 
+            onClick={handleCreateUser}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors"
+          >
+            + Criar Usuário
+          </button>
         </div>
         
         <div className="overflow-x-auto">
@@ -441,6 +486,23 @@ export function AdminDashboard() {
                           }`}
                         >
                           {u.subscriptionStatus === 'premium' ? "Downgrade Free" : "Dar Premium"}
+                        </button>
+
+                        <button 
+                          onClick={() => {
+                            setImpersonatedUid(u.id);
+                            navigate('/dashboard');
+                          }}
+                          className="px-2 py-1 rounded text-[10px] font-bold transition-all border bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 hover:bg-fuchsia-500/20"
+                        >
+                          Simular
+                        </button>
+                        
+                        <button 
+                          onClick={() => handleDeleteUser(u.id)}
+                          className="px-2 py-1 rounded text-[10px] font-bold transition-all border bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20"
+                        >
+                          Excluir
                         </button>
                       </div>
                     </td>
