@@ -10,6 +10,7 @@ import {
   MapPin, SlidersHorizontal, X
 } from "lucide-react";
 import { EmptyState } from "../../components/EmptyState";
+import { useTranslation } from "react-i18next";
 
 const FIESC_CHAMBERS = [
   "Agroindústria", "Alimentos e Bebidas", "Bens de Capital",
@@ -22,6 +23,7 @@ const REGIONS = ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"];
 export function Explore() {
   const { user, userProfile } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,17 +105,17 @@ export function Explore() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-slate-100 flex items-center gap-3">
-            <Compass className="text-indigo-400" size={24} /> Explorar Oportunidades
+            <Compass className="text-indigo-400" size={24} /> {t("explore.title")}
           </h1>
           <p className="text-slate-400 mt-1 text-sm">
-            Descubra projetos e organizações compatíveis com seu perfil.
+            {t("explore.subtitle")}
           </p>
         </div>
         <button 
           onClick={() => setShowFilters(!showFilters)}
           className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2.5 rounded-xl font-medium transition-all border border-slate-700 text-sm md:hidden"
         >
-          <SlidersHorizontal size={16} /> Filtros
+          <SlidersHorizontal size={16} /> {t("explore.filters")}
         </button>
       </div>
 
@@ -128,7 +130,7 @@ export function Explore() {
               value={filters.search || ""}
               onChange={e => setFilters({ ...filters, search: e.target.value })}
               onKeyDown={e => e.key === "Enter" && handleSearch()}
-              placeholder="Buscar por título, segmento ou palavra-chave..."
+              placeholder={t("explore.searchPlaceholder")}
               className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm"
             />
           </div>
@@ -136,14 +138,14 @@ export function Explore() {
             onClick={handleSearch}
             className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all text-sm flex items-center gap-2"
           >
-            <Search size={16} /> Buscar
+            <Search size={16} /> {t("explore.search")}
           </button>
         </div>
 
         {/* Filters row */}
         <div className={`flex flex-wrap gap-3 items-center ${showFilters ? 'block' : 'hidden md:flex'}`}>
           <div className="flex items-center gap-1.5 text-slate-500 text-xs">
-            <Filter size={14} /> Filtros:
+            <Filter size={14} /> {t("explore.filters")}:
           </div>
           
           <select
@@ -151,7 +153,7 @@ export function Explore() {
             onChange={e => setFilters({ ...filters, segment: e.target.value })}
             className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
           >
-            <option value="">Todos os Segmentos</option>
+            <option value="">{t("explore.allSegments")}</option>
             {FIESC_CHAMBERS.map(c => <option key={c} value={c}>{c}</option>)}
           </select>
 
@@ -160,7 +162,7 @@ export function Explore() {
             onChange={e => setFilters({ ...filters, minTrl: e.target.value ? Number(e.target.value) : undefined })}
             className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
           >
-            <option value="">Todos os TRLs</option>
+            <option value="">{t("explore.allTrls")}</option>
             {[1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>TRL {n}+</option>)}
           </select>
 
@@ -169,12 +171,12 @@ export function Explore() {
             onChange={e => setFilters({ ...filters, region: e.target.value })}
             className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
           >
-            <option value="">Todas as Regiões</option>
+            <option value="">{t("explore.allRegions")}</option>
             {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
 
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span>Score min:</span>
+            <span>{t("explore.minScore")}:</span>
             <span className="font-bold text-indigo-400">{filters.minScore || 50}%</span>
             <input 
               type="range" 
@@ -187,7 +189,7 @@ export function Explore() {
 
           {hasActiveFilters && (
             <button onClick={clearFilters} className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition">
-              <X size={12} /> Limpar
+              <X size={12} /> {t("explore.clear")}
             </button>
           )}
         </div>
@@ -202,15 +204,15 @@ export function Explore() {
         <div className="bg-slate-900/50 border border-slate-800 rounded-2xl">
           <EmptyState
             icon={Compass}
-            title="Nenhuma oportunidade encontrada"
-            description={hasActiveFilters ? "Ajuste os filtros ou amplie os critérios de busca." : "Aguarde novos cadastros no ecossistema ou convide parceiros."}
-            ctaLabel={hasActiveFilters ? "Limpar Filtros" : undefined}
+            title={t("explore.noOpportunities")}
+            description={hasActiveFilters ? t("explore.adjustFilters") : t("explore.awaitRegisters")}
+            ctaLabel={hasActiveFilters ? t("explore.clearFilters") : undefined}
             onCtaClick={hasActiveFilters ? clearFilters : undefined}
           />
         </div>
       ) : (
         <div className="space-y-4">
-          <p className="text-xs text-slate-500">{results.length} resultado{results.length !== 1 ? 's' : ''} encontrado{results.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-slate-500">{t("explore.resultsFound", { count: results.length })}</p>
           {results.map((project, idx) => {
             const tier = getMatchTier(project.score);
             const scoreColor = getScoreColor(project.score);
@@ -231,7 +233,7 @@ export function Explore() {
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
                     <h3 className="text-base font-bold text-slate-100 truncate">
-                      {project.title || "Projeto Confidencial"}
+                      {project.title || t("explore.confidentialProject")}
                     </h3>
                     
                     {tier.label && (
@@ -242,7 +244,7 @@ export function Explore() {
 
                     {project.isVdrReady && (
                       <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-500/20 font-medium flex items-center gap-1">
-                        <ShieldCheck size={10} /> VDR Auditado
+                        <ShieldCheck size={10} /> {t("explore.vdrAudited")}
                       </span>
                     )}
                   </div>
@@ -278,11 +280,11 @@ export function Explore() {
                     {connecting === project.id ? (
                       <Loader2 className="animate-spin" size={16} />
                     ) : (
-                      <>Iniciar Conexão <ArrowRight size={16} /></>
+                      <>{t("explore.startConnection")} <ArrowRight size={16} /></>
                     )}
                   </button>
                   {userProjects.length === 0 && (
-                    <p className="text-[10px] text-amber-400 mt-1 text-center">Cadastre um projeto primeiro</p>
+                    <p className="text-[10px] text-amber-400 mt-1 text-center">{t("explore.registerProjectFirst")}</p>
                   )}
                 </div>
               </div>

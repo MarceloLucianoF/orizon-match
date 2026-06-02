@@ -20,7 +20,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
 
   const roles = [
     { id: "inventor", label: "Inventor / Pesquisador" },
-    { id: "company", label: "Empresa (Company)" },
+    { id: "industry", label: "Empresa (Industry)" },
     { id: "ict", label: "ICT / Universidade" },
     { id: "investor", label: "Investidor" },
     { id: "admin", label: "Administrador" },

@@ -1,28 +1,32 @@
 // ===== ENUMS =====
 
 export type StakeholderType =
-  | "inventor"  // Criador da ideia
-  | "investidor" // Fornecedor de capital
-  | "ict"       // Instituto Científico/Tecnológico
-  | "industria" // Empresa executora
-  | "juridico"; // Proteção legal
+  | "inventor"  // Creator of the idea
+  | "investor"  // Provider of capital
+  | "ict"       // Scientific/Technological Institute
+  | "industry"  // Executing company/industry
+  | "legal";    // Legal protection
 
-export type IdeaMaturidade =
-  | "ideia"     // Conceito inicial
-  | "prototipo" // Prova de conceito
-  | "mvp"       // Produto mínimo viável
-  | "produto";  // Produto maduro
+export type MaturityLevel =
+  | "idea"      // Initial concept
+  | "prototype" // Proof of concept
+  | "mvp"       // Minimum viable product
+  | "product";  // Mature product
 
-export type InovaType =
-  | "inovacao"  // Completamente novo
-  | "melhoria"; // Melhoria incremental
+export type IdeaMaturidade = MaturityLevel; // Alias for backward compatibility if needed
+
+export type InnovationType =
+  | "innovation"  // Completely new
+  | "improvement"; // Incremental improvement
+
+export type InovaType = InnovationType; // Alias for backward compatibility if needed
 
 export type ProjectStatus =
-  | "rascunho"
-  | "publicado"
-  | "emmatching"
-  | "combinado"
-  | "arquivado";
+  | "draft"
+  | "published"
+  | "matching"
+  | "matched"
+  | "archived";
 
 export type MatchStatus =
   | "pending"
@@ -58,7 +62,7 @@ export interface User {
 
   // Perfil de interesse
   segmentosInteresse: string[];
-  interessesMaturidade: IdeaMaturidade[];
+  interessesMaturidade: MaturityLevel[];
 
   // Localização
   localizacao: Localizacao;
@@ -81,8 +85,8 @@ export interface Project {
 
   // Classificação
   segmento: string;
-  maturidade: IdeaMaturidade;
-  tipo: InovaType;
+  maturidade: MaturityLevel;
+  tipo: InnovationType;
 
   // CORE: O que precisa (matchmaking)
   precisa: StakeholderType[];
@@ -181,7 +185,7 @@ export interface CreateProjectFormData {
   profileType: StakeholderType | "";
   segment: string;
   patentStatus: "nao" | "pendente" | "concedida" | "";
-  maturity: IdeaMaturidade | "";
+  maturity: MaturityLevel | "";
   needs: StakeholderType[];
   locationCity: string;
   locationState: string;

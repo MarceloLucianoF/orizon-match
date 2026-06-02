@@ -32,7 +32,7 @@ export function calculateMatch(project: any, target: any) {
   if (hasAuditedVdr) breakdown.readiness += 8; // +8 pts for audited documents
 
   // NEEDS (20 pts)
-  if (project.needs?.investment && (target.role === "company" || target.role === "investor")) breakdown.needs += 20;
+  if (project.needs?.investment && (target.role === "industry" || target.role === "investor")) breakdown.needs += 20;
   if (project.needs?.research && target.role === "ict") breakdown.needs += 20;
 
   // LOCATION (10 pts)
@@ -122,7 +122,7 @@ export function getMatchLabel(match: any): string {
   const segment = match.targetSegment || match.segment;
   
   const roleLabels: Record<string, string> = {
-    company: "Empresa",
+    industry: "Empresa",
     investor: "Investidor",
     ict: "ICT / Universidade",
     legal: "Escritório Jurídico",

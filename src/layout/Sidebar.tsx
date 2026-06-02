@@ -2,6 +2,7 @@ import { LayoutDashboard, FolderKanban, Users, LogOut, MessageSquare, Building2,
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { SUPER_ADMIN_UID } from "../services/adminService";
+import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -10,17 +11,18 @@ interface SidebarProps {
 export function Sidebar({ onClose }: SidebarProps) {
   const { pathname } = useLocation();
   const { logout, user, userProfile } = useAuth();
+  const { t } = useTranslation();
   const isAdmin = userProfile?.role === 'admin' || user?.uid === SUPER_ADMIN_UID;
 
 
   const links = [
-    { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-    { to: "/projects", icon: FolderKanban, label: "Meus Projetos" },
-    { to: "/assets", icon: Gavel, label: "Ativos de PI" },
-    { to: "/explore", icon: Compass, label: "Explorar" },
-    { to: "/matches", icon: Users, label: "Matches" },
-    { to: "/chat", icon: MessageSquare, label: "Deal Flow" },
-    { to: "/profile", icon: Building2, label: "Meu Perfil" },
+    { to: "/dashboard", icon: LayoutDashboard, label: t("sidebar.dashboard") },
+    { to: "/projects", icon: FolderKanban, label: t("sidebar.projects") },
+    { to: "/assets", icon: Gavel, label: t("sidebar.assets") },
+    { to: "/explore", icon: Compass, label: t("sidebar.explore") },
+    { to: "/matches", icon: Users, label: t("sidebar.matches") },
+    { to: "/chat", icon: MessageSquare, label: t("sidebar.dealflow") },
+    { to: "/profile", icon: Building2, label: t("sidebar.profile") },
   ];
 
   const handleLinkClick = () => {
@@ -46,7 +48,7 @@ export function Sidebar({ onClose }: SidebarProps) {
       <nav className="flex-1 p-4 overflow-y-auto custom-scrollbar">
         {/* User Workspace */}
         <div className="mb-6">
-          <p className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Workspace</p>
+          <p className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{t("sidebar.workspace")}</p>
           <div className="space-y-1">
             {links.map((link) => {
               const isActive = pathname === link.to || (link.to !== '/dashboard' && pathname.startsWith(link.to));
@@ -75,7 +77,7 @@ export function Sidebar({ onClose }: SidebarProps) {
         {isAdmin && (
           <div className="pt-4 border-t border-slate-800">
             <p className="px-3 text-[10px] font-bold text-fuchsia-500 uppercase tracking-widest mb-2 flex items-center gap-2">
-              <ShieldAlert size={12} className="animate-pulse" /> Administração
+              <ShieldAlert size={12} className="animate-pulse" /> {t("sidebar.admin")}
             </p>
             <div className="space-y-1">
               <Link
@@ -88,7 +90,7 @@ export function Sidebar({ onClose }: SidebarProps) {
                 }`}
               >
                 <ShieldAlert size={20} />
-                <span className="font-medium text-sm">Painel Admin</span>
+                <span className="font-medium text-sm">{t("sidebar.adminpanel")}</span>
               </Link>
             </div>
           </div>
@@ -101,7 +103,7 @@ export function Sidebar({ onClose }: SidebarProps) {
           className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors"
         >
           <LogOut size={20} />
-          <span className="font-medium text-sm">Sair</span>
+          <span className="font-medium text-sm">{t("sidebar.logout")}</span>
         </button>
       </div>
     </aside>

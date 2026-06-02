@@ -31,7 +31,7 @@ export function Dashboard() {
   }
 
   // Empresa ou Investidor veem o Deal Flow CRM
-  if (userProfile?.role === 'company' || userProfile?.role === 'investor') {
+  if (userProfile?.role === 'industry' || userProfile?.role === 'investor') {
     return <CompanyDashboard />;
   }
 

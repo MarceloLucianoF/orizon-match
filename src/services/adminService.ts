@@ -15,14 +15,14 @@ export async function getGlobalMetrics() {
     const projects = projectsSnap.docs.map(d => d.data());
     
     const icts = users.filter(u => u.role === "ict").length;
-    const companies = users.filter(u => u.role === "company").length;
+    const companies = users.filter(u => u.role === "industry").length;
     const investors = users.filter(u => u.role === "investor").length;
 
     // TRL Distribution
     const trlDistribution = {
-      ideia: projects.filter(p => (p.maturity || p.trlScore) <= 3).length,
-      prototipo: projects.filter(p => (p.maturity || p.trlScore) > 3 && (p.maturity || p.trlScore) <= 6).length,
-      mercado: projects.filter(p => (p.maturity || p.trlScore) > 6).length
+      idea: projects.filter(p => (p.maturity || p.trlScore) <= 3).length,
+      prototype: projects.filter(p => (p.maturity || p.trlScore) > 3 && (p.maturity || p.trlScore) <= 6).length,
+      market: projects.filter(p => (p.maturity || p.trlScore) > 6).length
     };
 
     // VDR Progress

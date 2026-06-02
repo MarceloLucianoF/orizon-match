@@ -208,13 +208,13 @@ export function Profile() {
                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-950 border border-slate-800 group relative overflow-hidden">
                  <div className={`absolute inset-0 opacity-10 bg-gradient-to-r ${
                    userProfile?.role === 'ict' ? 'from-blue-500 to-indigo-500' : 
-                   userProfile?.role === 'company' ? 'from-emerald-500 to-teal-500' : 
+                   userProfile?.role === 'industry' ? 'from-emerald-500 to-teal-500' : 
                    'from-indigo-500 to-purple-500'
                  }`} />
                  <span className="text-xs text-slate-400 flex items-center gap-2 relative z-10"><Building2 size={14} /> Perfil</span>
                  <span className={`text-xs font-black uppercase relative z-10 px-2 py-0.5 rounded ${
                    userProfile?.role === 'ict' ? 'text-blue-400 bg-blue-400/10 border border-blue-400/20' : 
-                   userProfile?.role === 'company' ? 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20' : 
+                   userProfile?.role === 'industry' ? 'text-emerald-400 bg-emerald-400/10 border border-emerald-400/20' : 
                    'text-indigo-400 bg-indigo-400/10 border border-indigo-400/20'
                  }`}>
                    {userProfile?.role || 'inventor'}
@@ -227,7 +227,7 @@ export function Profile() {
                    <span className="text-[10px] font-bold text-blue-300 uppercase">Instituição de Pesquisa</span>
                  </div>
                )}
-               {userProfile?.role === 'company' && (
+               {userProfile?.role === 'industry' && (
                  <div className="p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 flex items-center gap-2">
                    <div className="w-2 h-2 rounded-full bg-emerald-500" />
                    <span className="text-[10px] font-bold text-emerald-300 uppercase">Parceiro Industrial</span>

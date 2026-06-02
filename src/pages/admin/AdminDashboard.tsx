@@ -123,26 +123,26 @@ export function AdminDashboard() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-400">Fase de Ideação (TRL 1-3)</span>
-              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.ideia || 0}</span>
+              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.idea || 0}</span>
             </div>
             <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-              <div className="bg-indigo-500 h-full transition-all duration-1000" style={{ width: `${(metrics?.trlDistribution?.ideia / metrics?.totalProjects) * 100 || 0}%` }} />
+              <div className="bg-indigo-500 h-full transition-all duration-1000" style={{ width: `${(metrics?.trlDistribution?.idea / metrics?.totalProjects) * 100 || 0}%` }} />
             </div>
             
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-400">Prototipação (TRL 4-6)</span>
-              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.prototipo || 0}</span>
+              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.prototype || 0}</span>
             </div>
             <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-              <div className="bg-cyan-500 h-full transition-all duration-1000" style={{ width: `${(metrics?.trlDistribution?.prototipo / metrics?.totalProjects) * 100 || 0}%` }} />
+              <div className="bg-cyan-500 h-full transition-all duration-1000" style={{ width: `${(metrics?.trlDistribution?.prototype / metrics?.totalProjects) * 100 || 0}%` }} />
             </div>
 
             <div className="flex items-center justify-between">
               <span className="text-xs text-slate-400">Pronto para Mercado (TRL 7+)</span>
-              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.mercado || 0}</span>
+              <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.market || 0}</span>
             </div>
             <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-              <div className="bg-emerald-500 h-full transition-all duration-1000" style={{ width: `${(metrics?.trlDistribution?.mercado / metrics?.totalProjects) * 100 || 0}%` }} />
+              <div className="bg-emerald-500 h-full transition-all duration-1000" style={{ width: `${(metrics?.trlDistribution?.market / metrics?.totalProjects) * 100 || 0}%` }} />
             </div>
           </div>
         </div>
@@ -262,7 +262,7 @@ export function AdminDashboard() {
                   </td>
                   <td className="p-4">
                     <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${
-                      u.role === 'company' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
+                      u.role === 'industry' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
                       u.role === 'investor' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                       u.role === 'ict' ? 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20' :
                       'bg-amber-500/10 text-amber-400 border-amber-500/20'

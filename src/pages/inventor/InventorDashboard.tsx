@@ -62,7 +62,7 @@ export function InventorDashboard() {
           if (allSegments.length > 0) {
             const orgsQ = query(
               collection(db, "users"),
-              where("role", "in", ["company", "investor", "provider"]),
+              where("role", "in", ["industry", "investor", "provider"]),
               where("segments", "array-contains-any", allSegments)
             );
             const orgsSnap = await getDocs(orgsQ);

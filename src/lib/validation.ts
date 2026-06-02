@@ -21,10 +21,10 @@ export const UserSchema = z.object({
   displayName: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   tipo: z.enum([
     "inventor",
-    "investidor",
+    "investor",
     "ict",
-    "industria",
-    "juridico",
+    "industry",
+    "legal",
   ] as const),
   segmentosInteresse: z.array(z.string()).min(1, "Selecione pelo menos um segmento"),
   interessesMaturidade: z.array(z.string()).min(1, "Selecione pelo menos uma maturidade"),
@@ -38,19 +38,19 @@ export const ProjectSchema = z.object({
   description: z.string().min(20, "Descrição deve ter pelo menos 20 caracteres"),
   segmento: z.string().min(2, "Segmento é obrigatório"),
   maturidade: z.enum([
-    "ideia",
-    "prototipo",
+    "idea",
+    "prototype",
     "mvp",
-    "produto",
+    "product",
   ] as const),
-  tipo: z.enum(["inovacao", "melhoria"] as const),
+  tipo: z.enum(["innovation", "improvement"] as const),
   precisa: z
     .array(
       z.enum([
-        "investidor",
+        "investor",
         "ict",
-        "industria",
-        "juridico",
+        "industry",
+        "legal",
       ] as const)
     )
     .min(1, "Selecione pelo menos uma necessidade"),
@@ -79,11 +79,11 @@ export const SummaryFreeTextSchema = z.object({
 
 export const CreateProjectFormSchema = z
   .object({
-    profileType: z.enum(["inventor", "investidor", "ict", "industria", "juridico", ""] as const),
+    profileType: z.enum(["inventor", "investor", "ict", "industry", "legal", ""] as const),
     segment: z.string().min(1, "Segmento é obrigatório"),
     patentStatus: z.enum(["nao", "pendente", "concedida", ""]),
-    maturity: z.enum(["ideia", "prototipo", "mvp", "produto", ""]),
-    needs: z.array(z.enum(["investidor", "ict", "industria", "juridico"] as const)).min(1, "Selecione pelo menos uma necessidade"),
+    maturity: z.enum(["idea", "prototype", "mvp", "product", ""]),
+    needs: z.array(z.enum(["investor", "ict", "industry", "legal"] as const)).min(1, "Selecione pelo menos uma necessidade"),
     locationCity: z.string().min(2, "Cidade é obrigatória"),
     locationState: z.string().length(2, "Estado deve ter 2 caracteres"),
     summaryMethod: z.enum(["guiado", "textoLivre", ""]),

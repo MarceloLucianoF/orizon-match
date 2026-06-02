@@ -20,7 +20,7 @@ export function CreateProjectWrapper() {
     return <CreateProjectICT />;
   }
   
-  if (userProfile.role === 'company' || userProfile.role === 'provider') {
+  if (userProfile.role === 'industry' || userProfile.role === 'provider') {
     return <CreateProjectCompany />;
   }
 

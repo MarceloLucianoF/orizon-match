@@ -9,12 +9,14 @@ import {
   Zap, Lock, Heart, X, ShieldCheck, FolderOpen 
 } from "lucide-react";
 import { EmptyState } from "../../components/EmptyState";
+import { useTranslation } from "react-i18next";
 
 export function Matches() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const projectId = searchParams.get("project");
+  const { t } = useTranslation();
   
   const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -76,9 +78,9 @@ export function Matches() {
       <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl">
         <EmptyState
           icon={FolderOpen}
-          title="Selecione um projeto"
-          description="Você precisa selecionar um projeto para ver seus matches de compatibilidade."
-          ctaLabel="Ir para Meus Projetos"
+          title={t("matches.selectProject")}
+          description={t("matches.selectProjectDesc")}
+          ctaLabel={t("matches.goToMyProjects")}
           ctaLink="/projects"
         />
       </div>
@@ -101,8 +103,8 @@ export function Matches() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">Triagem de Matches</h1>
-          <p className="text-slate-400 mt-1">Classifique seus matches para focar nas melhores oportunidades.</p>
+          <h1 className="text-2xl font-bold text-slate-100">{t("matches.title")}</h1>
+          <p className="text-slate-400 mt-1">{t("matches.subtitle")}</p>
         </div>
         
         {/* Filtros Rapidos */}
@@ -111,13 +113,13 @@ export function Matches() {
             onClick={() => setActiveFilter("all")}
             className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeFilter === "all" ? "bg-indigo-500/20 text-indigo-400" : "text-slate-400 hover:text-slate-200"}`}
           >
-            Caixa de Entrada
+            {t("matches.inbox")}
           </button>
           <button 
             onClick={() => setActiveFilter("saved")}
             className={`px-4 py-1.5 text-sm font-medium rounded-md transition-all ${activeFilter === "saved" ? "bg-pink-500/20 text-pink-400" : "text-slate-400 hover:text-slate-200"}`}
           >
-            Salvos
+            {t("matches.saved")}
           </button>
         </div>
       </div>
@@ -126,7 +128,7 @@ export function Matches() {
       <div className="bg-slate-900/40 border border-slate-800 rounded-xl p-4 flex flex-wrap gap-6 items-center">
         <div className="flex items-center gap-2 text-slate-400">
           <Filter size={16} />
-          <span className="text-sm font-medium">Score Mínimo:</span>
+          <span className="text-sm font-medium">{t("matches.minScore")}</span>
           <span className="text-indigo-400 font-bold">{minScore}%</span>
         </div>
         <input 
@@ -146,9 +148,9 @@ export function Matches() {
         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl">
           <EmptyState
             icon={Search}
-            title="Nenhum match na visão atual"
-            description="Enriqueça seu VDR com mais detalhes de maturidade comercial para atrair investidores. Ou ajuste os filtros acima."
-            ctaLabel="Explorar Oportunidades"
+            title={t("matches.noMatches")}
+            description={t("matches.noMatchesDesc")}
+            ctaLabel={t("matches.exploreOpportunities")}
             ctaLink="/explore"
           />
         </div>
@@ -174,29 +176,29 @@ export function Matches() {
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-2">
-                  <h3 className="text-lg font-bold text-slate-100 truncate">Organização Confidencial <span className="text-slate-500 text-sm font-normal ml-2">#ID-{match.id.slice(0, 6).toUpperCase()}</span></h3>
+                  <h3 className="text-lg font-bold text-slate-100 truncate">{t("matches.confidentialOrg")} <span className="text-slate-500 text-sm font-normal ml-2">#ID-{match.id.slice(0, 6).toUpperCase()}</span></h3>
                   
                   {match.targetStats && match.targetStats.saves > 0 && (
                     <span className="bg-pink-500/10 text-pink-400 text-xs px-2 py-0.5 rounded border border-pink-500/20 font-medium flex items-center gap-1">
-                      <Zap size={12} className="fill-pink-400/20" /> {match.targetStats.saves} Investidores avaliaram
+                      <Zap size={12} className="fill-pink-400/20" /> {t("matches.evaluatingInvestors", { count: match.targetStats.saves })}
                     </span>
                   )}
                   {match.targetStats && match.targetStats.ndaRequests > 0 && (
                     <span className="bg-indigo-500/10 text-indigo-400 text-xs px-2 py-0.5 rounded border border-indigo-500/20 font-medium flex items-center gap-1">
-                      <Lock size={12} /> {match.targetStats.ndaRequests} NDAs Solicitados
+                      <Lock size={12} /> {t("matches.ndaRequested", { count: match.targetStats.ndaRequests })}
                     </span>
                   )}
 
                   {match.isVdrReady && (
                     <span className="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/20 font-medium flex items-center gap-1">
-                      <ShieldCheck size={12} /> VDR Auditado
+                      <ShieldCheck size={12} /> {t("matches.vdrAudited")}
                     </span>
                   )}
 
                   {match.score >= 80 ? (
-                    <span className="bg-amber-500/10 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/20 font-medium">Top Fit</span>
+                    <span className="bg-amber-500/10 text-amber-400 text-xs px-2 py-0.5 rounded border border-amber-500/20 font-medium">{t("matches.topFit")}</span>
                   ) : match.score >= 70 ? (
-                    <span className="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/20 font-medium">Bom Fit</span>
+                    <span className="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/20 font-medium">{t("matches.goodFit")}</span>
                   ) : null}
                 </div>
                 
@@ -205,10 +207,10 @@ export function Matches() {
                 </div>
 
                 <div className="flex flex-wrap gap-2 text-xs mb-3">
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Segmento: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.segment} pts</span></span>
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Maturidade (TRL): <span className="text-indigo-400 font-bold ml-1">{match.breakdown.maturity} pts</span></span>
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Prontidão (VDR/IRL): <span className="text-indigo-400 font-bold ml-1">{match.breakdown.readiness} pts</span></span>
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">Necessidades: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.needs} pts</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.segment")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.segment} {t("matches.pts")}</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.maturity")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.maturity} {t("matches.pts")}</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.readiness")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.readiness} {t("matches.pts")}</span></span>
+                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.needs")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.needs} {t("matches.pts")}</span></span>
                 </div>
                 <p className="text-sm text-slate-300">{explainMatch(match.breakdown)}</p>
               </div>
@@ -232,9 +234,9 @@ export function Matches() {
                   }}
                   className="flex-1 md:flex-none bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.2)]"
                 >
-                  Tenho interesse <ArrowRight size={16} />
+                  {t("matches.interested")} <ArrowRight size={16} />
                 </button>
-
+ 
                 <div className="flex gap-2">
                   <button 
                     onClick={() => handleMatchAction(match.id, isSaved ? 'reset' : 'save')}
@@ -244,12 +246,12 @@ export function Matches() {
                         : "bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700"
                     }`}
                   >
-                    <Heart size={16} className={isSaved ? "fill-current" : ""} /> {isSaved ? "Salvo" : "Salvar"}
+                    <Heart size={16} className={isSaved ? "fill-current" : ""} /> {isSaved ? t("matches.savedLabel") : t("matches.save")}
                   </button>
                   <button 
                     onClick={() => handleMatchAction(match.id, 'ignore')}
                     className="flex-shrink-0 bg-slate-800 border border-slate-700 hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/30 text-slate-400 px-3 py-2.5 rounded-lg transition-all flex items-center justify-center"
-                    title="Ignorar Match"
+                    title={t("matches.ignore")}
                   >
                     <X size={16} />
                   </button>

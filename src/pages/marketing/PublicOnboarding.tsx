@@ -113,7 +113,7 @@ export default function PublicOnboarding() {
         name: formData.name,
         idNumber: formData.idNumber,
         phone: formData.phone,
-        role: formData.role === 'idea' ? 'inventor' : formData.role === 'provider' ? 'company' : 'ict'
+        role: formData.role === 'idea' ? 'inventor' : formData.role === 'provider' ? 'industry' : 'ict'
       });
 
       sessionStorage.setItem('@orizon:lead_data', JSON.stringify({
@@ -315,7 +315,7 @@ export default function PublicOnboarding() {
                     </h4>
                     <p className="text-[10px] text-slate-500 uppercase tracking-tighter mt-1">
                       {match.role === 'ict' ? 'Expertise em Pesquisa' : 
-                       match.role === 'company' ? 'Capacidade Industrial' : 
+                       match.role === 'industry' ? 'Capacidade Industrial' : 
                        match.role === 'investor' ? 'Aporte de Capital' : 'Parceiro Estratégico'}
                     </p>
                   </div>
