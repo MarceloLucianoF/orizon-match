@@ -35,7 +35,8 @@ export function Explore() {
     minTrl: undefined,
     minScore: 50,
     region: "",
-    search: ""
+    search: "",
+    fomento: ""
   });
 
   const [userProjects, setUserProjects] = useState<any[]>([]);
@@ -93,11 +94,11 @@ export function Explore() {
   };
 
   const clearFilters = () => {
-    setFilters({ segment: "", minTrl: undefined, minScore: 50, region: "", search: "" });
+    setFilters({ segment: "", minTrl: undefined, minScore: 50, region: "", search: "", fomento: "" });
     setReloadTrigger(t => t + 1);
   };
 
-  const hasActiveFilters = filters.segment || filters.minTrl || filters.region || (filters.minScore && filters.minScore > 50);
+  const hasActiveFilters = filters.segment || filters.minTrl || filters.region || filters.fomento || (filters.minScore && filters.minScore > 50);
 
   return (
     <div className="space-y-6">
@@ -175,6 +176,15 @@ export function Explore() {
             {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
           </select>
 
+          <select
+            value={filters.fomento || ""}
+            onChange={e => setFilters({ ...filters, fomento: e.target.value })}
+            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
+          >
+            <option value="">{t("explore.allFomentos")}</option>
+            {["FINEP", "Embrapii", "CNPq", "FAPESC", "SENAI"].map(f => <option key={f} value={f}>{f}</option>)}
+          </select>
+
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <span>{t("explore.minScore")}:</span>
             <span className="font-bold text-indigo-400">{filters.minScore || 50}%</span>
@@ -247,6 +257,12 @@ export function Explore() {
                         <ShieldCheck size={10} /> {t("explore.vdrAudited")}
                       </span>
                     )}
+
+                    {(project.isIctVerified || project.validatedMaturity) && (
+                      <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2 py-0.5 rounded border border-indigo-500/20 font-bold flex items-center gap-1">
+                        <ShieldCheck size={10} className="text-indigo-400" /> {t("explore.ictVerified")}
+                      </span>
+                    )}
                   </div>
                   
                   <div className="flex flex-wrap gap-2 text-[11px] mb-2">
@@ -255,14 +271,30 @@ export function Explore() {
                         {project.segment}
                       </span>
                     )}
-                    {project.maturity && (
-                      <span className="bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400">
-                        TRL {project.maturity}
-                      </span>
+                    {project.validatedMaturity ? (
+                      <>
+                        <span className="bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded text-emerald-400 font-bold">
+                          TRL {project.validatedMaturity} (Validado)
+                        </span>
+                        <span className="bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-500">
+                          TRL {project.maturity || 1} (Declarado)
+                        </span>
+                      </>
+                    ) : (
+                      project.maturity && (
+                        <span className="bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400">
+                          TRL {project.maturity} (Declarado)
+                        </span>
+                      )
                     )}
                     {project.location?.region && (
                       <span className="bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400 flex items-center gap-1">
                         <MapPin size={10} /> {project.location.region}
+                      </span>
+                    )}
+                    {project.fomento && (
+                      <span className="bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded text-amber-400 font-bold uppercase font-mono">
+                        {project.fomento}
                       </span>
                     )}
                   </div>

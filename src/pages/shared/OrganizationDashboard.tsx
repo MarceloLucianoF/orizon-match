@@ -9,7 +9,8 @@ import {
   Building2, Users, FileText, 
   Search, 
   ArrowUpRight, Clock, Zap,
-  BarChart3, ShieldCheck
+  BarChart3, ShieldCheck, Plus, 
+  Cpu, Award, Coins, Scale, Settings, GraduationCap
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -22,6 +23,7 @@ interface Stats {
 }
 
 interface OrgData {
+  id?: string;
   name: string;
   type: string;
   managers: string[];
@@ -39,6 +41,73 @@ export default function OrganizationDashboard() {
   });
   const [org, setOrg] = useState<OrgData | null>(null);
   const [recentProjects, setRecentProjects] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState("overview");
+
+  // Mock laboratories list (Vitrine Tecnológica)
+  const [labs, setLabs] = useState([
+    { id: 1, name: "Laboratório de Nanotecnologia e Grafeno (LNano)", area: "Ciência dos Materiais / Engenharia Química", equipment: "Microscópio Eletrônico de Varredura (MEV), Espectrômetro Raman", capacity: "Análise de nanoestruturas, deposição de filmes finos" },
+    { id: 2, name: "Núcleo de Inteligência Artificial Aplicada (NIAA)", area: "Computação / IoT / Automação", equipment: "Servidor de Deep Learning (GPU H100), Sensores Industriais IoT", capacity: "Modelagem preditiva, visão computacional industrial" },
+    { id: 3, name: "Lab de Biotecnologia e Enzimas (LBio)", area: "Biotecnologia / Agroindústria", equipment: "Biorreatores de Bancada, Cromatógrafo Líquido (HPLC)", capacity: "Desenvolvimento de bioativos, purificação de proteínas" }
+  ]);
+
+  const [newLabName, setNewLabName] = useState("");
+  const [newLabArea, setNewLabArea] = useState("");
+  const [newLabEquip, setNewLabEquip] = useState("");
+
+  const handleAddLab = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newLabName || !newLabArea) return;
+    setLabs([
+      ...labs,
+      {
+        id: Date.now(),
+        name: newLabName,
+        area: newLabArea,
+        equipment: newLabEquip || "N/A",
+        capacity: "Nova competência de pesquisa homologada"
+      }
+    ]);
+    setNewLabName("");
+    setNewLabArea("");
+    setNewLabEquip("");
+  };
+
+  // Mock Funding Calls (Radar de Fomento)
+  const fundingCalls = [
+    { id: 1, agency: "FINEP", title: "Mais Inovação Brasil - Saúde & Bio", amount: "Até R$ 5M", matchScore: 92, deadline: "15/07/2026", segment: "HealthTech/BioTech" },
+    { id: 2, agency: "Embrapii", title: "Chamada Industrial IoT & Manufatura Avançada", amount: "Subsídio de 50%", matchScore: 85, deadline: "30/08/2026", segment: "Indústria 4.0/IoT" },
+    { id: 3, agency: "FAPESC", title: "Programa Centelha III - Santa Catarina", amount: "Até R$ 100K", matchScore: 78, deadline: "10/06/2026", segment: "Agro/FoodTech" }
+  ];
+
+  // Mock Researchers (Lattes Integration)
+  const [researchersSearch, setResearchersSearch] = useState("");
+  const researchers = [
+    { id: 1, name: "Dra. Helena Martins", title: "Livre Docente em Engenharia de Materiais", expertise: "Grafeno, Supercapacitores, Nanotubos", hIndex: 34, patents: 8, compatibility: 96, image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" },
+    { id: 2, name: "Dr. André Lourenço", title: "Ph.D. em Inteligência Artificial", expertise: "Redes Neurais, IoT, Visão Computacional", hIndex: 28, patents: 4, compatibility: 89, image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" },
+    { id: 3, name: "Dra. Camila Soares", title: "Doutora em Microbiologia Molecular", expertise: "Biopolímeros, Enzimas Industriais", hIndex: 22, patents: 12, compatibility: 85, image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80" }
+  ];
+
+  const filteredResearchers = researchers.filter(r => 
+    r.name.toLowerCase().includes(researchersSearch.toLowerCase()) || 
+    r.expertise.toLowerCase().includes(researchersSearch.toLowerCase())
+  );
+
+  // PI Settings (Balcão de PI)
+  const [royaltyRate, setRoyaltyRate] = useState(3.5);
+  const [allowExclusive, setAllowExclusive] = useState(true);
+  const [isConfigSaving, setIsConfigSaving] = useState(false);
+  const [activePatents] = useState([
+    { id: 1, title: "Patente de Supercapacitor de Grafeno Estabilizado", inpi: "BR 10 2024 001234 5", trl: 6, status: "licensingAvailable" },
+    { id: 2, title: "Sensor IoT Autônomo de Vibração Industrial", inpi: "BR 10 2023 008910 2", trl: 5, status: "licensingActive" },
+    { id: 3, title: "Método de Extração Enzimática de Celulose Microcristalina", inpi: "BR 10 2025 000456 1", trl: 4, status: "licensingAvailable" }
+  ]);
+
+  const handleSaveConfig = () => {
+    setIsConfigSaving(true);
+    setTimeout(() => {
+      setIsConfigSaving(false);
+    }, 800);
+  };
 
   useEffect(() => {
     async function loadOrgData() {
@@ -138,107 +207,415 @@ export default function OrganizationDashboard() {
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Tabs Switcher */}
+      <div className="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80 self-start max-w-max">
         {[
-          { label: t("dashboard.organization.activeProjects"), val: stats.totalProjects, icon: <FileText className="text-blue-400" />, change: "+12%" },
-          { label: t("dashboard.organization.ipAssets"), val: stats.totalAssets, icon: <ShieldCheck className="text-emerald-400" />, change: "+5%" },
-          { label: t("dashboard.organization.inventors"), val: stats.totalInventors, icon: <Users className="text-amber-400" />, change: t("dashboard.organization.stable") },
-          { label: t("dashboard.organization.matchesGenerated"), val: stats.activeMatches, icon: <Zap className="text-indigo-400" />, change: "+24%" },
-        ].map((stat, i) => (
-          <div key={i} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all group relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-[40px] rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-all" />
-            <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 group-hover:scale-110 transition-transform">
-                {stat.icon}
-              </div>
-              <span className={`text-[10px] font-bold px-2 py-1 rounded bg-slate-950 border border-slate-800 ${stat.change.includes('+') ? 'text-emerald-400' : 'text-slate-500'}`}>
-                {stat.change}
-              </span>
-            </div>
-            <div className="text-3xl font-black text-white mb-1">{stat.val}</div>
-            <div className="text-xs text-slate-500 font-bold uppercase tracking-widest">{stat.label}</div>
-          </div>
+          { id: "overview", label: t("dashboard.organization.tabs.overview") },
+          { id: "capacities", label: t("dashboard.organization.tabs.capacities") },
+          { id: "fomento", label: t("dashboard.organization.tabs.fomento") },
+          { id: "researchers", label: t("dashboard.organization.tabs.researchers") },
+          { id: "ip_balcao", label: t("dashboard.organization.tabs.ip_balcao") }
+        ].map(tab => (
+          <button 
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'text-slate-400 hover:text-slate-200'}`}
+          >
+            {tab.label}
+          </button>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Projects List */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
-             <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Clock className="text-slate-600" size={20} /> {t("dashboard.organization.recentActivity")}
-             </h2>
-             <Link to="/app/projects" className="text-xs text-indigo-400 hover:underline">{t("dashboard.organization.viewAll")}</Link>
-          </div>
-          
-          <div className="space-y-4">
-            {recentProjects.length === 0 ? (
-              <div className="p-12 text-center border-2 border-dashed border-slate-800 rounded-3xl">
-                <p className="text-slate-500">{t("dashboard.organization.noRecentProjects")}</p>
+      {/* Overview Tab Content */}
+      {activeTab === "overview" && (
+        <div className="space-y-8">
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { label: t("dashboard.organization.activeProjects"), val: stats.totalProjects, icon: <FileText className="text-blue-400" />, change: "+12%" },
+              { label: t("dashboard.organization.ipAssets"), val: stats.totalAssets, icon: <ShieldCheck className="text-emerald-400" />, change: "+5%" },
+              { label: t("dashboard.organization.inventors"), val: stats.totalInventors, icon: <Users className="text-amber-400" />, change: t("dashboard.organization.stable") },
+              { label: t("dashboard.organization.matchesGenerated"), val: stats.activeMatches, icon: <Zap className="text-indigo-400" />, change: "+24%" },
+            ].map((stat, i) => (
+              <div key={i} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all group relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-[40px] rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-all" />
+                <div className="flex justify-between items-start mb-4">
+                  <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 group-hover:scale-110 transition-transform">
+                    {stat.icon}
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-1 rounded bg-slate-950 border border-slate-800 ${stat.change.includes('+') ? 'text-emerald-400' : 'text-slate-500'}`}>
+                    {stat.change}
+                  </span>
+                </div>
+                <div className="text-3xl font-black text-white mb-1">{stat.val}</div>
+                <div className="text-xs text-slate-500 font-bold uppercase tracking-widest">{stat.label}</div>
               </div>
-            ) : (
-              recentProjects.map(proj => (
-                <div key={proj.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center gap-4 hover:bg-slate-900/60 transition-all cursor-pointer group">
-                  <div className="w-12 h-12 bg-slate-950 rounded-xl flex items-center justify-center font-black text-indigo-500 border border-slate-800 group-hover:border-indigo-500/50 transition-colors">
-                    {proj.maturity || 1}
+            ))}
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Recent Projects List */}
+            <div className="lg:col-span-2 space-y-6">
+              <div className="flex items-center justify-between">
+                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <Clock className="text-slate-600" size={20} /> {t("dashboard.organization.recentActivity")}
+                 </h2>
+                 <Link to="/app/projects" className="text-xs text-indigo-400 hover:underline">{t("dashboard.organization.viewAll")}</Link>
+              </div>
+              
+              <div className="space-y-4">
+                {recentProjects.length === 0 ? (
+                  <div className="p-12 text-center border-2 border-dashed border-slate-800 rounded-3xl">
+                    <p className="text-slate-500">{t("dashboard.organization.noRecentProjects")}</p>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="font-bold text-white text-sm">{proj.title}</h4>
-                    <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-1">{proj.segment} • TRL {proj.maturity}</p>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <div className="text-right">
-                       <div className="text-xs font-bold text-white">{proj.matchesCount || 0} {t("dashboard.inventor.matches")}</div>
-                       <div className="text-[10px] text-slate-500">{t("dashboard.organization.activeIntel")}</div>
+                ) : (
+                  recentProjects.map(proj => (
+                    <div key={proj.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center gap-4 hover:bg-slate-900/60 transition-all cursor-pointer group">
+                      <div className="w-12 h-12 bg-slate-950 rounded-xl flex items-center justify-center font-black text-indigo-500 border border-slate-800 group-hover:border-indigo-500/50 transition-colors">
+                        {proj.maturity || 1}
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-bold text-white text-sm">{proj.title}</h4>
+                        <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-1">{proj.segment} • TRL {proj.maturity}</p>
+                      </div>
+                      <div className="flex items-center gap-6">
+                        <div className="text-right">
+                           <div className="text-xs font-bold text-white">{proj.matchesCount || 0} {t("dashboard.inventor.matches")}</div>
+                           <div className="text-[10px] text-slate-500">{t("dashboard.organization.activeIntel")}</div>
+                        </div>
+                        <ArrowUpRight className="text-slate-700 group-hover:text-white transition-colors" size={20} />
+                      </div>
                     </div>
-                    <ArrowUpRight className="text-slate-700 group-hover:text-white transition-colors" size={20} />
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Sidebar: Insights */}
+            <div className="space-y-6">
+               <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <BarChart3 className="text-slate-600" size={20} /> {t("dashboard.organization.hubInsights")}
+               </h2>
+               
+               <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-6 rounded-3xl shadow-xl shadow-indigo-500/10 space-y-4 relative overflow-hidden">
+                 <Zap className="absolute top-[-10px] right-[-10px] w-24 h-24 text-white/10 -rotate-12" />
+                 <h3 className="font-bold text-white leading-tight">{t("dashboard.organization.highConversionMatch")}</h3>
+                 <p className="text-white/70 text-xs leading-relaxed">
+                   {t("dashboard.organization.highConversionMatchDesc")}
+                 </p>
+                 <button className="w-full py-2.5 bg-white text-indigo-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-colors">
+                    {t("dashboard.organization.massNotification")}
+                 </button>
+               </div>
+
+               <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
+                 <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">{t("dashboard.organization.fundingMetrics")}</h3>
+                 <div className="space-y-3">
+                    {[
+                      { label: "Embrapii", percent: 65, color: "bg-blue-500" },
+                      { label: "FINEP", percent: 40, color: "bg-emerald-500" },
+                      { label: "FAPESC", percent: 85, color: "bg-amber-500" },
+                    ].map(bar => (
+                      <div key={bar.label} className="space-y-1.5">
+                        <div className="flex justify-between text-[10px] font-bold">
+                          <span className="text-slate-300">{bar.label}</span>
+                          <span className="text-slate-500">{bar.percent}%</span>
+                        </div>
+                        <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                          <div className={`${bar.color} h-full rounded-full`} style={{ width: `${bar.percent}%` }} />
+                        </div>
+                      </div>
+                    ))}
+                 </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Capacities Tab Content */}
+      {activeTab === "capacities" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Active Capacities List */}
+          <div className="lg:col-span-2 space-y-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Cpu className="text-indigo-400" size={22} /> {t("dashboard.organization.capacities.listTitle")}
+            </h2>
+            <div className="space-y-4">
+              {labs.map(l => (
+                <div key={l.id} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all space-y-3">
+                  <div className="flex justify-between items-start gap-4">
+                    <h3 className="text-base font-bold text-white">{l.name}</h3>
+                    <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2 py-1 rounded-lg border border-indigo-500/20 font-bold whitespace-nowrap">
+                      {l.area}
+                    </span>
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    <strong className="text-slate-300">{t("dashboard.organization.capacities.equipment")}: </strong> 
+                    {l.equipment}
+                  </div>
+                  <div className="text-xs text-slate-400 leading-relaxed">
+                    <strong className="text-slate-300">Competências: </strong> 
+                    {l.capacity}
                   </div>
                 </div>
-              ))
-            )}
+              ))}
+            </div>
+          </div>
+
+          {/* Add Capacity Panel */}
+          <div>
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-5">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Plus className="text-indigo-400" size={20} /> {t("dashboard.organization.capacities.addLabBtn")}
+              </h3>
+              <form onSubmit={handleAddLab} className="space-y-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t("dashboard.organization.capacities.labName")}</label>
+                  <input 
+                    type="text" 
+                    required 
+                    value={newLabName}
+                    onChange={e => setNewLabName(e.target.value)}
+                    placeholder="Ex: Laboratório de Biofotônica"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t("dashboard.organization.capacities.area")}</label>
+                  <input 
+                    type="text" 
+                    required
+                    value={newLabArea}
+                    onChange={e => setNewLabArea(e.target.value)}
+                    placeholder="Ex: Biotecnologia / Saúde"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t("dashboard.organization.capacities.equipment")}</label>
+                  <textarea 
+                    value={newLabEquip}
+                    onChange={e => setNewLabEquip(e.target.value)}
+                    placeholder="Ex: Microscópio Confocal, Centrífuga refrigerada"
+                    rows={3}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all resize-none"
+                  />
+                </div>
+                <button 
+                  type="submit"
+                  className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)]"
+                >
+                  {t("dashboard.organization.capacities.addLabBtn")}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
+      )}
 
-        {/* Sidebar: Insights */}
+      {/* Fomento Tab Content */}
+      {activeTab === "fomento" && (
         <div className="space-y-6">
-           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <BarChart3 className="text-slate-600" size={20} /> {t("dashboard.organization.hubInsights")}
-           </h2>
-           
-           <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-6 rounded-3xl shadow-xl shadow-indigo-500/10 space-y-4 relative overflow-hidden">
-             <Zap className="absolute top-[-10px] right-[-10px] w-24 h-24 text-white/10 -rotate-12" />
-             <h3 className="font-bold text-white leading-tight">{t("dashboard.organization.highConversionMatch")}</h3>
-             <p className="text-white/70 text-xs leading-relaxed">
-               {t("dashboard.organization.highConversionMatchDesc")}
-             </p>
-             <button className="w-full py-2.5 bg-white text-indigo-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-colors">
-                {t("dashboard.organization.massNotification")}
-             </button>
-           </div>
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Coins className="text-amber-400" size={22} /> {t("dashboard.organization.fomento.title")}
+              </h2>
+              <p className="text-slate-400 text-xs mt-1">{t("dashboard.organization.fomento.subtitle")}</p>
+            </div>
+          </div>
 
-           <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
-             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">{t("dashboard.organization.fundingMetrics")}</h3>
-             <div className="space-y-3">
-                {[
-                  { label: "Embrapii", percent: 65, color: "bg-blue-500" },
-                  { label: "FINEP", percent: 40, color: "bg-emerald-500" },
-                  { label: "FAPESC", percent: 85, color: "bg-amber-500" },
-                ].map(bar => (
-                  <div key={bar.label} className="space-y-1.5">
-                    <div className="flex justify-between text-[10px] font-bold">
-                      <span className="text-slate-300">{bar.label}</span>
-                      <span className="text-slate-500">{bar.percent}%</span>
-                    </div>
-                    <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800">
-                      <div className={`${bar.color} h-full rounded-full`} style={{ width: `${bar.percent}%` }} />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {fundingCalls.map(call => (
+              <div key={call.id} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all flex flex-col justify-between h-[230px] relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/5 blur-[30px] rounded-full group-hover:bg-indigo-500/10 transition-all" />
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 px-2 py-1 bg-amber-400/10 rounded-lg border border-amber-400/20">
+                      {call.agency}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-slate-500 font-bold">{t("dashboard.organization.fomento.matchScore")}:</span>
+                      <span className="text-xs font-extrabold text-emerald-400">{call.matchScore}%</span>
                     </div>
                   </div>
-                ))}
-             </div>
-           </div>
+                  <h3 className="text-sm font-bold text-white leading-snug">{call.title}</h3>
+                  <div className="flex items-center gap-4 text-xs text-slate-400">
+                    <div>
+                      <span className="text-[10px] text-slate-500 block uppercase font-bold">{t("dashboard.organization.fomento.fundingAgency")}</span>
+                      <strong className="text-slate-200">{call.amount}</strong>
+                    </div>
+                    <div className="border-l border-slate-850 h-8" />
+                    <div>
+                      <span className="text-[10px] text-slate-500 block uppercase font-bold">{t("dashboard.organization.fomento.deadline")}</span>
+                      <strong className="text-slate-200">{call.deadline}</strong>
+                    </div>
+                  </div>
+                </div>
+                <button className="w-full py-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all flex items-center justify-center gap-1">
+                  <Award size={12} /> {t("dashboard.organization.fomento.applyBtn")}
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Researchers Tab Content */}
+      {activeTab === "researchers" && (
+        <div className="space-y-6">
+          <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <GraduationCap className="text-indigo-400" size={24} /> {t("dashboard.organization.researchers.title")}
+              </h2>
+              <p className="text-slate-400 text-xs mt-1">{t("dashboard.organization.researchers.subtitle")}</p>
+            </div>
+            <div className="relative w-full md:w-80">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+              <input 
+                type="text" 
+                value={researchersSearch}
+                onChange={e => setResearchersSearch(e.target.value)}
+                placeholder={t("dashboard.organization.researchers.searchPlaceholder")}
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredResearchers.map(r => (
+              <div key={r.id} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all flex flex-col justify-between gap-5 relative group">
+                <div className="flex items-start gap-4">
+                  <img 
+                    src={r.image} 
+                    alt={r.name} 
+                    className="w-12 h-12 rounded-xl object-cover border border-slate-800"
+                  />
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-bold text-white truncate">{r.name}</h3>
+                    <p className="text-[10px] text-slate-500 font-semibold truncate mt-0.5">{r.title}</p>
+                    <div className="flex gap-2.5 mt-2">
+                      <span className="text-[9px] bg-slate-950 border border-slate-850 px-2 py-0.5 rounded text-slate-400">
+                        {t("dashboard.organization.researchers.hindex")}: <strong>{r.hIndex}</strong>
+                      </span>
+                      <span className="text-[9px] bg-slate-950 border border-slate-850 px-2 py-0.5 rounded text-slate-400">
+                        {t("dashboard.organization.researchers.patents")}: <strong>{r.patents}</strong>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="text-[11px] text-slate-400 leading-relaxed line-clamp-2">
+                    <strong className="text-slate-300">Expertise: </strong> {r.expertise}
+                  </div>
+                  <div className="flex justify-between items-center text-[10px] p-2.5 bg-slate-950/50 rounded-xl border border-slate-850">
+                    <span className="text-slate-400">{t("dashboard.organization.researchers.compat")}:</span>
+                    <strong className="text-emerald-400 font-extrabold">{r.compatibility}%</strong>
+                  </div>
+                </div>
+
+                <button className="w-full py-2.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all">
+                  {t("dashboard.organization.researchers.assignBtn")}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* IP Balcao Tab Content */}
+      {activeTab === "ip_balcao" && (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Patents Portfolio */}
+          <div className="lg:col-span-2 space-y-6">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <Scale className="text-indigo-400" size={22} /> {t("dashboard.organization.ip_balcao.patentsPortfolio")}
+            </h2>
+            <div className="space-y-4">
+              {activePatents.map(pat => (
+                <div key={pat.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-3xl hover:border-slate-700 transition-all flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-bold text-white leading-snug">{pat.title}</h3>
+                    <div className="flex flex-wrap items-center gap-3 text-[10px]">
+                      <span className="text-slate-500 font-bold uppercase tracking-wider">{t("dashboard.organization.ip_balcao.inpiNumber")}: <strong className="text-slate-300 font-mono">{pat.inpi}</strong></span>
+                      <div className="h-3 border-l border-slate-850" />
+                      <span className="bg-slate-950 border border-slate-850 px-2 py-0.5 rounded text-slate-400 font-bold">TRL {pat.trl}</span>
+                    </div>
+                  </div>
+                  <span className={`text-[10px] px-3 py-1.5 rounded-full border font-bold self-start sm:self-auto ${
+                    pat.status === "licensingAvailable" 
+                      ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                      : "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                  }`}>
+                    {t(`dashboard.organization.ip_balcao.${pat.status}`)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* PI Parameters Config */}
+          <div>
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-6">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <Settings className="text-indigo-400" size={20} /> {t("dashboard.organization.ip_balcao.title")}
+              </h3>
+              <div className="space-y-5">
+                {/* Royalty slider */}
+                <div className="space-y-2">
+                  <div className="flex justify-between text-xs font-bold">
+                    <span className="text-slate-400">{t("dashboard.organization.ip_balcao.royaltyRate")}</span>
+                    <span className="text-indigo-400 font-mono">{royaltyRate}%</span>
+                  </div>
+                  <input 
+                    type="range" 
+                    min="1" 
+                    max="10" 
+                    step="0.5" 
+                    value={royaltyRate}
+                    onChange={e => setRoyaltyRate(Number(e.target.value))}
+                    className="w-full accent-indigo-500 bg-slate-950 border border-slate-800 rounded-lg h-2"
+                  />
+                  <div className="flex justify-between text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+                    <span>1.0% Min</span>
+                    <span>10.0% Max</span>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-850 my-4" />
+
+                {/* Toggles */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-slate-400 font-semibold">{t("dashboard.organization.ip_balcao.exclusiveOption")}</span>
+                  <button 
+                    onClick={() => setAllowExclusive(!allowExclusive)}
+                    className={`w-11 h-6 rounded-full transition-all relative outline-none border ${
+                      allowExclusive 
+                        ? 'bg-indigo-600 border-indigo-500' 
+                        : 'bg-slate-950 border-slate-800'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 left-0.5 bg-white w-4.5 h-4.5 rounded-full shadow transition-all ${
+                      allowExclusive ? 'translate-x-5' : 'translate-x-0'
+                    }`} />
+                  </button>
+                </div>
+
+                <button 
+                  onClick={handleSaveConfig}
+                  disabled={isConfigSaving}
+                  className="w-full mt-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)] flex items-center justify-center gap-2"
+                >
+                  {isConfigSaving ? "..." : t("dashboard.organization.ip_balcao.saveConfig")}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

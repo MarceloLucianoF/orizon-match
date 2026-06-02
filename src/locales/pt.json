@@ -44,6 +44,8 @@
     "resultsFound_other": "{{count}} resultados encontrados",
     "confidentialProject": "Projeto Confidencial",
     "vdrAudited": "VDR Auditado",
+    "ictVerified": "Risco Mitigado (ICT Verified)",
+    "allFomentos": "Todos os Fomentos",
     "startConnection": "Iniciar Conexão",
     "registerProjectFirst": "Cadastre um projeto primeiro"
   },
@@ -121,7 +123,29 @@
       "inviteMsgPlaceholder": "Adicione um contexto sobre seu projeto...",
       "inviteNotice": "O escritório convidado receberá acesso de curadoria ao seu Data Room virtual, podendo validar a documentação jurídica do seu projeto.",
       "sending": "Enviando...",
-      "sendInvite": "Enviar Convite"
+      "sendInvite": "Enviar Convite",
+      "fomo": {
+        "lockedPartner": "Parceiro Oculto (Upgrade de Perfil)",
+        "unlockBtn": "Desbloquear Match",
+        "banner": "Aumente seu Score de Prontidão para 70% para liberar matches de alta qualidade."
+      },
+      "readinessChecklist": {
+        "title": "Missões de Readiness",
+        "titleCheck": "Preencher Título do Projeto",
+        "segmentCheck": "Definir Segmento de Atuação",
+        "trlCheck": "Certificar Maturidade (TRL)",
+        "needsCheck": "Cadastrar Necessidades",
+        "vdrCheck": "Adicionar Documentação ao VDR"
+      },
+      "legalProtection": {
+        "title": "Semáforo do Data Room",
+        "unprotected": "Exposto: Sem Patente",
+        "pending": "Proteção Parcial: Patente Pendente",
+        "protected": "Protegido: Patente Concedida",
+        "unprotectedDesc": "TRL avançado detectado sem comprovação de proteção de PI. Alto risco de exposição.",
+        "pendingDesc": "Patente em análise ou em depósito junto ao INPI. Nível de risco moderado.",
+        "protectedDesc": "Ativo de PI protegido legalmente e homologado."
+      }
     },
     "investor": {
       "title": "Dashboard do Investidor",
@@ -182,9 +206,56 @@
       "highConversionMatch": "Match de Alta Conversão Detectado",
       "highConversionMatchDesc": "Existem 5 empresas buscando por \"Inovação em Grafeno\" neste mês. Seu polo possui 2 projetos que atendem 90% dos critérios.",
       "massNotification": "Ativar Notificação de Massa",
-      "fundingMetrics": "Métricas de Fomento"
+      "fundingMetrics": "Métricas de Fomento",
+      "tabs": {
+        "overview": "Visão Geral",
+        "capacities": "Vitrine Tecnológica",
+        "fomento": "Radar de Fomento",
+        "researchers": "Pesquisadores (Lattes)",
+        "ip_balcao": "Balcão de PI"
+      },
+      "capacities": {
+        "title": "Vitrine Tecnológica & Infraestrutura",
+        "subtitle": "Laboratórios, equipamentos e competências de pesquisa homologadas.",
+        "addLabBtn": "Cadastrar Laboratório",
+        "labName": "Nome do Laboratório",
+        "area": "Área de Atuação",
+        "equipment": "Equipamentos Principais",
+        "noLabs": "Nenhum laboratório cadastrado.",
+        "listTitle": "Infraestruturas Ativas"
+      },
+      "fomento": {
+        "title": "Radar de Fomento & Editais",
+        "subtitle": "Editais de subvenção e crédito cruzados com suas linhas de pesquisa.",
+        "matchScore": "Match com Pesquisa",
+        "applyBtn": "Preparar Proposta",
+        "fundingAgency": "Agência de Fomento",
+        "deadline": "Prazo"
+      },
+      "researchers": {
+        "title": "Matchmaking de Pesquisadores",
+        "subtitle": "Base de talentos integrada ao Lattes para alocação em projetos de P&D.",
+        "searchPlaceholder": "Buscar pesquisador por competência, nome ou projeto...",
+        "hindex": "Índice h",
+        "patents": "Patentes",
+        "compat": "Compatibilidade",
+        "assignBtn": "Alocar em Projeto"
+      },
+      "ip_balcao": {
+        "title": "Balcão de PI & Transferência",
+        "subtitle": "Parâmetros institucionais de licenciamento e portfólio de patentes ativas.",
+        "royaltyRate": "Taxa de Royalties Padrão",
+        "exclusiveOption": "Permitir Licenciamento Exclusivo",
+        "saveConfig": "Salvar Parâmetros",
+        "patentsPortfolio": "Portfólio de Patentes",
+        "inpiNumber": "Número INPI",
+        "status": "Status de Licença",
+        "licensingActive": "Licenciado",
+        "licensingAvailable": "Disponível para Licenciamento"
+      }
     },
     "legal": {
+
       "title": "Curadoria Jurídica",
       "subtitle": "Valide documentação e maturidade jurídica dos projetos convidados.",
       "monitorInpiBtn": "Monitorar Processo INPI",
@@ -303,6 +374,17 @@
       "export": "Exportar",
       "engineActive": "Engine Ativa",
       "enginePaused": "Engine Pausada",
+      "warningBanner": {
+        "enginePausedTitle": "ALGORITMO DE MATCHMAKING PAUSADO",
+        "enginePausedDesc": "Novas conexões automáticas e cruzamento de dados de TRL/IRL não serão disparados até a reativação.",
+        "resumeEngine": "Reativar Motor"
+      },
+      "activeAudit": {
+        "title": "Auditoria Ativa de IA (Alertas de Inconsistência)",
+        "realtime": "Em tempo real"
+      },
+      "nudgeVdrBtn": "Notificar VDR Incompleto (Nudge)",
+      "exportRegionalBtn": "Exportar Relatório Regional (PDF/Excel)",
       "tabs": {
         "overview": "Visão Geral",
         "users": "Controle de Usuários",
@@ -333,5 +415,66 @@
         "newUserName": "Novo Usuário"
       }
     }
+  },
+  "projects": {
+    "title": "Portfólio de Inovação",
+    "subtitle": "Gerencie os projetos que o algoritmo da Orizon Match usa para prospectar parceiros.",
+    "newProject": "Novo Projeto",
+    "readinessScore": "Score de Prontidão",
+    "radarActive": "Radar Ativo",
+    "autoAnalysis": "Análise Automática",
+    "cardDescription": "Projeto focado em {{type}} com maturidade {{maturity}}. Algoritmo buscando matches com investidores e parceiros industriais.",
+    "empty": {
+      "title": "Nenhum projeto rodando",
+      "description": "O algoritmo precisa de pelo menos um projeto mapeado para poder escanear o ecossistema e encontrar os melhores parceiros.",
+      "cta": "Cadastrar Primeiro Projeto"
+    },
+    "status": {
+      "running": "Rodando",
+      "paused": "Pausado"
+    },
+    "actions": {
+      "viewDetails": "Ver Detalhes",
+      "viewMatches": "Ver Matches",
+      "edit": "Editar",
+      "pause": "Pausar Busca",
+      "resume": "Retomar Busca"
+    },
+    "editModal": {
+      "title": "Editar Projeto",
+      "projectTitle": "Título do Projeto",
+      "segment": "Segmento de Atuação",
+      "type": "Tipo de Projeto",
+      "tip": "Dica Orizon: Manter seu segmento e tipo atualizados garante que o algoritmo de match encontre parceiros com interesses estratégicos exatos para a sua fase atual.",
+      "saving": "Salvando...",
+      "saveChanges": "Salvar Alterações"
+    },
+    "alerts": {
+      "errorToggleStatus": "Erro ao alterar o status do projeto.",
+      "errorSave": "Erro ao salvar projeto."
+    },
+    "segments": {
+      "agro": "Agro/FoodTech",
+      "health": "HealthTech/BioTech",
+      "energy": "CleanTech/Energy",
+      "industry": "Indústria 4.0/IoT",
+      "tech": "Tech/SaaS"
+    },
+    "types": {
+      "software": "Software/Plataforma",
+      "hardware": "Hardware/Equipamento",
+      "process": "Processo/Metodologia",
+      "material": "Novo Material"
+    }
+  },
+  "vdr": {
+    "folder": {
+      "pi": "Propriedade Intelectual",
+      "finance": "Planilhas & Financeiro",
+      "legal": "Jurídico & Contratos",
+      "pitch": "Pitch Deck & Mídia",
+      "scientific": "Laudos e Testes Industriais"
+    }
   }
 }
+

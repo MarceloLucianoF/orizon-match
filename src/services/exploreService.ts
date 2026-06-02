@@ -8,6 +8,7 @@ export interface ExploreFilters {
   minScore?: number;
   region?: string;
   search?: string;
+  fomento?: string;
 }
 
 /**
@@ -40,6 +41,15 @@ export async function getExploreProjects(userProfile: any, userProjects: any[], 
 
     if (filters.region) {
       results = results.filter(p => p.location?.region === filters.region);
+    }
+
+    if (filters.fomento) {
+      results = results.filter(p => 
+        p.fomento === filters.fomento || 
+        (Array.isArray(p.fomento) && p.fomento.includes(filters.fomento)) ||
+        p.fundingSource === filters.fomento ||
+        (Array.isArray(p.fundingSource) && p.fundingSource.includes(filters.fomento))
+      );
     }
 
     if (filters.search) {

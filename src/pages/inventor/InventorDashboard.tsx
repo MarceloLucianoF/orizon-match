@@ -5,7 +5,8 @@ import { Link } from "react-router-dom";
 import { 
   Star, Activity, ShieldCheck, 
   ChevronRight, Loader2, X,
-  Gavel, Eye, Heart, Send, Mail, CheckCircle2
+  Gavel, Eye, Heart, Send, Mail, CheckCircle2,
+  Circle, Lock
 } from "lucide-react";
 import { useAuth } from "../../hooks/useAuth";
 import { explainMatch, getMatchLabel, getMatchTier, getScoreColor } from "../../lib/matching";
@@ -53,11 +54,12 @@ export function InventorDashboard() {
         if (userProjects.length > 0) {
           const firstProj = userProjects[0];
           setPrimaryProject(firstProj);
-          let score = 30;
+          let score = 10; // base score
           if (firstProj.title) score += 20;
           if (firstProj.segment) score += 20;
           if (firstProj.maturity || firstProj.trlScore) score += 10;
           if (firstProj.needs && Object.values(firstProj.needs).some(v => v)) score += 20;
+          if (firstProj.vdrStatus === 'verified' || firstProj.isVdrReady || firstProj.inpiStatus) score += 20;
           setCompletionScore(Math.min(score, 100));
 
           const allSegments = [...new Set(userProjects.map(p => p.segment))].filter(Boolean);
@@ -249,33 +251,50 @@ export function InventorDashboard() {
                 </div>
               ) : (
                 <div className="space-y-3">
+                  {completionScore < 70 && (
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4 text-xs text-amber-300 flex items-center gap-2">
+                      <Lock size={16} className="text-amber-400 flex-shrink-0" />
+                      <p>{t("dashboard.inventor.fomo.banner")}</p>
+                    </div>
+                  )}
                   {recentMatches.map(match => {
                     const tier = getMatchTier(match.score);
                     const scoreColor = getScoreColor(match.score);
-                    const label = getMatchLabel(match);
+                    const isFomoLocked = completionScore < 70;
+                    const label = isFomoLocked ? t("dashboard.inventor.fomo.lockedPartner") : getMatchLabel(match);
+                    const explanation = isFomoLocked ? "••••••••••••••••••••••••••••••••••••••••••••" : explainMatch(match.breakdown);
                     
                     return (
-                      <div key={match.id} className="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3 md:p-4 flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 hover:border-indigo-500/50 transition-all">
-                        <div className={`w-12 h-12 rounded-full border-2 border-slate-700 bg-slate-900 flex items-center justify-center flex-shrink-0 ${scoreColor}`}>
-                          <span className="font-bold text-sm">{match.score}%</span>
+                      <div key={match.id} className="bg-slate-950/50 border border-slate-800/80 rounded-xl p-3 md:p-4 flex flex-col sm:flex-row sm:items-center gap-3 md:gap-4 hover:border-indigo-500/50 transition-all relative overflow-hidden">
+                        <div className={`w-12 h-12 rounded-full border-2 border-slate-700 bg-slate-900 flex items-center justify-center flex-shrink-0 ${isFomoLocked ? 'text-slate-500 border-slate-800' : scoreColor}`}>
+                          {isFomoLocked ? <Lock size={16} className="text-slate-600" /> : <span className="font-bold text-sm">{match.score}%</span>}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
-                            <span className="font-medium text-slate-200 text-sm truncate">{label}</span>
-                            {tier.label && (
+                            <span className={`font-medium text-slate-200 text-sm truncate ${isFomoLocked ? 'filter blur-[4px] select-none opacity-40' : ''}`}>{label}</span>
+                            {!isFomoLocked && tier.label && (
                               <span className={`${tier.bgColor} ${tier.color} text-[10px] px-2 py-0.5 rounded border ${tier.borderColor} font-bold tracking-wider`}>
                                 {tier.label}
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-slate-400 line-clamp-1">{explainMatch(match.breakdown)}</p>
+                          <p className={`text-xs text-slate-400 line-clamp-1 ${isFomoLocked ? 'filter blur-[4px] select-none opacity-20' : ''}`}>{explanation}</p>
                         </div>
-                        <Link 
-                          to={`/matches?project=${match.ownerProjectId}`} 
-                          className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0 text-center"
-                        >
-                          {t("dashboard.inventor.details")}
-                        </Link>
+                        {isFomoLocked ? (
+                          <button 
+                            onClick={() => setShowTRLModal(true)}
+                            className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex-shrink-0 text-center flex items-center gap-1.5 shadow-[0_0_15px_rgba(245,158,11,0.1)]"
+                          >
+                            <Lock size={12} /> {t("dashboard.inventor.fomo.unlockBtn")}
+                          </button>
+                        ) : (
+                          <Link 
+                            to={`/matches?project=${match.ownerProjectId}`} 
+                            className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0 text-center"
+                          >
+                            {t("dashboard.inventor.details")}
+                          </Link>
+                        )}
                       </div>
                     );
                   })}
@@ -289,8 +308,13 @@ export function InventorDashboard() {
 
             <div className="bg-gradient-to-br from-indigo-900/40 to-cyan-900/20 border border-indigo-500/30 rounded-2xl p-5 md:p-6 relative overflow-hidden">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl" />
+              <div className="absolute right-5 top-5 flex items-center justify-center h-6 w-6">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-20"></span>
+                <span className="animate-pulse absolute inline-flex h-3 w-3 rounded-full bg-emerald-400 opacity-40"></span>
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
+              </div>
               <h3 className="text-sm font-semibold text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-2">
-                <Activity size={16} /> {t("dashboard.inventor.radarOrizon")}
+                <Activity size={16} className="text-emerald-400 animate-pulse" /> {t("dashboard.inventor.radarOrizon")}
               </h3>
               {radarCount === null ? (
                 <p className="text-slate-400 text-sm">{t("dashboard.inventor.scanning")}</p>
@@ -349,6 +373,123 @@ export function InventorDashboard() {
                 </div>
               )}
             </div>
+
+            {/* Checklist de Readiness */}
+            {primaryProject && (
+              <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-5 md:p-6 space-y-4">
+                <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
+                  {t("dashboard.inventor.readinessChecklist.title")}
+                </h3>
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                    <div className="flex items-center gap-2.5">
+                      {primaryProject.title ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-600" size={16} />}
+                      <span className={primaryProject.title ? "text-slate-300 font-medium" : "text-slate-500"}>
+                        {t("dashboard.inventor.readinessChecklist.titleCheck")}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-indigo-400 font-bold">+20%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                    <div className="flex items-center gap-2.5">
+                      {primaryProject.segment ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-600" size={16} />}
+                      <span className={primaryProject.segment ? "text-slate-300 font-medium" : "text-slate-500"}>
+                        {t("dashboard.inventor.readinessChecklist.segmentCheck")}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-indigo-400 font-bold">+20%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                    <div className="flex items-center gap-2.5">
+                      {(primaryProject.maturity || primaryProject.trlScore) ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-600" size={16} />}
+                      <span className={(primaryProject.maturity || primaryProject.trlScore) ? "text-slate-300 font-medium" : "text-slate-500"}>
+                        {t("dashboard.inventor.readinessChecklist.trlCheck")}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-indigo-400 font-bold">+10%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                    <div className="flex items-center gap-2.5">
+                      {(primaryProject.needs && Object.values(primaryProject.needs).some(v => v)) ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-600" size={16} />}
+                      <span className={(primaryProject.needs && Object.values(primaryProject.needs).some(v => v)) ? "text-slate-300 font-medium" : "text-slate-500"}>
+                        {t("dashboard.inventor.readinessChecklist.needsCheck")}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-indigo-400 font-bold">+20%</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                    <div className="flex items-center gap-2.5">
+                      {(primaryProject.vdrStatus === 'verified' || primaryProject.isVdrReady || primaryProject.inpiStatus) ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-600" size={16} />}
+                      <span className={(primaryProject.vdrStatus === 'verified' || primaryProject.isVdrReady || primaryProject.inpiStatus) ? "text-slate-300 font-medium" : "text-slate-500"}>
+                        {t("dashboard.inventor.readinessChecklist.vdrCheck")}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-indigo-400 font-bold">+20%</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Semáforo do Data Room */}
+            {primaryProject && (() => {
+              const trl = primaryProject.maturity || primaryProject.trlScore || 1;
+              const hasPatente = !!primaryProject.inpiStatus;
+              const isConcedida = primaryProject.inpiStatus?.toLowerCase() === 'concedida';
+              const isVerified = primaryProject.vdrStatus === 'verified' || primaryProject.isVdrReady;
+              
+              let titleKey = "dashboard.inventor.legalProtection.unprotected";
+              let descKey = "dashboard.inventor.legalProtection.unprotectedDesc";
+              let glowColor = "bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]";
+              let dotColor = "bg-red-500 animate-pulse";
+              
+              if (trl < 4) {
+                if (hasPatente || isVerified) {
+                  titleKey = "dashboard.inventor.legalProtection.protected";
+                  descKey = "dashboard.inventor.legalProtection.protectedDesc";
+                  glowColor = "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]";
+                  dotColor = "bg-emerald-500";
+                } else {
+                  titleKey = "dashboard.inventor.legalProtection.pending";
+                  descKey = "dashboard.inventor.legalProtection.pendingDesc";
+                  glowColor = "bg-amber-500/10 border-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)]";
+                  dotColor = "bg-amber-500 animate-pulse";
+                }
+              } else {
+                if (isConcedida || isVerified) {
+                  titleKey = "dashboard.inventor.legalProtection.protected";
+                  descKey = "dashboard.inventor.legalProtection.protectedDesc";
+                  glowColor = "bg-emerald-500/10 border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)]";
+                  dotColor = "bg-emerald-500";
+                } else if (hasPatente) {
+                  titleKey = "dashboard.inventor.legalProtection.pending";
+                  descKey = "dashboard.inventor.legalProtection.pendingDesc";
+                  glowColor = "bg-amber-500/10 border-amber-500/20 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.1)]";
+                  dotColor = "bg-amber-500 animate-pulse";
+                } else {
+                  titleKey = "dashboard.inventor.legalProtection.unprotected";
+                  descKey = "dashboard.inventor.legalProtection.unprotectedDesc";
+                  glowColor = "bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]";
+                  dotColor = "bg-red-500 animate-pulse";
+                }
+              }
+              
+              return (
+                <div className={`border rounded-2xl p-5 md:p-6 transition-all ${glowColor}`}>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs font-bold uppercase tracking-wider">
+                      {t("dashboard.inventor.legalProtection.title")}
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`h-2.5 w-2.5 rounded-full ${dotColor}`} />
+                      <span className="text-[10px] font-bold uppercase">{t(titleKey)}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs opacity-80 leading-relaxed">
+                    {t(descKey)}
+                  </p>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

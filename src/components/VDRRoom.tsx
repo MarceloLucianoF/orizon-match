@@ -9,6 +9,7 @@ import { SecureNDA } from "./SecureNDA";
 import { useAuth } from "../hooks/useAuth";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { useTranslation } from "react-i18next";
 
 interface VDRFile {
   id: string;
@@ -39,6 +40,7 @@ export function VDRRoom({
   inpiStatus?: string 
 }) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
   const [hasSignedNDA, setHasSignedNDA] = useState(false);
   const [showNDAModal, setShowNDAModal] = useState(false);
@@ -76,7 +78,7 @@ export function VDRRoom({
   const folders: VDRFolder[] = [
     {
       id: 'pi',
-      name: 'Propriedade Intelectual',
+      name: t("vdr.folder.pi"),
       icon: ShieldCheck,
       isLocked: false,
       files: [
@@ -86,7 +88,7 @@ export function VDRRoom({
     },
     {
       id: 'finance',
-      name: 'Planilhas & Financeiro',
+      name: t("vdr.folder.finance"),
       icon: TrendingUp,
       isLocked: isPublic && !hasSignedNDA,
       files: [
@@ -96,7 +98,7 @@ export function VDRRoom({
     },
     {
       id: 'legal',
-      name: 'Jurídico & Contratos',
+      name: t("vdr.folder.legal"),
       icon: Briefcase,
       isLocked: isPublic && !hasSignedNDA,
       files: [
@@ -105,8 +107,18 @@ export function VDRRoom({
       ]
     },
     {
+      id: 'scientific',
+      name: t("vdr.folder.scientific"),
+      icon: FileText,
+      isLocked: isPublic && !hasSignedNDA,
+      files: [
+        { id: '9', name: 'Laudo_Laboratorial_Homologado.pdf', type: 'PDF', size: '3.8 MB', status: 'verified', lastModified: '18/05/2024' },
+        { id: '10', name: 'Relatorio_Testes_Industriais_Fase_Piloto.pdf', type: 'PDF', size: '4.5 MB', status: 'verified', lastModified: '20/05/2024' },
+      ]
+    },
+    {
       id: 'pitch',
-      name: 'Pitch Deck & Media',
+      name: t("vdr.folder.pitch"),
       icon: FileBadge,
       isLocked: false,
       files: [
@@ -115,6 +127,7 @@ export function VDRRoom({
       ]
     }
   ];
+
 
   const currentFolder = folders.find(f => f.id === activeFolder);
 

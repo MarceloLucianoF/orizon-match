@@ -44,6 +44,8 @@
     "resultsFound_other": "{{count}} results found",
     "confidentialProject": "Confidential Project",
     "vdrAudited": "Audited VDR",
+    "ictVerified": "Mitigated Risk (ICT Verified)",
+    "allFomentos": "All Subsidies",
     "startConnection": "Start Connection",
     "registerProjectFirst": "Register a project first"
   },
@@ -121,7 +123,29 @@
       "inviteMsgPlaceholder": "Add context about your project...",
       "inviteNotice": "The invited firm will receive curation access to your virtual Data Room, allowing them to validate your project's legal documentation.",
       "sending": "Sending...",
-      "sendInvite": "Send Invitation"
+      "sendInvite": "Send Invitation",
+      "fomo": {
+        "lockedPartner": "Hidden Partner (Profile Upgrade)",
+        "unlockBtn": "Unlock Match",
+        "banner": "Increase your Readiness Score to 70% to unlock high-quality matches."
+      },
+      "readinessChecklist": {
+        "title": "Readiness Missions",
+        "titleCheck": "Fill Project Title",
+        "segmentCheck": "Define Sector of Activity",
+        "trlCheck": "Certify Maturity (TRL)",
+        "needsCheck": "Register Needs",
+        "vdrCheck": "Add Documentation to VDR"
+      },
+      "legalProtection": {
+        "title": "Data Room Semaphore",
+        "unprotected": "Exposed: No Patent",
+        "pending": "Partial Protection: Patent Pending",
+        "protected": "Protected: Patent Granted",
+        "unprotectedDesc": "High TRL detected without registered patent or protection. High risk of exposure.",
+        "pendingDesc": "Patent pending or applied at INPI. Moderate risk level.",
+        "protectedDesc": "IP asset legally protected and certified."
+      }
     },
     "investor": {
       "title": "Investor Dashboard",
@@ -182,9 +206,56 @@
       "highConversionMatch": "High-Conversion Match Detected",
       "highConversionMatchDesc": "There are 5 companies looking for 'Graphene Innovation' this month. Your hub has 2 projects that meet 90% of the criteria.",
       "massNotification": "Activate Mass Notification",
-      "fundingMetrics": "Funding Metrics"
+      "fundingMetrics": "Funding Metrics",
+      "tabs": {
+        "overview": "Overview",
+        "capacities": "Technology Vitrine",
+        "fomento": "Funding Radar",
+        "researchers": "Researchers (Lattes)",
+        "ip_balcao": "IP Counter"
+      },
+      "capacities": {
+        "title": "Technology Showcase & Infrastructure",
+        "subtitle": "Certified laboratories, equipment, and research competencies.",
+        "addLabBtn": "Register Laboratory",
+        "labName": "Laboratory Name",
+        "area": "Research Area",
+        "equipment": "Main Equipment",
+        "noLabs": "No registered laboratories.",
+        "listTitle": "Active Infrastructures"
+      },
+      "fomento": {
+        "title": "Funding Radar & Open Calls",
+        "subtitle": "Grant and credit calls matched with your active research lines.",
+        "matchScore": "Research Match",
+        "applyBtn": "Prepare Proposal",
+        "fundingAgency": "Funding Agency",
+        "deadline": "Deadline"
+      },
+      "researchers": {
+        "title": "Researcher Matchmaking",
+        "subtitle": "Talent database integrated with Lattes for R&D project allocation.",
+        "searchPlaceholder": "Search researcher by expertise, name or project...",
+        "hindex": "h-index",
+        "patents": "Patents",
+        "compat": "Compatibility",
+        "assignBtn": "Allocate to Project"
+      },
+      "ip_balcao": {
+        "title": "IP Counter & Transfer",
+        "subtitle": "Institutional licensing parameters and active patent portfolio.",
+        "royaltyRate": "Default Royalty Rate",
+        "exclusiveOption": "Allow Exclusive Licensing",
+        "saveConfig": "Save Parameters",
+        "patentsPortfolio": "Patent Portfolio",
+        "inpiNumber": "INPI Number",
+        "status": "License Status",
+        "licensingActive": "Licensed",
+        "licensingAvailable": "Available for Licensing"
+      }
     },
     "legal": {
+
       "title": "Legal Curation",
       "subtitle": "Validate documentation and legal maturity of invited projects.",
       "monitorInpiBtn": "Monitor INPI Process",
@@ -303,6 +374,17 @@
       "export": "Export",
       "engineActive": "Engine Active",
       "enginePaused": "Engine Paused",
+      "warningBanner": {
+        "enginePausedTitle": "MATCHMAKING ALGORITHM PAUSED",
+        "enginePausedDesc": "New automatic connections and TRL/IRL cross-matching will not be triggered until reactivated.",
+        "resumeEngine": "Reactivate Engine"
+      },
+      "activeAudit": {
+        "title": "Active AI Audit (Inconsistency Alerts)",
+        "realtime": "Real-time"
+      },
+      "nudgeVdrBtn": "Notify Low VDR (Nudge)",
+      "exportRegionalBtn": "Export Regional Report (PDF/Excel)",
       "tabs": {
         "overview": "Overview",
         "users": "User Control",
@@ -333,5 +415,66 @@
         "newUserName": "New User"
       }
     }
+  },
+  "projects": {
+    "title": "Innovation Portfolio",
+    "subtitle": "Manage the projects Orizon Match's algorithm uses to find partners.",
+    "newProject": "New Project",
+    "readinessScore": "Readiness Score",
+    "radarActive": "Active Radar",
+    "autoAnalysis": "Automated Analysis",
+    "cardDescription": "Project focused on {{type}} with maturity {{maturity}}. Algorithm searching matches with investors and industry partners.",
+    "empty": {
+      "title": "No running projects",
+      "description": "The algorithm needs at least one mapped project to scan the ecosystem and find the best partners.",
+      "cta": "Register First Project"
+    },
+    "status": {
+      "running": "Running",
+      "paused": "Paused"
+    },
+    "actions": {
+      "viewDetails": "View Details",
+      "viewMatches": "View Matches",
+      "edit": "Edit",
+      "pause": "Pause Search",
+      "resume": "Resume Search"
+    },
+    "editModal": {
+      "title": "Edit Project",
+      "projectTitle": "Project Title",
+      "segment": "Sector of Activity",
+      "type": "Project Type",
+      "tip": "Orizon Tip: Keeping your segment and type updated ensures the match algorithm finds partners with exact strategic interests for your current phase.",
+      "saving": "Saving...",
+      "saveChanges": "Save Changes"
+    },
+    "alerts": {
+      "errorToggleStatus": "Error changing project status.",
+      "errorSave": "Error saving project."
+    },
+    "segments": {
+      "agro": "Agro/FoodTech",
+      "health": "HealthTech/BioTech",
+      "energy": "CleanTech/Energy",
+      "industry": "Industry 4.0/IoT",
+      "tech": "Tech/SaaS"
+    },
+    "types": {
+      "software": "Software/Platform",
+      "hardware": "Hardware/Equipment",
+      "process": "Process/Methodology",
+      "material": "New Material"
+    }
+  },
+  "vdr": {
+    "folder": {
+      "pi": "Intellectual Property",
+      "finance": "Finance & Spreadsheets",
+      "legal": "Legal & Contracts",
+      "pitch": "Pitch Deck & Media",
+      "scientific": "Scientific Reports & Tests"
+    }
   }
 }
+

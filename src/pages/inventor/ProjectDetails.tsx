@@ -129,10 +129,26 @@ export function ProjectDetails() {
           </Link>
           <div>
             <h1 className="text-2xl font-bold text-white">{project.title}</h1>
-            <div className="flex items-center gap-2 text-slate-400 text-sm mt-1">
+            <div className="flex items-center gap-2 flex-wrap text-slate-400 text-sm mt-1">
               <span className="bg-slate-800 px-2 py-0.5 rounded text-[10px] font-bold uppercase">{project.segment}</span>
               <span>•</span>
-              <span>TRL {project.maturity}</span>
+              {project.validatedMaturity ? (
+                <>
+                  <span className="text-emerald-400 font-bold">TRL {project.validatedMaturity} (Validado)</span>
+                  <span>/</span>
+                  <span className="text-slate-500">TRL {project.maturity || 1} (Declarado)</span>
+                </>
+              ) : (
+                <span>TRL {project.maturity || 1} (Declarado)</span>
+              )}
+              {(project.isIctVerified || project.validatedMaturity) && (
+                <>
+                  <span>•</span>
+                  <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2.5 py-0.5 rounded border border-indigo-500/20 font-black uppercase tracking-wider flex items-center gap-1 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+                    <ShieldCheck size={12} /> Risco Mitigado (ICT Verified)
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>

@@ -163,7 +163,68 @@ export function AdminDashboard() {
             </div>
           </div>
           <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">{t("dashboard.admin.vdrCompleteness")}</p>
-          <p className="text-[10px] text-slate-600 mt-2 max-w-[200px]">{t("dashboard.admin.vdrCompletenessDesc")}</p>
+          <p className="text-[10px] text-slate-600 mt-2 max-w-[200px] mb-4">{t("dashboard.admin.vdrCompletenessDesc")}</p>
+          <button 
+            onClick={() => alert("Campanha de Nudge disparada com sucesso! 42 inventores com VDR incompleto (< 70%) foram notificados por e-mail e push.")}
+            className="w-full py-2 bg-indigo-650/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/20 rounded-xl font-bold text-xs transition-all shadow-[0_0_15px_rgba(99,102,241,0.05)]"
+          >
+            {t("dashboard.admin.nudgeVdrBtn")}
+          </button>
+        </div>
+      </div>
+
+      {/* AI Active Audit Feed */}
+      <div className="bg-[#0A0514] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2">
+            <ShieldAlert className="text-fuchsia-500 animate-pulse" size={18} /> {t("dashboard.admin.activeAudit.title")}
+          </h3>
+          <span className="text-[9px] bg-fuchsia-500/10 text-fuchsia-400 px-2 py-0.5 rounded border border-fuchsia-500/20 font-bold uppercase tracking-wider">{t("dashboard.admin.activeAudit.realtime")}</span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl flex items-start gap-3 hover:border-red-500/20 transition-all">
+            <ShieldAlert className="text-red-400 mt-0.5 flex-shrink-0" size={16} />
+            <div>
+              <h4 className="text-xs font-bold text-slate-200">Projeto: Grafeno Nano-Estruturado (LNano)</h4>
+              <p className="text-[11px] text-slate-450 mt-1">Inconsistência TRL/PI: Declarado TRL 7 (pronto para mercado) porém sem patente registrada ou pendente no VDR.</p>
+              <div className="flex gap-2 mt-3">
+                <button 
+                  onClick={() => alert("Notificação enviada ao inventor!")}
+                  className="text-[9px] bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2.5 py-1 rounded border border-red-500/20 font-bold transition-all"
+                >
+                  Notificar Inventor
+                </button>
+                <button 
+                  onClick={() => handleTabChange("logs")}
+                  className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
+                >
+                  Auditar VDR
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex items-start gap-3 hover:border-amber-500/20 transition-all">
+            <ShieldAlert className="text-amber-400 mt-0.5 flex-shrink-0" size={16} />
+            <div>
+              <h4 className="text-xs font-bold text-slate-200">Projeto: Smart Grid IoT para Cidades Inteligentes</h4>
+              <p className="text-[11px] text-slate-450 mt-1">Inconsistência TRL/PI: Declarado TRL 5 (protótipo validado) mas com pendência de documentos de cessão de direitos autorais de software.</p>
+              <div className="flex gap-2 mt-3">
+                <button 
+                  onClick={() => alert("Notificação enviada ao inventor!")}
+                  className="text-[9px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded border border-amber-500/20 font-bold transition-all"
+                >
+                  Notificar Inventor
+                </button>
+                <button 
+                  onClick={() => handleTabChange("logs")}
+                  className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
+                >
+                  Auditar VDR
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -213,7 +274,13 @@ export function AdminDashboard() {
                </div>
              ))}
           </div>
-          <div className="mt-6 pt-6 border-t border-slate-800">
+          <button 
+            onClick={() => alert("Planilha de densidade regional e atividade governamental exportada!")}
+            className="w-full mt-5 py-2.5 bg-slate-950 hover:bg-slate-900 text-slate-400 border border-slate-800 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-1.5"
+          >
+            <Download size={12} /> {t("dashboard.admin.exportRegionalBtn")}
+          </button>
+          <div className="mt-4 pt-4 border-t border-slate-800/80">
             <p className="text-[10px] text-slate-500 italic flex items-center gap-2">
               <Globe size={12} /> {t("dashboard.admin.heatmapDesc")}
             </p>
@@ -411,7 +478,26 @@ export function AdminDashboard() {
   );
 
   return (
-    <div className="space-y-6 pb-12 font-sans">
+    <div className="space-y-6 pb-12 font-sans animate-in fade-in duration-700">
+      
+      {/* WARNING BANNER FOR PAUSED ENGINE */}
+      {!isEngineRunning && (
+        <div className="bg-amber-500/10 border border-amber-500/20 text-amber-405 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
+          <div className="flex items-center gap-3">
+            <ShieldAlert size={20} className="text-amber-500 flex-shrink-0 animate-pulse" />
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-wider">{t("dashboard.admin.warningBanner.enginePausedTitle")}</h4>
+              <p className="text-[11px] text-slate-450 mt-0.5">{t("dashboard.admin.warningBanner.enginePausedDesc")}</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setIsEngineRunning(true)}
+            className="text-[10px] font-black uppercase tracking-widest bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-1.5 rounded-lg transition-colors whitespace-nowrap"
+          >
+            {t("dashboard.admin.warningBanner.resumeEngine")}
+          </button>
+        </div>
+      )}
       
       {/* HEADER PRINCIPAL */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-fuchsia-900/30 pb-6">

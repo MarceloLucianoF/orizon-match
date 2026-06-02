@@ -4,9 +4,11 @@ import { useAuth } from "../../hooks/useAuth";
 import { getUserProjects, updateProject } from "../../services/projectService";
 import { Plus, Loader2, FolderKanban, Activity, BarChart3, Pause, Play, Settings2, X, Save } from "lucide-react";
 import { EmptyState } from "../../components/EmptyState";
+import { useTranslation } from "react-i18next";
 
 export function Projects() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -48,7 +50,7 @@ export function Projects() {
     } catch (err) {
       // Rollback se falhar
       setProjects(prev => prev.map(p => p.id === id ? { ...p, active: currentStatus } : p));
-      alert("Erro ao alterar o status do projeto.");
+      alert(t("projects.alerts.errorToggleStatus"));
     }
   };
 
@@ -82,7 +84,7 @@ export function Projects() {
       }));
       setEditingProject(null);
     } catch (err) {
-      alert("Erro ao salvar projeto.");
+      alert(t("projects.alerts.errorSave"));
     } finally {
       setIsSaving(false);
     }
@@ -92,14 +94,14 @@ export function Projects() {
     <div className="space-y-8 relative">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-100">Portfólio de Inovação</h1>
-          <p className="text-slate-400 mt-1">Gerencie os projetos que o algoritmo da Orizon Match usa para prospectar parceiros.</p>
+          <h1 className="text-2xl font-bold text-slate-100">{t("projects.title")}</h1>
+          <p className="text-slate-400 mt-1">{t("projects.subtitle")}</p>
         </div>
         <Link 
           to="/projects/new"
           className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] flex items-center gap-2"
         >
-          <Plus size={18} /> Novo Projeto
+          <Plus size={18} /> {t("projects.newProject")}
         </Link>
       </div>
 
@@ -111,100 +113,104 @@ export function Projects() {
         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-8">
           <EmptyState
             icon={FolderKanban}
-            title="Nenhum projeto rodando"
-            description="O algoritmo precisa de pelo menos um projeto mapeado para poder escannear o ecossistema e encontrar os melhores parceiros."
-            ctaLabel="Cadastrar Primeiro Projeto"
+            title={t("projects.empty.title")}
+            description={t("projects.empty.description")}
+            ctaLabel={t("projects.empty.cta")}
             ctaLink="/projects/new"
           />
         </div>
       ) : (
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {projects.map((project) => (
-            <div key={project.id} className={`bg-slate-900/60 backdrop-blur-xl border rounded-2xl p-6 transition-all shadow-xl flex flex-col md:flex-row gap-6 ${
-              project.active ? "border-slate-700 hover:border-indigo-500/50" : "border-slate-800 opacity-60 grayscale-[50%]"
-            }`}>
-              
-              {/* Lado Esquerdo: Score Radial */}
-              <div className="flex-shrink-0 flex flex-col items-center justify-center bg-slate-950/50 rounded-xl p-4 border border-slate-800 w-full md:w-32 relative">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Score de<br/>Prontidão</p>
-                <div className="relative w-16 h-16 flex items-center justify-center">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                    <path className="text-slate-800" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path className={`transition-all duration-1000 ease-out ${project.readinessScore >= 80 ? 'text-emerald-500' : project.readinessScore >= 50 ? 'text-indigo-500' : 'text-amber-500'}`} strokeWidth="4" strokeDasharray={`${project.readinessScore}, 100`} strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                  </svg>
-                  <div className="absolute flex flex-col items-center justify-center">
-                    <span className="text-sm font-bold text-slate-100">{project.readinessScore}%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Centro: Info */}
-              <div className="flex-1 min-w-0 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                      project.active ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-800 text-slate-400 border border-slate-700"
-                    }`}>
-                      {project.active ? "Rodando" : "Pausado"}
+          {projects.map((project) => {
+            const segmentLabel = t(`projects.segments.${project.segment}`, { defaultValue: project.segment });
+            const typeLabel = t(`projects.types.${project.type}`, { defaultValue: project.type });
+            return (
+              <div key={project.id} className={`bg-slate-900/60 backdrop-blur-xl border rounded-2xl p-6 transition-all shadow-xl flex flex-col md:flex-row gap-6 ${
+                project.active ? "border-slate-700 hover:border-indigo-500/50" : "border-slate-800 opacity-60 grayscale-[50%]"
+              }`}>
+                
+                {/* Lado Esquerdo: Score Radial */}
+                <div className="flex-shrink-0 flex flex-col items-center justify-center bg-slate-950/50 rounded-xl p-4 border border-slate-800 w-full md:w-32 relative">
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">{t("projects.readinessScore")}</p>
+                  <div className="relative w-16 h-16 flex items-center justify-center">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      <path className="text-slate-800" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <path className={`transition-all duration-1000 ease-out ${project.readinessScore >= 80 ? 'text-emerald-500' : project.readinessScore >= 50 ? 'text-indigo-500' : 'text-amber-500'}`} strokeWidth="4" strokeDasharray={`${project.readinessScore}, 100`} strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div className="absolute flex flex-col items-center justify-center">
+                      <span className="text-sm font-bold text-slate-100">{project.readinessScore}%</span>
                     </div>
-                    <span className="bg-slate-800 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-slate-300">
-                      {project.segment}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-xl font-bold text-slate-100 mb-1 truncate" title={project.title}>{project.title}</h3>
-                  <p className="text-slate-400 text-sm mb-4 line-clamp-2 leading-relaxed">
-                    Projeto focado em {project.type} com maturidade {project.maturity}. Algoritmo buscando matches com investidores e parceiros industriais.
-                  </p>
-                </div>
-
-                {/* Footer: Métricas Básicas */}
-                <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-800/80">
-                  <div className="flex items-center gap-1.5 text-slate-300">
-                    <Activity size={14} className="text-indigo-400" />
-                    <span className="text-sm font-medium">Radar Ativo</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-slate-300">
-                    <BarChart3 size={14} className="text-cyan-400" />
-                    <span className="text-sm font-medium">Análise Automática</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Lado Direito: Ações */}
-              <div className="flex-shrink-0 flex md:flex-col gap-2 w-full md:w-auto pt-4 md:pt-0 md:pl-4 md:border-l border-slate-800 justify-center md:justify-start">
-                <Link 
-                  to={`/projects/${project.id}`} 
-                  className="flex-1 md:flex-none text-center bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                  Ver Detalhes
-                </Link>
-                <Link 
-                  to={`/matches?project=${project.id}`} 
-                  className="flex-1 md:flex-none text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                  Ver Matches
-                </Link>
-                <button 
-                  onClick={() => setEditingProject({ ...project })}
-                  className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                >
-                  <Settings2 size={16} /> Editar
-                </button>
-                <button 
-                  onClick={() => handleToggleStatus(project.id, project.active)}
-                  className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
-                    project.active 
-                      ? "border-slate-700 hover:bg-amber-500/10 hover:text-amber-400 hover:border-amber-500/30 text-slate-400" 
-                      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
-                  }`}
-                >
-                  {project.active ? <><Pause size={16} /> Pausar Busca</> : <><Play size={16} /> Retomar Busca</>}
-                </button>
-              </div>
+                {/* Centro: Info */}
+                <div className="flex-1 min-w-0 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
+                        project.active ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-slate-800 text-slate-400 border border-slate-700"
+                      }`}>
+                        {project.active ? t("projects.status.running") : t("projects.status.paused")}
+                      </div>
+                      <span className="bg-slate-800 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-slate-300">
+                        {segmentLabel}
+                      </span>
+                    </div>
+                    
+                    <h3 className="text-xl font-bold text-slate-100 mb-1 truncate" title={project.title}>{project.title}</h3>
+                    <p className="text-slate-400 text-sm mb-4 line-clamp-2 leading-relaxed">
+                      {t("projects.cardDescription", { type: typeLabel, maturity: project.maturity })}
+                    </p>
+                  </div>
 
-            </div>
-          ))}
+                  {/* Footer: Métricas Básicas */}
+                  <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-800/80">
+                    <div className="flex items-center gap-1.5 text-slate-300">
+                      <Activity size={14} className="text-indigo-400" />
+                      <span className="text-sm font-medium">{t("projects.radarActive")}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-slate-300">
+                      <BarChart3 size={14} className="text-cyan-400" />
+                      <span className="text-sm font-medium">{t("projects.autoAnalysis")}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lado Direito: Ações */}
+                <div className="flex-shrink-0 flex md:flex-col gap-2 w-full md:w-auto pt-4 md:pt-0 md:pl-4 md:border-l border-slate-800 justify-center md:justify-start">
+                  <Link 
+                    to={`/projects/${project.id}`} 
+                    className="flex-1 md:flex-none text-center bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    {t("projects.actions.viewDetails")}
+                  </Link>
+                  <Link 
+                    to={`/matches?project=${project.id}`} 
+                    className="flex-1 md:flex-none text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    {t("projects.actions.viewMatches")}
+                  </Link>
+                  <button 
+                    onClick={() => setEditingProject({ ...project })}
+                    className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 text-slate-300 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Settings2 size={16} /> {t("projects.actions.edit")}
+                  </button>
+                  <button 
+                    onClick={() => handleToggleStatus(project.id, project.active)}
+                    className={`flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors border ${
+                      project.active 
+                        ? "border-slate-700 hover:bg-amber-500/10 hover:text-amber-400 hover:border-amber-500/30 text-slate-400" 
+                        : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20"
+                    }`}
+                  >
+                    {project.active ? <><Pause size={16} /> {t("projects.actions.pause")}</> : <><Play size={16} /> {t("projects.actions.resume")}</>}
+                  </button>
+                </div>
+
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -215,7 +221,7 @@ export function Projects() {
             <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
               <h3 className="font-bold text-slate-100 flex items-center gap-2">
                 <Settings2 className="text-indigo-400" size={20} />
-                Editar Projeto
+                {t("projects.editModal.title")}
               </h3>
               <button 
                 onClick={() => setEditingProject(null)} 
@@ -229,7 +235,7 @@ export function Projects() {
               <form id="editProjectForm" onSubmit={handleSaveEdit} className="space-y-4">
                 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">Título do Projeto</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">{t("projects.editModal.projectTitle")}</label>
                   <input 
                     type="text" 
                     value={editingProject.title}
@@ -240,7 +246,7 @@ export function Projects() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">Segmento de Atuação</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">{t("projects.editModal.segment")}</label>
                   <select 
                     value={editingProject.segment}
                     onChange={(e) => setEditingProject({...editingProject, segment: e.target.value})}
@@ -256,7 +262,7 @@ export function Projects() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">Tipo de Projeto</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">{t("projects.editModal.type")}</label>
                   <select 
                     value={editingProject.type}
                     onChange={(e) => setEditingProject({...editingProject, type: e.target.value})}
@@ -272,7 +278,7 @@ export function Projects() {
 
                 <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-xl mt-6">
                   <p className="text-xs text-indigo-300 leading-relaxed">
-                    <strong>Dica Orizon:</strong> Manter seu segmento e tipo atualizados garante que o algoritmo de match encontre parceiros com interesses estratégicos exatos para a sua fase atual.
+                    {t("projects.editModal.tip")}
                   </p>
                 </div>
 
@@ -286,7 +292,7 @@ export function Projects() {
                 className="px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
                 disabled={isSaving}
               >
-                Cancelar
+                {t("common.cancel")}
               </button>
               <button 
                 type="submit" 
@@ -295,7 +301,7 @@ export function Projects() {
                 className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors shadow-[0_0_15px_rgba(79,70,229,0.3)]"
               >
                 {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                {isSaving ? "Salvando..." : "Salvar Alterações"}
+                {isSaving ? t("projects.editModal.saving") : t("projects.editModal.saveChanges")}
               </button>
             </div>
           </div>
