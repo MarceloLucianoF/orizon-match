@@ -14,9 +14,9 @@ L.Icon.Default.mergeOptions({
 
 // Dados mockados para demonstração do cluster
 const MOCK_INNOVATION_HUBS = [
-  { id: 1, name: 'Fundação CERTI', lat: -27.6001, lng: -48.5191, type: 'ICT' },
-  { id: 2, name: 'Laboratório de Robótica (UFSC)', lat: -27.6015, lng: -48.5140, type: 'Universidade' },
-  { id: 3, name: 'Polo Tecnológico Alfa', lat: -27.5459, lng: -48.5020, type: 'Hub' },
+  { id: 1, name: 'Inatel - Prédio NGTI', lat: -22.2568, lng: -45.7027, type: 'ICT' },
+  { id: 2, name: 'Wireless & AI Lab (WAI Lab)', lat: -22.2575, lng: -45.7032, type: 'Laboratório' },
+  { id: 3, name: 'Centro de Radiocomunicações (CRR)', lat: -22.2560, lng: -45.7020, type: 'Pesquisa' },
 ];
 
 interface ProRadarMapProps {
@@ -25,8 +25,8 @@ interface ProRadarMapProps {
 }
 
 export function ProRadarMap({ isPremium, onUpgradeClick }: ProRadarMapProps) {
-  // Coordenadas centrais (Florianópolis - SC)
-  const centerPosition: [number, number] = [-27.5954, -48.5480];
+  // Coordenadas centrais (Santa Rita do Sapucaí - MG)
+  const centerPosition: [number, number] = [-22.2568, -45.7027];
 
   return (
     <div className="relative w-full h-[500px] rounded-xl overflow-hidden border border-slate-700 bg-slate-900 shadow-inner">

@@ -182,49 +182,77 @@ export function AdminDashboard() {
           <span className="text-[9px] bg-fuchsia-500/10 text-fuchsia-400 px-2 py-0.5 rounded border border-fuchsia-500/20 font-bold uppercase tracking-wider">{t("dashboard.admin.activeAudit.realtime")}</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl flex items-start gap-3 hover:border-red-500/20 transition-all">
-            <ShieldAlert className="text-red-400 mt-0.5 flex-shrink-0" size={16} />
-            <div>
-              <h4 className="text-xs font-bold text-slate-200">Projeto: Grafeno Nano-Estruturado (LNano)</h4>
-              <p className="text-[11px] text-slate-450 mt-1">Inconsistência TRL/PI: Declarado TRL 7 (pronto para mercado) porém sem patente registrada ou pendente no VDR.</p>
-              <div className="flex gap-2 mt-3">
-                <button 
-                  onClick={() => alert("Notificação enviada ao inventor!")}
-                  className="text-[9px] bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2.5 py-1 rounded border border-red-500/20 font-bold transition-all"
-                >
-                  Notificar Inventor
-                </button>
-                <button 
-                  onClick={() => handleTabChange("logs")}
-                  className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
-                >
-                  Auditar VDR
-                </button>
+          {logs && logs.length > 0 ? (
+            logs.slice(0, 2).map((log: any) => (
+              <div key={log.id} className={`p-4 rounded-2xl flex items-start gap-3 transition-all ${log.type === 'alert' ? 'bg-red-500/5 border border-red-500/10 hover:border-red-500/20' : 'bg-amber-500/5 border border-amber-500/10 hover:border-amber-500/20'}`}>
+                <ShieldAlert className={`${log.type === 'alert' ? 'text-red-400' : 'text-amber-400'} mt-0.5 flex-shrink-0`} size={16} />
+                <div>
+                  <h4 className="text-xs font-bold text-slate-200">Projeto: {log.projectTitle || (log.projectId === 'proj_gateway_iot' ? 'Gateway IoT Industrial' : (log.projectId === 'proj_scm_embrapii' ? 'Smart City Manager (SCM)' : 'Projeto Inatel'))}</h4>
+                  <p className="text-[11px] text-slate-450 mt-1">{log.message || log.text}</p>
+                  <div className="flex gap-2 mt-3">
+                    <button 
+                      onClick={() => alert("Notificação enviada ao inventor!")}
+                      className={`text-[9px] px-2.5 py-1 rounded border font-bold transition-all ${log.type === 'alert' ? 'bg-red-500/10 hover:bg-red-500/20 border-red-500/20 text-red-300' : 'bg-amber-500/10 hover:bg-amber-500/20 border-amber-500/20 text-amber-300'}`}
+                    >
+                      Notificar Inventor
+                    </button>
+                    <button 
+                      onClick={() => handleTabChange("logs")}
+                      className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
+                    >
+                      Auditar VDR
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            ))
+          ) : (
+            <>
+              <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex items-start gap-3 hover:border-amber-500/20 transition-all">
+                <ShieldAlert className="text-amber-400 mt-0.5 flex-shrink-0" size={16} />
+                <div>
+                  <h4 className="text-xs font-bold text-slate-200">Projeto: Gateway IoT Industrial</h4>
+                  <p className="text-[11px] text-slate-450 mt-1">Auditoria: Este projeto está aderente ao programa MOVER (Mobilidade Verde e Inovação). Sugerimos vincular o laboratório WAI Lab do Inatel para acelerar a subvenção de R$ 300k da EMBRAPII.</p>
+                  <div className="flex gap-2 mt-3">
+                    <button 
+                      onClick={() => alert("Notificação enviada ao inventor!")}
+                      className="text-[9px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded border border-amber-500/20 font-bold transition-all"
+                    >
+                      Notificar Inventor
+                    </button>
+                    <button 
+                      onClick={() => handleTabChange("logs")}
+                      className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
+                    >
+                      Auditar VDR
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-          <div className="p-4 bg-amber-500/5 border border-amber-500/10 rounded-2xl flex items-start gap-3 hover:border-amber-500/20 transition-all">
-            <ShieldAlert className="text-amber-400 mt-0.5 flex-shrink-0" size={16} />
-            <div>
-              <h4 className="text-xs font-bold text-slate-200">Projeto: Smart Grid IoT para Cidades Inteligentes</h4>
-              <p className="text-[11px] text-slate-450 mt-1">Inconsistência TRL/PI: Declarado TRL 5 (protótipo validado) mas com pendência de documentos de cessão de direitos autorais de software.</p>
-              <div className="flex gap-2 mt-3">
-                <button 
-                  onClick={() => alert("Notificação enviada ao inventor!")}
-                  className="text-[9px] bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded border border-amber-500/20 font-bold transition-all"
-                >
-                  Notificar Inventor
-                </button>
-                <button 
-                  onClick={() => handleTabChange("logs")}
-                  className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
-                >
-                  Auditar VDR
-                </button>
+              <div className="p-4 bg-red-500/5 border border-red-500/10 rounded-2xl flex items-start gap-3 hover:border-red-500/20 transition-all">
+                <ShieldAlert className="text-red-400 mt-0.5 flex-shrink-0" size={16} />
+                <div>
+                  <h4 className="text-xs font-bold text-slate-200">Projeto: Smart City Manager (SCM)</h4>
+                  <p className="text-[11px] text-slate-450 mt-1">Inconsistência TRL/PI: Declarado TRL 6 mas com pendência de documentos de cessão de direitos autorais de software.</p>
+                  <div className="flex gap-2 mt-3">
+                    <button 
+                      onClick={() => alert("Notificação enviada ao inventor!")}
+                      className="text-[9px] bg-red-500/10 hover:bg-red-500/20 text-red-300 px-2.5 py-1 rounded border border-red-500/20 font-bold transition-all"
+                    >
+                      Notificar Inventor
+                    </button>
+                    <button 
+                      onClick={() => handleTabChange("logs")}
+                      className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
+                    >
+                      Auditar VDR
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </div>
       </div>
 
@@ -258,10 +286,10 @@ export function AdminDashboard() {
           <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">{t("dashboard.admin.regionalActivity")}</h3>
           <div className="flex-1 flex flex-col justify-center space-y-4">
              {[
-               { region: 'Joinville / Norte', activity: 85, color: 'bg-indigo-500' },
-               { region: 'Florianópolis / Litoral', activity: 92, color: 'bg-emerald-500' },
-               { region: 'Chapecó / Oeste', activity: 45, color: 'bg-amber-500' },
-               { region: 'Blumenau / Vale', activity: 68, color: 'bg-cyan-500' },
+               { region: 'Santa Rita do Sapucaí / Vale da Eletrônica', activity: 95, color: 'bg-indigo-500' },
+               { region: 'Belo Horizonte / Região Metropolitana', activity: 88, color: 'bg-emerald-500' },
+               { region: 'Uberlândia / Triângulo Mineiro', activity: 64, color: 'bg-amber-500' },
+               { region: 'Juiz de Fora / Zona da Mata', activity: 48, color: 'bg-cyan-500' },
              ].map((reg, idx) => (
                <div key={idx} className="space-y-1">
                  <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">

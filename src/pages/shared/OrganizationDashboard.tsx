@@ -45,9 +45,9 @@ export default function OrganizationDashboard() {
 
   // Mock laboratories list (Vitrine Tecnológica)
   const [labs, setLabs] = useState([
-    { id: 1, name: "Laboratório de Nanotecnologia e Grafeno (LNano)", area: "Ciência dos Materiais / Engenharia Química", equipment: "Microscópio Eletrônico de Varredura (MEV), Espectrômetro Raman", capacity: "Análise de nanoestruturas, deposição de filmes finos" },
-    { id: 2, name: "Núcleo de Inteligência Artificial Aplicada (NIAA)", area: "Computação / IoT / Automação", equipment: "Servidor de Deep Learning (GPU H100), Sensores Industriais IoT", capacity: "Modelagem preditiva, visão computacional industrial" },
-    { id: 3, name: "Lab de Biotecnologia e Enzimas (LBio)", area: "Biotecnologia / Agroindústria", equipment: "Biorreatores de Bancada, Cromatógrafo Líquido (HPLC)", capacity: "Desenvolvimento de bioativos, purificação de proteínas" }
+    { id: 1, name: "Centro de Referência em Radiocomunicações (CRR)", area: "Telecomunicações / RF", equipment: "Analisador de Espectro de 110 GHz, Câmara Anecoica Blindada", capacity: "Caracterização de antenas, testes de conformidade 5G/6G" },
+    { id: 2, name: "Wireless & AI Lab (WAI Lab)", area: "Inteligência Artificial / Computação Móvel", equipment: "Cluster GPU Nvidia DGX, Módulos SDR (Software Defined Radio)", capacity: "Otimização de canais de RF com aprendizado de máquina, redes neurais aplicadas a telecom" },
+    { id: 3, name: "Laboratório WOCA (Wireless and Optical Convergent Access)", area: "Fotônica / Redes de Acesso", equipment: "Fusora de Fibra Óptica de Precisão, Medidor de Potência Óptica de Alta Resolução", capacity: "Integração entre redes sem fio e fibra óptica (backhaul/fronthaul)" }
   ]);
 
   const [newLabName, setNewLabName] = useState("");
@@ -74,17 +74,17 @@ export default function OrganizationDashboard() {
 
   // Mock Funding Calls (Radar de Fomento)
   const fundingCalls = [
-    { id: 1, agency: "FINEP", title: "Mais Inovação Brasil - Saúde & Bio", amount: "Até R$ 5M", matchScore: 92, deadline: "15/07/2026", segment: "HealthTech/BioTech" },
-    { id: 2, agency: "Embrapii", title: "Chamada Industrial IoT & Manufatura Avançada", amount: "Subsídio de 50%", matchScore: 85, deadline: "30/08/2026", segment: "Indústria 4.0/IoT" },
-    { id: 3, agency: "FAPESC", title: "Programa Centelha III - Santa Catarina", amount: "Até R$ 100K", matchScore: 78, deadline: "10/06/2026", segment: "Agro/FoodTech" }
+    { id: 1, agency: "FINEP", title: "Mais Inovação Brasil - Telecom & Semicondutores", amount: "Até R$ 5M", matchScore: 94, deadline: "15/07/2026", segment: "Telecom/Hardware" },
+    { id: 2, agency: "Embrapii", title: "Chamada Unidades EMBRAPII - Hard Tech & IoT", amount: "Subsídio de 50%", matchScore: 92, deadline: "30/08/2026", segment: "Indústria 4.0/IoT" },
+    { id: 3, agency: "FAPEMIG", title: "Programa Centelha III - Minas Gerais", amount: "Até R$ 100K", matchScore: 85, deadline: "10/06/2026", segment: "Hardware/Telecom" }
   ];
 
   // Mock Researchers (Lattes Integration)
   const [researchersSearch, setResearchersSearch] = useState("");
   const researchers = [
-    { id: 1, name: "Dra. Helena Martins", title: "Livre Docente em Engenharia de Materiais", expertise: "Grafeno, Supercapacitores, Nanotubos", hIndex: 34, patents: 8, compatibility: 96, image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" },
-    { id: 2, name: "Dr. André Lourenço", title: "Ph.D. em Inteligência Artificial", expertise: "Redes Neurais, IoT, Visão Computacional", hIndex: 28, patents: 4, compatibility: 89, image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" },
-    { id: 3, name: "Dra. Camila Soares", title: "Doutora em Microbiologia Molecular", expertise: "Biopolímeros, Enzimas Industriais", hIndex: 22, patents: 12, compatibility: 85, image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80" }
+    { id: 1, name: "Prof. Dr. Rafael Silva", title: "Coordenador no CRR / Inatel", expertise: "Antenas inteligentes, Redes 5G/6G, Hardware RF", hIndex: 34, patents: 8, compatibility: 96, image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" },
+    { id: 2, name: "Dr. André Lourenço", title: "Pesquisador Sênior no WAI Lab", expertise: "Redes Neurais, IoT Industrial, Algoritmos de Borda", hIndex: 28, patents: 4, compatibility: 89, image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" },
+    { id: 3, name: "Dra. Camila Santos", title: "Pesquisadora de Segurança Cibernética", expertise: "Segurança de Redes, Criptografia Pós-Quântica, IoT", hIndex: 22, patents: 12, compatibility: 85, image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80" }
   ];
 
   const filteredResearchers = researchers.filter(r => 
@@ -97,9 +97,9 @@ export default function OrganizationDashboard() {
   const [allowExclusive, setAllowExclusive] = useState(true);
   const [isConfigSaving, setIsConfigSaving] = useState(false);
   const [activePatents] = useState([
-    { id: 1, title: "Patente de Supercapacitor de Grafeno Estabilizado", inpi: "BR 10 2024 001234 5", trl: 6, status: "licensingAvailable" },
-    { id: 2, title: "Sensor IoT Autônomo de Vibração Industrial", inpi: "BR 10 2023 008910 2", trl: 5, status: "licensingActive" },
-    { id: 3, title: "Método de Extração Enzimática de Celulose Microcristalina", inpi: "BR 10 2025 000456 1", trl: 4, status: "licensingAvailable" }
+    { id: 1, title: "Topologia de Circuito RF de Baixa Latência para Gateway 5G", inpi: "BR 10 2024 001234 5", trl: 6, status: "licensingAvailable" },
+    { id: 2, title: "Sistema de Roteamento Dinâmico em Redes Mesh LTE", inpi: "BR 10 2023 008910 2", trl: 5, status: "licensingActive" },
+    { id: 3, title: "Algoritmo de Detecção de Intrusão Baseado em Assinaturas de Sinal", inpi: "BR 10 2025 000456 1", trl: 4, status: "licensingAvailable" }
   ]);
 
   const handleSaveConfig = () => {
@@ -314,7 +314,7 @@ export default function OrganizationDashboard() {
                     {[
                       { label: "Embrapii", percent: 65, color: "bg-blue-500" },
                       { label: "FINEP", percent: 40, color: "bg-emerald-500" },
-                      { label: "FAPESC", percent: 85, color: "bg-amber-500" },
+                      { label: "FAPEMIG", percent: 85, color: "bg-amber-500" },
                     ].map(bar => (
                       <div key={bar.label} className="space-y-1.5">
                         <div className="flex justify-between text-[10px] font-bold">
