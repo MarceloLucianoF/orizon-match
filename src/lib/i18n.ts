@@ -10,11 +10,25 @@ const resources = {
   es: { translation: es }
 };
 
+const getInitialLanguage = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('i18nextLng');
+    if (saved && ['pt', 'en', 'es'].includes(saved)) {
+      return saved;
+    }
+    const browserLang = navigator.language.split('-')[0];
+    if (['pt', 'en', 'es'].includes(browserLang)) {
+      return browserLang;
+    }
+  }
+  return 'pt';
+};
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: 'pt', // Default to Portuguese for now
+    lng: getInitialLanguage(),
     fallbackLng: 'en',
     interpolation: {
       escapeValue: false // React already escapes values (xss protection)

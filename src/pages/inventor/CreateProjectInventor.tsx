@@ -586,8 +586,7 @@ export function CreateProjectInventor() {
               </button>
               <button 
                 onClick={() => {
-                  if (formData.role === 'idea') nextStep('MATURITY');
-                  else nextStep('CADASTRO');
+                  nextStep('MATURITY');
                 }} 
                 className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
               >Próximo</button>

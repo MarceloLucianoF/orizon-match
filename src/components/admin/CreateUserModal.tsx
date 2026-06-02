@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X, UserPlus, KeyRound, Loader2, Mail, BadgeCheck, Copy, Check } from "lucide-react";
 import { adminCreateUserAPI } from "../../services/adminService";
+import { useTranslation } from "react-i18next";
 
 interface CreateUserModalProps {
   onClose: () => void;
@@ -8,6 +9,7 @@ interface CreateUserModalProps {
 }
 
 export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,11 +21,11 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
   const [copied, setCopied] = useState(false);
 
   const roles = [
-    { id: "inventor", label: "Inventor / Pesquisador" },
-    { id: "industry", label: "Empresa (Industry)" },
-    { id: "ict", label: "ICT / Universidade" },
-    { id: "investor", label: "Investidor" },
-    { id: "admin", label: "Administrador" },
+    { id: "inventor", label: t("dashboard.admin.roles.inventor") },
+    { id: "industry", label: t("dashboard.admin.roles.industry") },
+    { id: "ict", label: t("dashboard.admin.roles.ict") },
+    { id: "investor", label: t("dashboard.admin.roles.investor") },
+    { id: "admin", label: t("dashboard.admin.roles.admin") },
   ];
 
   const handleGeneratePassword = () => {
@@ -49,7 +51,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
     setLoading(true);
 
     if (formData.password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres.");
+      setError(t("dashboard.admin.createUserModal.passwordMinLength"));
       setLoading(false);
       return;
     }
@@ -58,12 +60,12 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
       await adminCreateUserAPI({
         email: formData.email,
         password: formData.password,
-        displayName: formData.name || "Novo Usuário",
+        displayName: formData.name || t("dashboard.admin.createUserModal.newUserName"),
         role: formData.role,
       });
       onSuccess();
     } catch (err: any) {
-      setError(err.message || "Erro ao criar usuário.");
+      setError(err.message || t("dashboard.admin.createUserModal.errorCreateUser"));
     } finally {
       setLoading(false);
     }
@@ -84,8 +86,8 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
               <UserPlus size={20} />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-100">Criar Novo Usuário</h2>
-              <p className="text-xs text-slate-400">Adicione um novo membro ao ecossistema.</p>
+              <h2 className="text-lg font-bold text-slate-100">{t("dashboard.admin.createUserModal.title")}</h2>
+              <p className="text-xs text-slate-400">{t("dashboard.admin.createUserModal.subtitle")}</p>
             </div>
           </div>
           <button 
@@ -107,7 +109,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
           <form id="create-user-form" onSubmit={handleSubmit} className="space-y-4">
             
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Nome Completo</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">{t("dashboard.admin.createUserModal.fullName")}</label>
               <div className="relative">
                 <BadgeCheck className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
                 <input 
@@ -115,14 +117,14 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-                  placeholder="Ex: João da Silva"
+                  placeholder={t("dashboard.admin.createUserModal.placeholderName")}
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">E-mail</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">{t("dashboard.admin.createUserModal.email")}</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
                 <input 
@@ -137,7 +139,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Nível de Acesso (Role)</label>
+              <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">{t("dashboard.admin.createUserModal.accessLevel")}</label>
               <select 
                 value={formData.role}
                 onChange={(e) => setFormData(p => ({ ...p, role: e.target.value }))}
@@ -153,13 +155,13 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
 
             <div className="space-y-1.5 pt-2">
               <div className="flex items-center justify-between ml-1">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">Senha de Acesso</label>
+                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest">{t("dashboard.admin.createUserModal.password")}</label>
                 <button 
                   type="button"
                   onClick={handleGeneratePassword}
                   className="text-[10px] text-indigo-400 font-bold hover:text-indigo-300 transition-colors uppercase tracking-widest"
                 >
-                  Gerar Aleatória
+                  {t("dashboard.admin.createUserModal.generateRandom")}
                 </button>
               </div>
               <div className="relative">
@@ -169,7 +171,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder={t("dashboard.admin.createUserModal.passwordPlaceholder")}
                   className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-12 text-sm text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
                 />
                 <button
@@ -194,7 +196,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
             disabled={loading}
             className="px-5 py-2.5 rounded-xl font-bold text-xs text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
           >
-            Cancelar
+            {t("dashboard.admin.createUserModal.cancel")}
           </button>
           <button 
             type="submit"
@@ -202,7 +204,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
             disabled={loading || !formData.email || !formData.password}
             className="px-5 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 min-w-[140px]"
           >
-            {loading ? <Loader2 size={16} className="animate-spin" /> : "Salvar Usuário"}
+            {loading ? <Loader2 size={16} className="animate-spin" /> : t("dashboard.admin.createUserModal.saveUser")}
           </button>
         </div>
 

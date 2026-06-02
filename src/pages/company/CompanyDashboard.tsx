@@ -10,6 +10,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { ProRadarMap } from "../../components/analytics/ProRadarMap";
 import { LayoutDashboard, Map as MapIcon } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 type DealStatus = 'triagem' | 'avaliacao' | 'due_diligence' | 'negociacao' | 'fechado';
 
@@ -33,6 +34,7 @@ const COLUMNS: { id: DealStatus; title: string; color: string }[] = [
 export function CompanyDashboard() {
   const { userProfile } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [smartPrompt, setSmartPrompt] = useState<{ dealId: string, message: string, action: string } | null>(null);
@@ -63,14 +65,14 @@ export function CompanyDashboard() {
     if (newStatus === 'due_diligence') {
       setSmartPrompt({
         dealId,
-        message: "Projeto movido para Due Diligence. Deseja enviar o modelo de NDA padrão Orizon para o Inventor?",
-        action: "Enviar NDA"
+        message: t("dashboard.investor.smartPrompts.dueDiligence"),
+        action: t("dashboard.investor.smartPrompts.sendNda")
       });
     } else if (newStatus === 'negociacao') {
         setSmartPrompt({
             dealId,
-            message: "Negociação iniciada. Deseja solicitar acesso ao Data Room Virtual (VDR) do projeto?",
-            action: "Solicitar Acesso ao VDR"
+            message: t("dashboard.investor.smartPrompts.negotiation"),
+            action: t("dashboard.investor.smartPrompts.requestVdr")
         });
     } else {
       setSmartPrompt(null);
@@ -86,7 +88,7 @@ export function CompanyDashboard() {
   }
 
   const funnelData = COLUMNS.map(col => ({
-    name: col.title,
+    name: t(`dashboard.investor.funnelColumns.${col.id}`),
     value: deals.filter(d => d.status === col.id).length,
   }));
 
@@ -97,8 +99,8 @@ export function CompanyDashboard() {
       {/* Header com Abas */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-100">Dashboard do Investidor</h1>
-          <p className="text-slate-400 mt-1 text-sm">Gerencie seu pipeline de negociações e acompanhe cada oportunidade.</p>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-100">{t("dashboard.investor.title")}</h1>
+          <p className="text-slate-400 mt-1 text-sm">{t("dashboard.investor.subtitle")}</p>
         </div>
 
         <div className="flex bg-slate-900/50 p-1 rounded-2xl border border-slate-800 shadow-inner">
@@ -111,7 +113,7 @@ export function CompanyDashboard() {
             }`}
           >
             <LayoutDashboard size={14} />
-            Pipeline
+            {t("dashboard.investor.pipeline")}
           </button>
           
           <button
@@ -123,7 +125,7 @@ export function CompanyDashboard() {
             }`}
           >
             <MapIcon size={14} />
-            Radar Pro
+            {t("dashboard.investor.radarPro")}
           </button>
         </div>
       </div>
@@ -133,26 +135,26 @@ export function CompanyDashboard() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatsCard 
-              label="Em Triagem" 
+              label={t("dashboard.investor.inScreening")} 
               value={deals.filter(d => d.status === 'triagem').length} 
               icon={Zap} 
               color="indigo" 
             />
             <StatsCard 
-              label="Due Diligence" 
+              label={t("dashboard.investor.dueDiligence")} 
               value={deals.filter(d => d.status === 'due_diligence').length} 
               icon={Target} 
               color="amber" 
             />
             <StatsCard 
-              label="Deals Fechados" 
+              label={t("dashboard.investor.closedDeals")} 
               value={deals.filter(d => d.status === 'fechado').length} 
               icon={Briefcase} 
               color="emerald" 
             />
             <StatsCard 
-              label="Ticket Médio" 
-              value="R$ 450k" 
+              label={t("dashboard.investor.avgTicket")} 
+              value={t("dashboard.investor.avgTicketVal")} 
               icon={TrendingUp} 
               trend={15} 
               color="cyan" 
@@ -162,7 +164,7 @@ export function CompanyDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-slate-900/50 border border-slate-800 rounded-3xl p-6 flex flex-col">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest">Distribuição do Pipeline</h3>
+                <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest">{t("dashboard.investor.distFunnel")}</h3>
                 <div className="flex gap-4">
                   <div className="flex items-center gap-2 bg-slate-900 border border-slate-700 rounded-xl px-3 py-1.5">
                     <Filter size={14} className="text-slate-500" />
@@ -171,8 +173,8 @@ export function CompanyDashboard() {
                       onChange={e => setTrlFilter(e.target.value ? Number(e.target.value) : null)}
                       className="bg-transparent text-xs text-slate-300 outline-none"
                     >
-                      <option value="">TRL (Todos)</option>
-                      {[1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>TRL {n}+</option>)}
+                      <option value="">{t("dashboard.investor.trlAll")}</option>
+                      {[1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>{t("dashboard.investor.trlOption", { val: n })}</option>)}
                     </select>
                   </div>
                 </div>
@@ -204,7 +206,7 @@ export function CompanyDashboard() {
             </div>
 
             <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/20 rounded-3xl p-6">
-              <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">Market Match Score</h3>
+              <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">{t("dashboard.investor.marketMatchScore")}</h3>
               <div className="flex flex-col items-center justify-center h-full pb-6">
                 <div className="relative w-32 h-32 flex items-center justify-center mb-4">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -216,7 +218,7 @@ export function CompanyDashboard() {
                   </div>
                 </div>
                 <p className="text-center text-xs text-slate-400 leading-relaxed px-4">
-                  Sua tese de investimento tem um **alto alinhamento** com os projetos disponíveis na região Sul.
+                  {t("dashboard.investor.marketMatchDesc")}
                 </p>
               </div>
             </div>
@@ -229,7 +231,7 @@ export function CompanyDashboard() {
                 <span className="font-medium text-sm">{smartPrompt.message}</span>
               </div>
               <div className="flex gap-2 flex-shrink-0">
-                <button onClick={() => setSmartPrompt(null)} className="text-slate-400 hover:text-slate-200 px-3 py-1.5 text-xs">Ignorar</button>
+                <button onClick={() => setSmartPrompt(null)} className="text-slate-400 hover:text-slate-200 px-3 py-1.5 text-xs">{t("dashboard.investor.ignore")}</button>
                 <button onClick={() => setSmartPrompt(null)} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(79,70,229,0.3)] transition-all">
                   {smartPrompt.action}
                 </button>
@@ -241,23 +243,26 @@ export function CompanyDashboard() {
           <div className="overflow-x-auto pb-4 custom-scrollbar">
             {deals.length === 0 ? (
               <div className="h-64 bg-slate-900/30 border border-slate-800 rounded-2xl flex items-center justify-center">
-                <EmptyState icon={LayoutGrid} title="Pipeline Vazio" description="Você ainda não possui projetos em negociação." ctaLabel="Explorar Projetos" ctaLink="/explore" />
+                <EmptyState icon={LayoutGrid} title={t("dashboard.investor.emptyTitle")} description={t("dashboard.investor.emptyDesc")} ctaLabel={t("dashboard.investor.emptyCta")} ctaLink="/explore" />
               </div>
             ) : (
               <div className="flex gap-6 min-w-max">
                 {COLUMNS.map(column => {
                   const columnDeals = deals.filter(d => d.status === column.id);
+                  const columnTitle = t(`dashboard.investor.funnelColumns.${column.id}`);
                   return (
                     <div key={column.id} className={`w-80 flex flex-col rounded-2xl border ${column.color} p-4`}>
                       <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-slate-200 text-sm">{column.title}</h3>
+                        <h3 className="font-bold text-slate-200 text-sm">{columnTitle}</h3>
                         <span className="bg-slate-900/50 text-slate-400 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-700/50">{columnDeals.length}</span>
                       </div>
                       <div className="space-y-3">
                         {columnDeals.map(deal => (
                           <div key={deal.id} className="bg-slate-900 border border-slate-700/80 rounded-xl p-4 hover:border-indigo-500/50 transition-all shadow-lg">
                             <div className="flex justify-between items-start mb-2">
-                              <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">{deal.score}% FIT</span>
+                              <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                                {t("dashboard.investor.fitLabel", { score: deal.score })}
+                              </span>
                               <span className="text-[10px] text-slate-500">{deal.lastUpdate}</span>
                             </div>
                             <h4 className="font-bold text-slate-200 text-sm mb-3">{deal.projectName}</h4>
@@ -266,7 +271,11 @@ export function CompanyDashboard() {
                               value={deal.status}
                               onChange={(e) => moveDeal(deal.id, e.target.value as DealStatus)}
                             >
-                              {COLUMNS.map(c => <option key={c.id} value={c.id}>Mover para {c.title}</option>)}
+                              {COLUMNS.map(c => (
+                                <option key={c.id} value={c.id}>
+                                  {t("dashboard.investor.moveOption", { col: t(`dashboard.investor.funnelColumns.${c.id}`) })}
+                                </option>
+                              ))}
                             </select>
                           </div>
                         ))}
@@ -286,13 +295,13 @@ export function CompanyDashboard() {
                 <Target className="text-indigo-400" size={20} />
               </div>
               <div>
-                <h2 className="text-lg font-bold text-white">Inteligência Geoespacial</h2>
-                <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Mapeamento de Clusters Industriais e ICTs</p>
+                <h2 className="text-lg font-bold text-white">{t("dashboard.investor.geoIntel")}</h2>
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">{t("dashboard.investor.geoSub")}</p>
               </div>
             </div>
             {isPremium && (
               <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                <Zap size={12} fill="currentColor" /> Premium Ativo
+                <Zap size={12} fill="currentColor" /> {t("dashboard.investor.premiumActive")}
               </div>
             )}
           </div>

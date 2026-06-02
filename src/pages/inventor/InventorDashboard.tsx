@@ -16,9 +16,11 @@ import { updateProject } from "../../services/projectService";
 import { StatsCard } from "../../components/analytics/StatsCard";
 import { ProjectPerformanceChart } from "../../components/analytics/ProjectPerformanceChart";
 import { MarketTrendsChart } from "../../components/analytics/MarketTrendsChart";
+import { useTranslation } from "react-i18next";
 
 export function InventorDashboard() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [stats, setStats] = useState({ projects: 0, matches: 0, views: 0, saves: 0 });
   const [recentMatches, setRecentMatches] = useState<any[]>([]);
   const [radarCount, setRadarCount] = useState<number | null>(null);
@@ -150,21 +152,21 @@ export function InventorDashboard() {
     <div className="space-y-6 md:space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-100">Painel do Inventor</h1>
-          <p className="text-slate-400 mt-1 text-sm">Gerencie sua jornada de inovação e atraia investidores.</p>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-100">{t("dashboard.inventor.title")}</h1>
+          <p className="text-slate-400 mt-1 text-sm">{t("dashboard.inventor.subtitle")}</p>
         </div>
         <div className="flex gap-1.5 bg-slate-900/50 p-1 rounded-xl border border-slate-800 self-start sm:self-auto">
           <button 
             onClick={() => setActiveTab('overview')}
             className={`px-3 md:px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'overview' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            Visão Geral
+            {t("dashboard.inventor.overview")}
           </button>
           <button 
             onClick={() => setActiveTab('vdr')}
             className={`px-3 md:px-4 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === 'vdr' ? 'bg-indigo-600 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}
           >
-            Data Room
+            {t("dashboard.inventor.vdr")}
           </button>
         </div>
       </div>
@@ -179,16 +181,16 @@ export function InventorDashboard() {
             
             <div className="bg-gradient-to-br from-indigo-900/20 to-slate-900 border border-indigo-500/20 rounded-2xl md:rounded-3xl p-5 md:p-6">
               <h3 className="text-sm font-bold text-indigo-300 mb-2 flex items-center gap-2">
-                <Gavel size={16} /> Curadoria Jurídica
+                <Gavel size={16} /> {t("dashboard.inventor.legalCurator")}
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-4">
-                Projetos com documentação validada por especialistas em PI têm <strong>4x mais chances</strong> de fechar investimento.
+                {t("dashboard.inventor.legalCuratorDesc")}
               </p>
               <button 
                 onClick={() => setShowInviteModal(true)}
                 className="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] flex items-center justify-center gap-2"
               >
-                <Send size={14} /> Convidar Escritório Parceiro
+                <Send size={14} /> {t("dashboard.inventor.inviteLegalBtn")}
               </button>
             </div>
           </div>
@@ -198,21 +200,21 @@ export function InventorDashboard() {
           <div className="lg:col-span-2 space-y-4 md:space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <StatsCard 
-                label="Visualizações" 
+                label={t("dashboard.inventor.views")} 
                 value={stats.views} 
                 icon={Eye} 
                 trend={12} 
                 color="indigo"
               />
               <StatsCard 
-                label="Salvos" 
+                label={t("dashboard.inventor.saves")} 
                 value={stats.saves} 
                 icon={Heart} 
                 trend={5} 
                 color="emerald"
               />
               <StatsCard 
-                label="Matches" 
+                label={t("dashboard.inventor.matches")} 
                 value={stats.matches} 
                 icon={Star} 
                 trend={8} 
@@ -220,16 +222,16 @@ export function InventorDashboard() {
               />
             </div>
 
-            <ProjectPerformanceChart title="Alcance do Projeto" />
+            <ProjectPerformanceChart title={t("dashboard.inventor.chartTitle")} />
 
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-4 md:mb-6">
                 <h2 className="text-base md:text-lg font-bold text-slate-100 flex items-center gap-2">
-                  <Star className="text-amber-400" size={18} /> Matches em Destaque
+                  <Star className="text-amber-400" size={18} /> {t("dashboard.inventor.featuredMatches")}
                 </h2>
                 {stats.projects > 0 && (
                   <Link to="/matches" className="text-xs md:text-sm text-indigo-400 hover:text-indigo-300 font-medium flex items-center gap-1">
-                    Ver todos <ChevronRight size={14} />
+                    {t("dashboard.inventor.viewAll")} <ChevronRight size={14} />
                   </Link>
                 )}
               </div>
@@ -239,10 +241,10 @@ export function InventorDashboard() {
                   <div className="w-14 h-14 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-3">
                     <Star className="text-slate-600" size={22} />
                   </div>
-                  <p className="text-slate-400 font-medium text-sm">Nenhum match encontrado ainda.</p>
-                  <p className="text-xs text-slate-500 mt-1">Complete seu projeto para o algoritmo trabalhar.</p>
+                  <p className="text-slate-400 font-medium text-sm">{t("dashboard.inventor.noMatches")}</p>
+                  <p className="text-xs text-slate-500 mt-1">{t("dashboard.inventor.noMatchesDesc")}</p>
                   <Link to="/projects/new" className="inline-block mt-4 text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition">
-                    Cadastrar Projeto
+                    {t("dashboard.inventor.registerProject")}
                   </Link>
                 </div>
               ) : (
@@ -272,7 +274,7 @@ export function InventorDashboard() {
                           to={`/matches?project=${match.ownerProjectId}`} 
                           className="bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0 text-center"
                         >
-                          Detalhes
+                          {t("dashboard.inventor.details")}
                         </Link>
                       </div>
                     );
@@ -283,31 +285,31 @@ export function InventorDashboard() {
           </div>
 
           <div className="space-y-4 md:space-y-6">
-            <MarketTrendsChart title="Tendências de Mercado" />
+            <MarketTrendsChart title={t("dashboard.inventor.marketTrends")} />
 
             <div className="bg-gradient-to-br from-indigo-900/40 to-cyan-900/20 border border-indigo-500/30 rounded-2xl p-5 md:p-6 relative overflow-hidden">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl" />
               <h3 className="text-sm font-semibold text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-2">
-                <Activity size={16} /> Radar Orizon
+                <Activity size={16} /> {t("dashboard.inventor.radarOrizon")}
               </h3>
               {radarCount === null ? (
-                <p className="text-slate-400 text-sm">Escaneando o mercado...</p>
+                <p className="text-slate-400 text-sm">{t("dashboard.inventor.scanning")}</p>
               ) : radarCount > 0 ? (
                 <>
                   <p className="text-3xl font-black text-white my-2">{radarCount}</p>
                   <p className="text-xs text-slate-300 leading-relaxed">
-                    empresas e investidores buscando inovações em **{primaryProject?.segment}** no ecossistema FIESC agora.
+                    {t("dashboard.inventor.radarDesc", { segment: primaryProject?.segment })}
                   </p>
                 </>
               ) : (
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Adicione projetos com segmentos definidos para ativar o radar de oportunidades.
+                  {t("dashboard.inventor.radarFallback")}
                 </p>
               )}
             </div>
 
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-5 md:p-6">
-              <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Prontidão para o Mercado</h3>
+              <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">{t("dashboard.inventor.marketReadiness")}</h3>
               <div className="flex flex-col items-center mb-5">
                 <div className="relative w-28 h-28 md:w-32 md:h-32 flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -319,9 +321,9 @@ export function InventorDashboard() {
                   </div>
                 </div>
                 <p className="text-[10px] text-slate-500 mt-2 text-center">
-                  {completionScore < 50 ? "Preencha mais dados do projeto para aumentar visibilidade" :
-                   completionScore < 80 ? "Projeto com boa base. Adicione TRL/IRL para subir no ranking" :
-                   "Projeto com alta prontidão para investidores"}
+                  {completionScore < 50 ? t("dashboard.inventor.completionUnder50") :
+                   completionScore < 80 ? t("dashboard.inventor.completionUnder80") :
+                   t("dashboard.inventor.completionHigh")}
                 </p>
               </div>
 
@@ -329,11 +331,11 @@ export function InventorDashboard() {
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-2 md:gap-3">
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                      <span className="block text-[10px] font-bold text-slate-500 uppercase">TRL Atual</span>
+                      <span className="block text-[10px] font-bold text-slate-500 uppercase">{t("dashboard.inventor.currentTrl")}</span>
                       <span className="text-lg md:text-xl font-black text-indigo-400">{primaryProject.maturity || 1}</span>
                     </div>
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
-                      <span className="block text-[10px] font-bold text-slate-500 uppercase">IRL Score</span>
+                      <span className="block text-[10px] font-bold text-slate-500 uppercase">{t("dashboard.inventor.irlScore")}</span>
                       <span className="text-lg md:text-xl font-black text-emerald-400">{primaryProject.irlScore || 0}</span>
                     </div>
                   </div>
@@ -342,7 +344,7 @@ export function InventorDashboard() {
                     onClick={() => setShowTRLModal(true)}
                     className="w-full py-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-bold text-xs transition-all flex items-center justify-center gap-2"
                   >
-                    <ShieldCheck size={16} /> Certificar Maturidade
+                    <ShieldCheck size={16} /> {t("dashboard.inventor.certifyMaturity")}
                   </button>
                 </div>
               )}
@@ -357,8 +359,8 @@ export function InventorDashboard() {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl md:rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
             <div className="p-4 md:p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
               <div className="min-w-0">
-                <h2 className="text-lg md:text-xl font-bold text-white truncate">Certificação de Maturidade (TRL/IRL)</h2>
-                <p className="text-xs md:text-sm text-slate-400 truncate">Projeto: {primaryProject.title}</p>
+                <h2 className="text-lg md:text-xl font-bold text-white truncate">{t("dashboard.inventor.certifyModalTitle")}</h2>
+                <p className="text-xs md:text-sm text-slate-400 truncate">{t("dashboard.inventor.certifyModalProject", { title: primaryProject.title })}</p>
               </div>
               <button 
                 onClick={() => setShowTRLModal(false)}
@@ -387,7 +389,7 @@ export function InventorDashboard() {
                 onClick={() => setShowTRLModal(false)}
                 className="px-4 md:px-6 py-2 rounded-xl text-slate-400 hover:text-white transition font-medium text-sm"
               >
-                Cancelar
+                {t("dashboard.inventor.cancel")}
               </button>
               <button 
                 onClick={async () => {
@@ -407,7 +409,7 @@ export function InventorDashboard() {
                 }}
                 className="px-6 md:px-8 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-500/20 transition-all text-sm"
               >
-                Salvar Certificação
+                {t("dashboard.inventor.saveCertification")}
               </button>
             </div>
           </div>
@@ -420,7 +422,7 @@ export function InventorDashboard() {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-slate-800 flex justify-between items-center">
               <h3 className="font-bold text-slate-100 flex items-center gap-2 text-base">
-                <Gavel className="text-indigo-400" size={20} /> Convidar Escritório Jurídico
+                <Gavel className="text-indigo-400" size={20} /> {t("dashboard.inventor.inviteModalTitle")}
               </h3>
               <button 
                 onClick={() => { setShowInviteModal(false); setInviteSent(false); }}
@@ -433,31 +435,31 @@ export function InventorDashboard() {
             {inviteSent ? (
               <div className="p-8 text-center">
                 <CheckCircle2 className="mx-auto text-emerald-400 mb-3" size={48} />
-                <p className="text-slate-200 font-bold text-base">Convite enviado com sucesso</p>
-                <p className="text-xs text-slate-400 mt-1">O escritório receberá uma notificação para validar seu projeto.</p>
+                <p className="text-slate-200 font-bold text-base">{t("dashboard.inventor.inviteSentTitle")}</p>
+                <p className="text-xs text-slate-400 mt-1">{t("dashboard.inventor.inviteSentDesc")}</p>
               </div>
             ) : (
               <div className="p-5 space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400 block">Email do Escritório</label>
+                  <label className="text-sm font-medium text-slate-400 block">{t("dashboard.inventor.inviteEmailLabel")}</label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-600" size={16} />
                     <input 
                       type="email"
                       value={inviteEmail}
                       onChange={e => setInviteEmail(e.target.value)}
-                      placeholder="contato@escritorio.com"
+                      placeholder={t("dashboard.inventor.inviteEmailPlaceholder")}
                       className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-400 block">Mensagem (opcional)</label>
+                  <label className="text-sm font-medium text-slate-400 block">{t("dashboard.inventor.inviteMsgLabel")}</label>
                   <textarea 
                     value={inviteMessage}
                     onChange={e => setInviteMessage(e.target.value)}
-                    placeholder="Adicione um contexto sobre seu projeto..."
+                    placeholder={t("dashboard.inventor.inviteMsgPlaceholder")}
                     rows={3}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition resize-none text-sm"
                   />
@@ -465,7 +467,7 @@ export function InventorDashboard() {
 
                 <div className="bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl">
                   <p className="text-[11px] text-indigo-300 leading-relaxed">
-                    O escritório convidado receberá acesso de curadoria ao seu Data Room virtual, podendo validar a documentação jurídica do seu projeto.
+                    {t("dashboard.inventor.inviteNotice")}
                   </p>
                 </div>
 
@@ -475,7 +477,7 @@ export function InventorDashboard() {
                   className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition text-sm shadow-[0_0_15px_rgba(79,70,229,0.3)]"
                 >
                   {inviteSending ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}
-                  {inviteSending ? "Enviando..." : "Enviar Convite"}
+                  {inviteSending ? t("dashboard.inventor.sending") : t("dashboard.inventor.sendInvite")}
                 </button>
               </div>
             )}

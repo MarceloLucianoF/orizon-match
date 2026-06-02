@@ -12,6 +12,7 @@ import {
   BarChart3, ShieldCheck
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 interface Stats {
   totalProjects: number;
@@ -28,6 +29,7 @@ interface OrgData {
 
 export default function OrganizationDashboard() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<Stats>({
     totalProjects: 0,
@@ -105,9 +107,9 @@ export default function OrganizationDashboard() {
     return (
       <div className="max-w-xl mx-auto py-20 text-center space-y-6">
         <Building2 className="mx-auto text-slate-800" size={64} />
-        <h2 className="text-2xl font-bold text-white">Nenhuma Instituição Vinculada</h2>
-        <p className="text-slate-400">Você ainda não faz parte de uma organização gestora ou NIT no Orizon Match.</p>
-        <button className="bg-indigo-600 px-6 py-3 rounded-xl font-bold text-white">Solicitar Acesso Institucional</button>
+        <h2 className="text-2xl font-bold text-white">{t("dashboard.organization.noLinkedOrg")}</h2>
+        <p className="text-slate-400">{t("dashboard.organization.noLinkedOrgDesc")}</p>
+        <button className="bg-indigo-600 px-6 py-3 rounded-xl font-bold text-white">{t("dashboard.organization.requestAccess")}</button>
       </div>
     );
   }
@@ -121,17 +123,17 @@ export default function OrganizationDashboard() {
              <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
                 <Building2 size={20} />
              </div>
-             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500/80">Painel Institucional</span>
+             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500/80">{t("dashboard.organization.panelTitle")}</span>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">{org.name}</h1>
-          <p className="text-slate-400 text-sm mt-1">Gestão centralizada de inovação e ativos de PI.</p>
+          <p className="text-slate-400 text-sm mt-1">{t("dashboard.organization.subtitle")}</p>
         </div>
         <div className="flex gap-3">
           <button className="bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl text-slate-400 text-sm font-bold flex items-center gap-2 hover:text-white transition-all">
-             <Search size={18} /> Buscar Inventor
+             <Search size={18} /> {t("dashboard.organization.searchInventor")}
           </button>
           <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all">
-             Relatório Executivo
+             {t("dashboard.organization.execReport")}
           </button>
         </div>
       </div>
@@ -139,10 +141,10 @@ export default function OrganizationDashboard() {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Projetos Ativos", val: stats.totalProjects, icon: <FileText className="text-blue-400" />, change: "+12%" },
-          { label: "Ativos de PI", val: stats.totalAssets, icon: <ShieldCheck className="text-emerald-400" />, change: "+5%" },
-          { label: "Inventores", val: stats.totalInventors, icon: <Users className="text-amber-400" />, change: "Estável" },
-          { label: "Matches Gerados", val: stats.activeMatches, icon: <Zap className="text-indigo-400" />, change: "+24%" },
+          { label: t("dashboard.organization.activeProjects"), val: stats.totalProjects, icon: <FileText className="text-blue-400" />, change: "+12%" },
+          { label: t("dashboard.organization.ipAssets"), val: stats.totalAssets, icon: <ShieldCheck className="text-emerald-400" />, change: "+5%" },
+          { label: t("dashboard.organization.inventors"), val: stats.totalInventors, icon: <Users className="text-amber-400" />, change: t("dashboard.organization.stable") },
+          { label: t("dashboard.organization.matchesGenerated"), val: stats.activeMatches, icon: <Zap className="text-indigo-400" />, change: "+24%" },
         ].map((stat, i) => (
           <div key={i} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all group relative overflow-hidden">
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-[40px] rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-all" />
@@ -165,15 +167,15 @@ export default function OrganizationDashboard() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
              <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Clock className="text-slate-600" size={20} /> Atividade Recente
+                <Clock className="text-slate-600" size={20} /> {t("dashboard.organization.recentActivity")}
              </h2>
-             <Link to="/app/projects" className="text-xs text-indigo-400 hover:underline">Ver Todos</Link>
+             <Link to="/app/projects" className="text-xs text-indigo-400 hover:underline">{t("dashboard.organization.viewAll")}</Link>
           </div>
           
           <div className="space-y-4">
             {recentProjects.length === 0 ? (
               <div className="p-12 text-center border-2 border-dashed border-slate-800 rounded-3xl">
-                <p className="text-slate-500">Nenhum projeto vinculado recentemente.</p>
+                <p className="text-slate-500">{t("dashboard.organization.noRecentProjects")}</p>
               </div>
             ) : (
               recentProjects.map(proj => (
@@ -187,8 +189,8 @@ export default function OrganizationDashboard() {
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="text-right">
-                       <div className="text-xs font-bold text-white">{proj.matchesCount || 0} Matches</div>
-                       <div className="text-[10px] text-slate-500">Inteligência Ativa</div>
+                       <div className="text-xs font-bold text-white">{proj.matchesCount || 0} {t("dashboard.inventor.matches")}</div>
+                       <div className="text-[10px] text-slate-500">{t("dashboard.organization.activeIntel")}</div>
                     </div>
                     <ArrowUpRight className="text-slate-700 group-hover:text-white transition-colors" size={20} />
                   </div>
@@ -201,22 +203,22 @@ export default function OrganizationDashboard() {
         {/* Sidebar: Insights */}
         <div className="space-y-6">
            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <BarChart3 className="text-slate-600" size={20} /> Insights do Polo
+              <BarChart3 className="text-slate-600" size={20} /> {t("dashboard.organization.hubInsights")}
            </h2>
            
            <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-6 rounded-3xl shadow-xl shadow-indigo-500/10 space-y-4 relative overflow-hidden">
              <Zap className="absolute top-[-10px] right-[-10px] w-24 h-24 text-white/10 -rotate-12" />
-             <h3 className="font-bold text-white leading-tight">Match de Alta Conversão Detectado</h3>
+             <h3 className="font-bold text-white leading-tight">{t("dashboard.organization.highConversionMatch")}</h3>
              <p className="text-white/70 text-xs leading-relaxed">
-               Existem 5 empresas buscando por "Inovação em Grafeno" neste mês. Seu polo possui 2 projetos que atendem 90% dos critérios.
+               {t("dashboard.organization.highConversionMatchDesc")}
              </p>
              <button className="w-full py-2.5 bg-white text-indigo-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-colors">
-                Ativar Notificação de Massa
+                {t("dashboard.organization.massNotification")}
              </button>
            </div>
 
            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
-             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">Métricas de Fomento</h3>
+             <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">{t("dashboard.organization.fundingMetrics")}</h3>
              <div className="space-y-3">
                 {[
                   { label: "Embrapii", percent: 65, color: "bg-blue-500" },

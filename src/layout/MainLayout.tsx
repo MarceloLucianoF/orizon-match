@@ -4,8 +4,10 @@ import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { useAuth } from "../hooks/useAuth";
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export function MainLayout() {
+  const { t } = useTranslation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { impersonatingAdminId, setImpersonatedUid } = useAuth();
 
@@ -26,12 +28,12 @@ export function MainLayout() {
         {impersonatingAdminId && (
           <div className="bg-amber-500 text-amber-950 px-4 py-2 flex items-center justify-center gap-3 text-sm font-bold shadow-md z-50 animate-in slide-in-from-top">
             <AlertTriangle size={18} />
-            <span>MODO SIMULAÇÃO ATIVO. Você está vendo o sistema como outro usuário.</span>
+            <span>{t("common.simulationActive")}</span>
             <button 
               onClick={() => setImpersonatedUid(null)}
               className="ml-4 px-3 py-1 bg-amber-950 text-amber-500 rounded-md text-xs hover:bg-amber-900 transition-colors"
             >
-              Encerrar Simulação
+              {t("common.endSimulation")}
             </button>
           </div>
         )}
