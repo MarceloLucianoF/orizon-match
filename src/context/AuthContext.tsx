@@ -187,5 +187,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 }
 
 export { AuthContext };
-
-export { AuthContext };

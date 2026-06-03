@@ -1,12 +1,13 @@
 import { db } from "../firebase";
 import { calculateMatch, isValidPair } from "../matching/engine";
 import { Project, Organization } from "../types/project";
+import { UserRole } from "../types/role";
 import * as admin from "firebase-admin";
 
 export async function generateMatches(newProject: Project) {
   const snapshot = await db
     .collection("users")
-    .where("role", "in", ["company", "investor"])
+    .where("role", "in", [UserRole.INDUSTRY, UserRole.INVESTOR])
     .where("segments", "array-contains", newProject.segment) // 🔥 pré-filtro
     .limit(30)
     .get();

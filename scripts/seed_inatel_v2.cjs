@@ -496,7 +496,8 @@ async function seedV2() {
   ];
 
   projectsData.forEach(p => {
-    batch.set(db.collection('projects').doc(p.id), {
+    const projectRef = db.collection('projects').doc(p.id);
+    batch.set(projectRef, {
       userId: p.userId,
       title: p.title,
       summary: p.summary,
@@ -509,11 +510,17 @@ async function seedV2() {
       status: 'active',
       vdrStatus: p.verified ? 'green' : 'yellow',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      researcher: p.researcher,
-      patentStatus: p.patentStatus,
       ictName: p.ictName,
       fundingTags: p.fundingTags,
       location: { region: 'Santa Rita do Sapucaí, MG' }
+    });
+
+    const privateRef = projectRef.collection('private').doc('details');
+    batch.set(privateRef, {
+      researcher: p.researcher,
+      patentStatus: p.patentStatus,
+      contactEmail: `${p.userId}@orizon.com`,
+      confidentialNotes: `Detalhes de PI confidenciais para o projeto ${p.title}.`
     });
   });
 

@@ -176,10 +176,18 @@ export function InventorDashboard() {
       {activeTab === 'vdr' ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
           <div className="lg:col-span-2">
-            <VDRRoom inpiStatus={primaryProject?.inpiStatus} />
+            <VDRRoom 
+              projectId={primaryProject?.id} 
+              projectTitle={primaryProject?.title} 
+              inpiStatus={primaryProject?.inpiStatus} 
+              isPublic={false}
+            />
           </div>
           <div className="space-y-6">
-            <DueDiligenceChecklist />
+            <DueDiligenceChecklist 
+              projectId={primaryProject?.id} 
+              projectTitle={primaryProject?.title} 
+            />
             
             <div className="bg-gradient-to-br from-indigo-900/20 to-slate-900 border border-indigo-500/20 rounded-2xl md:rounded-3xl p-5 md:p-6">
               <h3 className="text-sm font-bold text-indigo-300 mb-2 flex items-center gap-2">

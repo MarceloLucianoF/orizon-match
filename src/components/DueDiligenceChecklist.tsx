@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   CheckCircle2, Circle, ShieldCheck, 
-  AlertCircle, ArrowRight, Activity
+  AlertCircle, ArrowRight, Activity, Loader2
 } from "lucide-react";
+import { doc, collection, onSnapshot, setDoc, updateDoc, getDocs } from "firebase/firestore";
+import { db } from "../firebase/config";
+import { useAuth } from "../hooks/useAuth";
 import { notifyStakeholdersOnVdrCompletion } from "../services/notificationService";
 
 interface ChecklistItem {
@@ -11,37 +14,141 @@ interface ChecklistItem {
   category: 'pi' | 'finance' | 'legal' | 'team';
   isCompleted: boolean;
   isRequired: boolean;
+  status: 'pending' | 'completed';
+  responsavel: string;
+  observacao: string;
+  data: any;
 }
 
-export function DueDiligenceChecklist({ items: initialItems = [] }: any) {
-  const [items, setItems] = useState<ChecklistItem[]>(initialItems.length > 0 ? initialItems : [
-    { id: '1', label: 'Certificado de Depósito de Patente', category: 'pi', isCompleted: true, isRequired: true },
-    { id: '2', label: 'Análise de Anterioridade Validada', category: 'pi', isCompleted: false, isRequired: true },
-    { id: '3', label: 'Projeção Financeira (3 anos)', category: 'finance', isCompleted: false, isRequired: true },
-    { id: '4', label: 'Pitch Deck Atualizado', category: 'finance', isCompleted: true, isRequired: true },
-    { id: '5', label: 'Estatuto Social / Contrato Social', category: 'legal', isCompleted: true, isRequired: false },
-    { id: '6', label: 'Currículo Lattes/LinkedIn Fundadores', category: 'team', isCompleted: false, isRequired: true },
-  ]);
-
+export function DueDiligenceChecklist({ projectId, projectTitle }: { projectId?: string; projectTitle?: string }) {
+  const { user } = useAuth();
+  const [items, setItems] = useState<ChecklistItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [hasNotified, setHasNotified] = useState(false);
 
-  const progress = Math.round((items.filter(i => i.isCompleted).length / items.length) * 100);
+  const defaultItems: Omit<ChecklistItem, 'data'>[] = [
+    { id: '1', label: 'Certificado de Depósito de Patente', category: 'pi', isCompleted: true, isRequired: true, status: 'completed', responsavel: 'Sistema', observacao: 'Importado do INPI' },
+    { id: '2', label: 'Análise de Anterioridade Validada', category: 'pi', isCompleted: false, isRequired: true, status: 'pending', responsavel: '', observacao: '' },
+    { id: '3', label: 'Projeção Financeira (3 anos)', category: 'finance', isCompleted: false, isRequired: true, status: 'pending', responsavel: '', observacao: '' },
+    { id: '4', label: 'Pitch Deck Atualizado', category: 'finance', isCompleted: true, isRequired: true, status: 'completed', responsavel: 'Sistema', observacao: 'Carregado no VDR' },
+    { id: '5', label: 'Estatuto Social / Contrato Social', category: 'legal', isCompleted: true, isRequired: false, status: 'completed', responsavel: 'Sistema', observacao: 'Padrão' },
+    { id: '6', label: 'Currículo Lattes/LinkedIn Fundadores', category: 'team', isCompleted: false, isRequired: true, status: 'pending', responsavel: '', observacao: '' },
+  ];
+
+  // 1. Real-time checklist sync
+  useEffect(() => {
+    if (!projectId) return;
+
+    setLoading(true);
+    const checklistRef = collection(db, "projects", projectId, "due_diligence");
+    
+    const unsubscribe = onSnapshot(checklistRef, async (snapshot) => {
+      let list = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as ChecklistItem[];
+
+      // If empty, initialize database with default checklist items
+      if (list.length === 0) {
+        try {
+          await Promise.all(
+            defaultItems.map(item => {
+              const itemRef = doc(db, "projects", projectId, "due_diligence", item.id);
+              return setDoc(itemRef, {
+                ...item,
+                data: new Date()
+              });
+            })
+          );
+        } catch (err) {
+          console.error("Erro ao inicializar checklist de due diligence:", err);
+        }
+      } else {
+        // Sort items by ID to keep the layout predictable
+        list.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+        setItems(list);
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, [projectId]);
+
+  // Calculate statistics
+  const progress = items.length > 0 
+    ? Math.round((items.filter(i => i.isCompleted).length / items.length) * 100) 
+    : 0;
+  
   const requiredCompleted = items.filter(i => i.isRequired && i.isCompleted).length;
   const totalRequired = items.filter(i => i.isRequired).length;
-  const isReady = requiredCompleted === totalRequired;
+  const isReady = items.length > 0 && requiredCompleted === totalRequired;
 
-  if (isReady && !hasNotified) {
-    setHasNotified(true);
-    // Simulação de gatilho de notificação
-    notifyStakeholdersOnVdrCompletion("mock-project-id", "Projeto Orizon Match");
-  }
+  // 2. Trigger notification via useEffect to prevent render cycles
+  useEffect(() => {
+    if (isReady && !hasNotified && projectId) {
+      setHasNotified(true);
+      notifyStakeholdersOnVdrCompletion(projectId, projectTitle || "Projeto");
+    } else if (!isReady) {
+      setHasNotified(false);
+    }
+  }, [isReady, hasNotified, projectId, projectTitle]);
 
-  const toggleItem = (id: string) => {
-    const newItems = items.map(item => 
-      item.id === id ? { ...item, isCompleted: !item.isCompleted } : item
+  const toggleItem = async (itemId: string) => {
+    if (!projectId || !user || loading) return;
+    const toggledItem = items.find(i => i.id === itemId);
+    if (!toggledItem) return;
+
+    const nextIsCompleted = !toggledItem.isCompleted;
+    
+    // Optimistic local state update
+    const updatedItems = items.map(item => 
+      item.id === itemId ? { ...item, isCompleted: nextIsCompleted } : item
     );
-    setItems(newItems);
+    setItems(updatedItems);
+
+    const nextProgress = Math.round((updatedItems.filter(i => i.isCompleted).length / updatedItems.length) * 100);
+    const nextRequiredCompleted = updatedItems.filter(i => i.isRequired && i.isCompleted).length;
+    const nextTotalRequired = updatedItems.filter(i => i.isRequired).length;
+    const nextIsVdrReady = nextRequiredCompleted === nextTotalRequired;
+
+    try {
+      // 1. Update subcollection document
+      const itemRef = doc(db, "projects", projectId, "due_diligence", itemId);
+      await setDoc(itemRef, {
+        isCompleted: nextIsCompleted,
+        status: nextIsCompleted ? 'completed' : 'pending',
+        responsavel: user.displayName || user.email || 'Membro do Time',
+        data: new Date()
+      }, { merge: true });
+
+      // 2. Update parent document progress stats
+      const projectRef = doc(db, "projects", projectId);
+      await updateDoc(projectRef, {
+        dueDiligenceProgress: nextProgress,
+        isVdrReady: nextIsVdrReady
+      });
+    } catch (err) {
+      console.error("Erro ao atualizar item do checklist:", err);
+      // Revert optimistic update on failure
+      loadBackupItems();
+    }
   };
+
+  const loadBackupItems = async () => {
+    if (!projectId) return;
+    const snapshot = await getDocs(collection(db, "projects", projectId, "due_diligence"));
+    const list = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as ChecklistItem[];
+    list.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+    setItems(list);
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 flex justify-center items-center py-12">
+        <Loader2 className="animate-spin text-indigo-400" size={24} />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 space-y-6">
@@ -84,6 +191,9 @@ export function DueDiligenceChecklist({ items: initialItems = [] }: any) {
                 {item.label}
                 {item.isRequired && !item.isCompleted && (
                   <span className="ml-2 text-[9px] text-amber-500 font-bold uppercase">Obrigatório</span>
+                )}
+                {item.isCompleted && item.responsavel && (
+                  <span className="ml-2 text-[9px] text-slate-500 font-mono">({item.responsavel})</span>
                 )}
               </span>
             </div>

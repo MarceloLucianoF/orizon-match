@@ -50,21 +50,37 @@ export function Explore() {
     getUserProjects(user.uid).then(setUserProjects).catch(console.error);
   }, [user]);
 
+  const [lastDoc, setLastDoc] = useState<any>(null);
+  const [hasMore, setHasMore] = useState(true);
+
   useEffect(() => {
     if (!user || !userProfile) return;
-    loadResults();
+    setLastDoc(null);
+    setHasMore(true);
+    loadResults(false, null);
   }, [user, userProfile, userProjects, reloadTrigger]);
 
-  const loadResults = async () => {
+  const loadResults = async (isLoadMore = false, customCursor?: any) => {
     if (!userProfile) return;
     setLoading(true);
     try {
-      const data = await getExploreProjects(
+      const cursorToUse = isLoadMore ? (customCursor !== undefined ? customCursor : lastDoc) : null;
+      const response = await getExploreProjects(
         { ...userProfile, uid: user?.uid },
         userProjects,
-        filters
+        filters,
+        6, // Page Size
+        cursorToUse
       );
-      setResults(data);
+      
+      if (isLoadMore) {
+        setResults(prev => [...prev, ...response.projects]);
+      } else {
+        setResults(response.projects);
+      }
+      
+      setLastDoc(response.lastDoc);
+      setHasMore(response.projects.length > 0 && response.lastDoc !== null);
     } catch (error) {
       console.error("Erro ao carregar projetos:", error);
     } finally {
@@ -399,6 +415,18 @@ export function Explore() {
               </div>
             );
           })}
+          
+          {hasMore && (
+            <div className="flex justify-center pt-6">
+              <button 
+                onClick={() => loadResults(true)}
+                disabled={loading}
+                className="bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 hover:border-indigo-500/40 text-indigo-400 font-bold px-6 py-3 rounded-xl transition text-sm flex items-center gap-2"
+              >
+                {loading ? <Loader2 className="animate-spin" size={16} /> : "Carregar Mais Projetos"}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

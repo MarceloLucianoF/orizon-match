@@ -62,13 +62,33 @@ export async function handleWebhook(body: any, signature: string) {
     throw new Error("Webhook secret not configured");
   }
 
-  let event;
+  let event: any;
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
     console.error(`Webhook signature verification failed: ${err.message}`);
     throw new Error(`Webhook Error: ${err.message}`);
   }
+
+  // 1. Idempotency Check: Evitar processar evento duplicado
+  const eventRef = db.collection("billing_events").doc(event.id);
+  const eventDoc = await eventRef.get();
+  if (eventDoc.exists) {
+    console.log(`[STRIPE WEBHOOK] Event ${event.id} already processed.`);
+    return { received: true, duplicate: true };
+  }
+
+  // 2. Auditoria e Logs: Salvar evento de faturamento antes do processamento
+  await eventRef.set({
+    eventId: event.id,
+    type: event.type,
+    created: event.created,
+    processedAt: admin.firestore.FieldValue.serverTimestamp(),
+    livemode: event.livemode,
+  });
+
+  // 3. Processamento de Eventos Core
+  console.log(`[STRIPE WEBHOOK] Processing event ${event.id} of type ${event.type}`);
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as any;
@@ -81,7 +101,41 @@ export async function handleWebhook(body: any, signature: string) {
         subscriptionId: session.subscription,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-      console.log(`User ${userId} upgraded to premium.`);
+      console.log(`[STRIPE WEBHOOK] User ${userId} upgraded to premium. Customer: ${session.customer}`);
+    }
+  } 
+  else if (event.type === 'invoice.payment_succeeded') {
+    const invoice = event.data.object as any;
+    const customerId = invoice.customer;
+
+    if (customerId) {
+      const userQuery = await db.collection("users").where("stripeCustomerId", "==", customerId).get();
+      if (!userQuery.empty) {
+        const userDocRef = userQuery.docs[0].ref;
+        await userDocRef.update({
+          subscriptionStatus: 'premium',
+          lastPaymentStatus: 'succeeded',
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        console.log(`[STRIPE WEBHOOK] Recurring payment succeeded for customer ${customerId}`);
+      }
+    }
+  } 
+  else if (event.type === 'customer.subscription.deleted') {
+    const subscription = event.data.object as any;
+    const customerId = subscription.customer;
+
+    if (customerId) {
+      const userQuery = await db.collection("users").where("stripeCustomerId", "==", customerId).get();
+      if (!userQuery.empty) {
+        const userDocRef = userQuery.docs[0].ref;
+        await userDocRef.update({
+          subscriptionStatus: 'free',
+          subscriptionId: null,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        console.log(`[STRIPE WEBHOOK] Subscription deleted for customer ${customerId}. Downgraded to free.`);
+      }
     }
   }
 

@@ -1,7 +1,6 @@
 import { LayoutDashboard, FolderKanban, Users, LogOut, MessageSquare, Building2, ShieldAlert, Gavel, Compass, X, ServerCog } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { SUPER_ADMIN_UID } from "../services/adminService";
 import { useTranslation } from "react-i18next";
 
 interface SidebarProps {
@@ -11,10 +10,9 @@ interface SidebarProps {
 export function Sidebar({ onClose }: SidebarProps) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { logout, user, userProfile, simulatedRole, setSimulatedRole } = useAuth();
+  const { logout, userProfile, simulatedRole, setSimulatedRole, isActualAdmin } = useAuth();
   const { t } = useTranslation();
   
-  const isActualAdmin = user?.uid === SUPER_ADMIN_UID;
   const currentRole = userProfile?.role || 'inventor';
 
   // Define sidebar links dynamically per role
