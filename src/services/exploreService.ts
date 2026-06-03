@@ -9,6 +9,9 @@ export interface ExploreFilters {
   region?: string;
   search?: string;
   fomento?: string;
+  investmentStage?: string;
+  ticketRange?: string;
+  onlyIctVerified?: boolean;
 }
 
 /**
@@ -50,6 +53,18 @@ export async function getExploreProjects(userProfile: any, userProjects: any[], 
         p.fundingSource === filters.fomento ||
         (Array.isArray(p.fundingSource) && p.fundingSource.includes(filters.fomento))
       );
+    }
+
+    if (filters.investmentStage) {
+      results = results.filter(p => p.investmentStage === filters.investmentStage);
+    }
+
+    if (filters.ticketRange) {
+      results = results.filter(p => p.ticketRange === filters.ticketRange);
+    }
+
+    if (filters.onlyIctVerified) {
+      results = results.filter(p => p.isIctVerified === true);
     }
 
     if (filters.search) {

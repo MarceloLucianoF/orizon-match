@@ -36,7 +36,10 @@ export function Explore() {
     minScore: 50,
     region: "",
     search: "",
-    fomento: ""
+    fomento: "",
+    investmentStage: undefined,
+    ticketRange: undefined,
+    onlyIctVerified: undefined
   });
 
   const [userProjects, setUserProjects] = useState<any[]>([]);
@@ -94,11 +97,29 @@ export function Explore() {
   };
 
   const clearFilters = () => {
-    setFilters({ segment: "", minTrl: undefined, minScore: 50, region: "", search: "", fomento: "" });
+    setFilters({ 
+      segment: "", 
+      minTrl: undefined, 
+      minScore: 50, 
+      region: "", 
+      search: "", 
+      fomento: "",
+      investmentStage: undefined,
+      ticketRange: undefined,
+      onlyIctVerified: undefined
+    });
     setReloadTrigger(t => t + 1);
   };
 
-  const hasActiveFilters = filters.segment || filters.minTrl || filters.region || filters.fomento || (filters.minScore && filters.minScore > 50);
+  const hasActiveFilters = 
+    filters.segment || 
+    filters.minTrl || 
+    filters.region || 
+    filters.fomento || 
+    filters.investmentStage || 
+    filters.ticketRange || 
+    filters.onlyIctVerified || 
+    (filters.minScore && filters.minScore > 50);
 
   return (
     <div className="space-y-6">
@@ -184,6 +205,41 @@ export function Explore() {
             <option value="">{t("explore.allFomentos")}</option>
             {["FINEP", "Embrapii", "CNPq", "FAPESC", "SENAI"].map(f => <option key={f} value={f}>{f}</option>)}
           </select>
+
+          <select
+            value={filters.investmentStage || ""}
+            onChange={e => setFilters({ ...filters, investmentStage: e.target.value })}
+            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
+          >
+            <option value="">Estágio de Desenvolvimento</option>
+            <option value="concept">Idea / Concept (TRL 1-3)</option>
+            <option value="prototype">Prototype / Lab (TRL 4-6)</option>
+            <option value="market">Market Ready (TRL 7-9)</option>
+          </select>
+
+          <select
+            value={filters.ticketRange || ""}
+            onChange={e => setFilters({ ...filters, ticketRange: e.target.value })}
+            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
+          >
+            <option value="">Ticket de Financiamento</option>
+            <option value="50k">&lt; R$ 250k (Pre-Seed/Seed)</option>
+            <option value="250k">R$ 250k - R$ 1M (Growth)</option>
+            <option value="1m">&gt; R$ 1M (Corporate VC)</option>
+          </select>
+
+          <label htmlFor="ictFilter" className="flex items-center gap-2 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300 cursor-pointer hover:border-indigo-500 transition duration-200">
+            <input 
+              type="checkbox" 
+              id="ictFilter" 
+              checked={!!filters.onlyIctVerified}
+              onChange={e => setFilters({ ...filters, onlyIctVerified: e.target.checked })}
+              className="w-4 h-4 text-indigo-600 rounded border-slate-700 bg-slate-950 focus:ring-indigo-500 focus:ring-offset-0" 
+            />
+            <span className="flex items-center gap-1.5 font-semibold">
+              <ShieldCheck className="w-4 h-4 text-emerald-400"/> Somente ICT Verified
+            </span>
+          </label>
 
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <span>{t("explore.minScore")}:</span>

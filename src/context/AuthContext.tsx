@@ -21,6 +21,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   setImpersonatedUid: (uid: string | null) => void;
   impersonatingAdminId: string | null;
+  simulatedRole: string | null;
+  setSimulatedRole: (role: string | null) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -30,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [impersonatedUid, setImpersonatedUid] = useState<string | null>(null);
+  const [simulatedRole, setSimulatedRole] = useState<string | null>(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
@@ -57,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } else {
         setUserProfile(null);
+        setSimulatedRole(null);
       }
       setLoading(false);
     });
@@ -129,17 +133,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ? new Proxy(user, { get: (target, prop) => prop === 'uid' ? impersonatedUid : target[prop as keyof User] }) 
     : user;
 
+  const actingUserProfile = userProfile && simulatedRole
+    ? { ...userProfile, role: simulatedRole }
+    : userProfile;
+
   return (
     <AuthContext.Provider value={{ 
       user: actingUser, 
-      userProfile, 
+      userProfile: actingUserProfile, 
       loading, 
       login, 
       signUp, 
       loginWithGoogle, 
       logout,
       setImpersonatedUid,
-      impersonatingAdminId: impersonatedUid && user ? user.uid : null
+      impersonatingAdminId: impersonatedUid && user ? user.uid : null,
+      simulatedRole,
+      setSimulatedRole
     }}>
       {children}
     </AuthContext.Provider>

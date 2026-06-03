@@ -40,6 +40,7 @@ export function CompanyDashboard() {
   const [smartPrompt, setSmartPrompt] = useState<{ dealId: string, message: string, action: string } | null>(null);
   const [trlFilter, setTrlFilter] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'radar'>('overview');
+  const [activeMobileColumn, setActiveMobileColumn] = useState<DealStatus>('triagem');
 
   const isPremium = userProfile?.subscriptionStatus === 'premium';
 
@@ -240,18 +241,49 @@ export function CompanyDashboard() {
           )}
 
           {/* Kanban Board */}
+          {deals.length > 0 && (
+            <div className="flex sm:hidden overflow-x-auto gap-2 pb-3 mb-2 custom-scrollbar">
+              {COLUMNS.map(col => {
+                const count = deals.filter(d => d.status === col.id).length;
+                const title = t(`dashboard.investor.funnelColumns.${col.id}`);
+                const isActive = activeMobileColumn === col.id;
+                
+                return (
+                  <button
+                    key={col.id}
+                    onClick={() => setActiveMobileColumn(col.id)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap border transition-all cursor-pointer ${
+                      isActive
+                        ? "bg-indigo-600/20 border-indigo-500/35 text-indigo-400 shadow-lg"
+                        : "bg-slate-900/50 border-slate-800 text-slate-500 hover:text-slate-350"
+                    }`}
+                  >
+                    {title} ({count})
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           <div className="overflow-x-auto pb-4 custom-scrollbar">
             {deals.length === 0 ? (
               <div className="h-64 bg-slate-900/30 border border-slate-800 rounded-2xl flex items-center justify-center">
                 <EmptyState icon={LayoutGrid} title={t("dashboard.investor.emptyTitle")} description={t("dashboard.investor.emptyDesc")} ctaLabel={t("dashboard.investor.emptyCta")} ctaLink="/explore" />
               </div>
             ) : (
-              <div className="flex gap-6 min-w-max">
+              <div className="flex flex-col sm:flex-row gap-6 min-w-full sm:min-w-max">
                 {COLUMNS.map(column => {
                   const columnDeals = deals.filter(d => d.status === column.id);
                   const columnTitle = t(`dashboard.investor.funnelColumns.${column.id}`);
+                  const isVisibleOnMobile = activeMobileColumn === column.id;
+
                   return (
-                    <div key={column.id} className={`w-80 flex flex-col rounded-2xl border ${column.color} p-4`}>
+                    <div 
+                      key={column.id} 
+                      className={`w-full sm:w-80 flex flex-col rounded-2xl border ${column.color} p-4 ${
+                        isVisibleOnMobile ? "flex" : "hidden sm:flex"
+                      }`}
+                    >
                       <div className="flex items-center justify-between mb-4">
                         <h3 className="font-bold text-slate-200 text-sm">{columnTitle}</h3>
                         <span className="bg-slate-900/50 text-slate-400 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-700/50">{columnDeals.length}</span>

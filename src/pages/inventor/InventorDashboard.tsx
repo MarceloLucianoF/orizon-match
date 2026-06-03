@@ -198,8 +198,8 @@ export function InventorDashboard() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
-          <div className="lg:col-span-2 space-y-4 md:space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 min-w-0">
+          <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0 overflow-hidden">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <StatsCard 
                 label={t("dashboard.inventor.views")} 
@@ -303,7 +303,7 @@ export function InventorDashboard() {
             </div>
           </div>
 
-          <div className="space-y-4 md:space-y-6">
+          <div className="space-y-4 md:space-y-6 min-w-0 overflow-hidden">
             <MarketTrendsChart title={t("dashboard.inventor.marketTrends")} />
 
             <div className="bg-gradient-to-br from-indigo-900/40 to-cyan-900/20 border border-indigo-500/30 rounded-2xl p-5 md:p-6 relative overflow-hidden">

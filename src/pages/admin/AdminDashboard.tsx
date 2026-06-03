@@ -13,7 +13,7 @@ import {
   LayoutDashboard
 } from "lucide-react";
 import { exportEcosystemReport } from "../../services/reportService";
-import { collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { collection, query, orderBy, limit, getDocs, doc, setDoc, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { StatsCard } from "../../components/analytics/StatsCard";
 import { 
@@ -29,9 +29,17 @@ export function AdminDashboard() {
   const [deals, setDeals] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  // Match Simulator State
+  const [simProject, setSimProject] = useState("");
+  const [simUser, setSimUser] = useState("");
+  const [simScore, setSimScore] = useState(90);
+  const [simFullFlow, setSimFullFlow] = useState(true);
+  const [simulating, setSimulating] = useState(false);
   
   const { setImpersonatedUid } = useAuth();
   const navigate = useNavigate();
@@ -49,6 +57,9 @@ export function AdminDashboard() {
       setMetrics(m);
       setDeals(d);
       setUsers(u);
+
+      const projSnap = await getDocs(collection(db, "projects"));
+      setProjects(projSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
       const logsQ = query(collection(db, "logs_ai"), orderBy("timestamp", "desc"), limit(20));
       const logsSnap = await getDocs(logsQ);
@@ -505,6 +516,183 @@ export function AdminDashboard() {
     </div>
   );
 
+  const handleCreateSimulation = async () => {
+    if (!simProject || !simUser) {
+      alert("Por favor, selecione um projeto e um usuário-alvo.");
+      return;
+    }
+    setSimulating(true);
+    try {
+      const selectedProj = projects.find(p => p.id === simProject);
+      const selectedUser = users.find(u => u.id === simUser);
+
+      if (!selectedProj || !selectedUser) return;
+
+      const matchId = `match_${simProject}_${simUser}`;
+      const matchRef = doc(db, "matches", matchId);
+
+      // Create Match
+      await setDoc(matchRef, {
+        id: matchId,
+        ownerProjectId: simProject,
+        ownerProjectTitle: selectedProj.title || "Projeto Orizon",
+        targetUserId: simUser,
+        targetRole: selectedUser.role,
+        targetSegment: selectedUser.segment || selectedUser.segments?.[0] || "Deep Tech",
+        score: simScore,
+        status: simFullFlow ? "negotiation" : "new",
+        createdAt: serverTimestamp(),
+        breakdown: {
+          segment: 30,
+          maturity: 20,
+          readiness: 15,
+          needs: 15,
+          location: 10
+        }
+      });
+
+      // If full flow requested, create conversation and initial messages
+      if (simFullFlow) {
+        const convRef = doc(db, "conversations", matchId);
+        await setDoc(convRef, {
+          projectId: simProject,
+          organizationId: simUser,
+          matchId: matchId,
+          participants: [selectedProj.userId || "inventor_rafael", simUser],
+          stage: "negotiation",
+          status: "active",
+          initiatorId: selectedProj.userId || "inventor_rafael",
+          updatedAt: serverTimestamp(),
+          projectTitle: selectedProj.title || "Projeto Orizon",
+          unreadCount: {
+            [selectedProj.userId || "inventor_rafael"]: 0,
+            [simUser]: 0
+          },
+          lastMessage: "Olá! Vimos o selo ICT Verified no seu projeto e gostaríamos de iniciar a análise de Due Diligence."
+        });
+
+        // Add initial system message
+        await addDoc(collection(db, "messages"), {
+          conversationId: matchId,
+          senderId: "system",
+          text: "Interesse demonstrado. O Deal Flow foi iniciado na etapa de Negociação Ativa (Match Simulado).",
+          type: "system",
+          createdAt: serverTimestamp(),
+          isSystem: true
+        });
+
+        // Add user message
+        await addDoc(collection(db, "messages"), {
+          conversationId: matchId,
+          senderId: simUser,
+          text: "Olá! Vimos o selo ICT Verified no seu projeto e gostaríamos de iniciar a análise de Due Diligence.",
+          type: "text",
+          createdAt: serverTimestamp()
+        });
+      }
+
+      alert("Match simulado com sucesso!");
+      loadData();
+    } catch (err: any) {
+      console.error(err);
+      alert("Erro ao simular match: " + err.message);
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  const renderSimulator = () => (
+    <div className="bg-[#0A0514] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6 max-w-2xl mx-auto animate-in fade-in duration-500">
+      <div>
+        <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+          <ServerCog className="text-fuchsia-500 animate-spin" size={22} /> Simulador de Match ("Demo Maker")
+        </h2>
+        <p className="text-xs text-slate-400 mt-1">Gere matches e fluxos de negociação (CRM/Chat) fictícios para testar a plataforma instantaneamente.</p>
+      </div>
+
+      <div className="space-y-4">
+        {/* Project Selector */}
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">1. Selecionar Projeto (Inventor/ICT)</label>
+          <select
+            value={simProject}
+            onChange={e => setSimProject(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-fuchsia-500"
+          >
+            <option value="">-- Escolha um Projeto --</option>
+            {projects.map(p => (
+              <option key={p.id} value={p.id}>
+                {p.title} (TRL {p.maturity || p.declaredTRL || 1} - {p.segment})
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* User Selector */}
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">2. Selecionar Empresa / Vendedor (Destino)</label>
+          <select
+            value={simUser}
+            onChange={e => setSimUser(e.target.value)}
+            className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-fuchsia-500"
+          >
+            <option value="">-- Escolha uma Empresa/Investidor --</option>
+            {users
+              .filter(u => u.role === 'industry' || u.role === 'investor')
+              .map(u => (
+                <option key={u.id} value={u.id}>
+                  {u.name} ({u.role?.toUpperCase()} - {u.segment || "Deep Tech"})
+                </option>
+              ))}
+          </select>
+        </div>
+
+        {/* Score Slider */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
+            <span>3. Afinidade (Match Score)</span>
+            <span className="text-fuchsia-400">{simScore}% FIT</span>
+          </div>
+          <input
+            type="range"
+            min="60"
+            max="100"
+            step="1"
+            value={simScore}
+            onChange={e => setSimScore(Number(e.target.value))}
+            className="w-full accent-fuchsia-500"
+          />
+        </div>
+
+        {/* Full Flow Switch */}
+        <div className="flex items-center gap-3 p-3 bg-slate-950 rounded-xl border border-slate-800">
+          <input
+            type="checkbox"
+            id="simFullFlow"
+            checked={simFullFlow}
+            onChange={e => setSimFullFlow(e.target.checked)}
+            className="w-5 h-5 text-fuchsia-500 rounded border-slate-750 focus:ring-fuchsia-500 bg-slate-900"
+          />
+          <label htmlFor="simFullFlow" className="text-xs font-bold text-slate-350 cursor-pointer select-none">
+            Simular Fluxo Completo (Criar Chat & Conversas no CRM)
+          </label>
+        </div>
+
+        <button
+          onClick={handleCreateSimulation}
+          disabled={simulating}
+          className="w-full py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold text-sm uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(217,70,239,0.3)] flex items-center justify-center gap-2 cursor-pointer"
+        >
+          {simulating ? (
+            <Loader2 className="animate-spin" size={20} />
+          ) : (
+            <>Simular & Forçar Match</>
+          )}
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <div className="space-y-6 pb-12 font-sans animate-in fade-in duration-700">
       
@@ -565,6 +753,7 @@ export function AdminDashboard() {
           { id: 'users', label: t("dashboard.admin.tabs.users"), icon: Users },
           { id: 'deals', label: t("dashboard.admin.tabs.deals"), icon: Activity },
           { id: 'logs', label: t("dashboard.admin.tabs.logs"), icon: FileSearch },
+          { id: 'simulator', label: "Simulador de Match", icon: ServerCog },
         ].map(tab => (
           <button
             key={tab.id}
@@ -587,6 +776,7 @@ export function AdminDashboard() {
         {activeTab === 'users' && renderUsers()}
         {activeTab === 'deals' && renderDeals()}
         {activeTab === 'logs' && renderLogs()}
+        {activeTab === 'simulator' && renderSimulator()}
       </div>
 
       {showCreateModal && (

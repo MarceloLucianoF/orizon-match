@@ -1,4 +1,4 @@
-import { LayoutDashboard, FolderKanban, Users, LogOut, MessageSquare, Building2, ShieldAlert, Gavel, Compass, X } from "lucide-react";
+import { LayoutDashboard, FolderKanban, Users, LogOut, MessageSquare, Building2, ShieldAlert, Gavel, Compass, X, ServerCog } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { SUPER_ADMIN_UID } from "../services/adminService";
@@ -10,20 +10,49 @@ interface SidebarProps {
 
 export function Sidebar({ onClose }: SidebarProps) {
   const { pathname } = useLocation();
-  const { logout, user, userProfile } = useAuth();
+  const { logout, user, userProfile, simulatedRole, setSimulatedRole } = useAuth();
   const { t } = useTranslation();
-  const isAdmin = userProfile?.role === 'admin' || user?.uid === SUPER_ADMIN_UID;
+  
+  const isActualAdmin = user?.uid === SUPER_ADMIN_UID;
+  const currentRole = userProfile?.role || 'inventor';
 
+  // Define sidebar links dynamically per role
+  let links: { to: string; icon: any; label: string }[] = [];
 
-  const links = [
-    { to: "/dashboard", icon: LayoutDashboard, label: t("sidebar.dashboard") },
-    { to: "/projects", icon: FolderKanban, label: t("sidebar.projects") },
-    { to: "/assets", icon: Gavel, label: t("sidebar.assets") },
-    { to: "/explore", icon: Compass, label: t("sidebar.explore") },
-    { to: "/matches", icon: Users, label: t("sidebar.matches") },
-    { to: "/chat", icon: MessageSquare, label: t("sidebar.dealflow") },
-    { to: "/profile", icon: Building2, label: t("sidebar.profile") },
-  ];
+  if (currentRole === 'admin') {
+    links = [
+      { to: "/admin", icon: ShieldAlert, label: t("sidebar.adminpanel") || "Painel Admin" },
+    ];
+  } else if (currentRole === 'ict') {
+    links = [
+      { to: "/dashboard", icon: LayoutDashboard, label: "Polo Dashboard" },
+      { to: "/projects", icon: FolderKanban, label: "Portfólio do Polo" },
+      { to: "/assets", icon: Gavel, label: "Patentes & PI" },
+      { to: "/explore", icon: Compass, label: "Explorar Radar" },
+      { to: "/matches", icon: Users, label: "Matches" },
+      { to: "/chat", icon: MessageSquare, label: "Mensagens" },
+      { to: "/profile", icon: Building2, label: "Perfil do Polo" },
+    ];
+  } else if (currentRole === 'investor' || currentRole === 'industry') {
+    links = [
+      { to: "/dashboard", icon: LayoutDashboard, label: "CRM Pipeline" },
+      { to: "/explore", icon: Compass, label: "Explorar Radar" },
+      { to: "/matches", icon: Users, label: "Matches" },
+      { to: "/chat", icon: MessageSquare, label: "Negociações" },
+      { to: "/profile", icon: Building2, label: "Perfil Corporativo" },
+    ];
+  } else {
+    // Default (inventor)
+    links = [
+      { to: "/dashboard", icon: LayoutDashboard, label: t("sidebar.dashboard") },
+      { to: "/projects", icon: FolderKanban, label: t("sidebar.projects") },
+      { to: "/assets", icon: Gavel, label: t("sidebar.assets") },
+      { to: "/explore", icon: Compass, label: t("sidebar.explore") },
+      { to: "/matches", icon: Users, label: t("sidebar.matches") },
+      { to: "/chat", icon: MessageSquare, label: t("sidebar.dealflow") },
+      { to: "/profile", icon: Building2, label: t("sidebar.profile") },
+    ];
+  }
 
   const handleLinkClick = () => {
     if (onClose) onClose();
@@ -46,6 +75,29 @@ export function Sidebar({ onClose }: SidebarProps) {
       </div>
 
       <nav className="flex-1 p-4 overflow-y-auto custom-scrollbar">
+        {/* Visualization Switcher for Admins */}
+        {isActualAdmin && (
+          <div className="mb-6 px-3">
+            <p className="text-[10px] font-bold text-fuchsia-500 uppercase tracking-widest mb-2 flex items-center gap-2">
+              <ServerCog size={12} className="animate-spin" /> Modo de Visualização
+            </p>
+            <select
+              value={simulatedRole || "admin"}
+              onChange={(e) => {
+                const selected = e.target.value;
+                setSimulatedRole(selected === "admin" ? null : selected);
+              }}
+              className="w-full bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-lg p-2 outline-none focus:border-fuchsia-500 transition-all font-semibold"
+            >
+              <option value="admin">Administrador (Padrão)</option>
+              <option value="inventor">Inventor</option>
+              <option value="ict">ICT / NIT</option>
+              <option value="investor">Investidor (VC)</option>
+              <option value="industry">Indústria</option>
+            </select>
+          </div>
+        )}
+
         {/* User Workspace */}
         <div className="mb-6">
           <p className="px-3 text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">{t("sidebar.workspace")}</p>
@@ -73,8 +125,8 @@ export function Sidebar({ onClose }: SidebarProps) {
           </div>
         </div>
 
-        {/* Admin Workspace */}
-        {isAdmin && (
+        {/* Admin Workspace fallback/quick link */}
+        {isActualAdmin && currentRole !== 'admin' && (
           <div className="pt-4 border-t border-slate-800">
             <p className="px-3 text-[10px] font-bold text-fuchsia-500 uppercase tracking-widest mb-2 flex items-center gap-2">
               <ShieldAlert size={12} className="animate-pulse" /> {t("sidebar.admin")}
