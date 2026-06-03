@@ -110,17 +110,15 @@ service cloud.firestore {
     match /audit_logs/{logId} {
       // Users can read their own logs; Admins can read all.
       allow read: if request.auth != null && (isAdmin() || request.auth.uid == resource.data.actorId);
-      // Only authenticated users can write audit logs.
-      allow create: if request.auth != null;
-      // Immutable: logs cannot be modified or deleted.
-      allow update, delete: if false;
+      // Immutable & System-only: logs cannot be created, modified or deleted by client-side.
+      allow write: if false;
     }
 
     match /activity_events/{eventId} {
       // Anyone logged in can read the activity timeline.
       allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update, delete: if isAdmin();
+      // Immutable & System-only: events cannot be created, modified or deleted by client-side.
+      allow write: if false;
     }
 
     match /domain_events/{eventId} {

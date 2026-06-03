@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.adminDeleteUser = exports.adminCreateUser = exports.generateProjectReport = exports.stripeWebhook = exports.createPortalSession = exports.createCheckoutSession = exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
+exports.onDomainEventCreated = exports.adminDeleteUser = exports.adminCreateUser = exports.generateProjectReport = exports.stripeWebhook = exports.createPortalSession = exports.createCheckoutSession = exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
 const functions = __importStar(require("firebase-functions/v1"));
 const admin = __importStar(require("firebase-admin"));
 const match_service_1 = require("./services/match.service");
@@ -507,6 +507,61 @@ exports.adminDeleteUser = functions.region("southamerica-east1").https.onRequest
     catch (error) {
         console.error("Error deleting user:", error);
         res.status(500).json({ error: { message: error.message || "Erro ao deletar usuário." } });
+    }
+});
+exports.onDomainEventCreated = functions.region("southamerica-east1").firestore
+    .document("domain_events/{eventId}")
+    .onCreate(async (snap) => {
+    var _a, _b, _c, _d, _e;
+    const event = snap.data();
+    if (!event)
+        return;
+    const eventType = event.eventType || "";
+    const payload = event.payload || {};
+    try {
+        if (eventType.startsWith("audit.")) {
+            const action = eventType.replace("audit.", "");
+            await db.collection("audit_logs").add({
+                action,
+                actorId: ((_a = payload.actor) === null || _a === void 0 ? void 0 : _a.uid) || "",
+                actorName: ((_b = payload.actor) === null || _b === void 0 ? void 0 : _b.name) || ((_c = payload.actor) === null || _c === void 0 ? void 0 : _c.email) || "Usuário",
+                actorEmail: ((_d = payload.actor) === null || _d === void 0 ? void 0 : _d.email) || "",
+                actorRole: ((_e = payload.actor) === null || _e === void 0 ? void 0 : _e.role) || "unknown",
+                projectId: payload.projectId || null,
+                projectTitle: payload.projectTitle || null,
+                before: payload.before || null,
+                after: payload.after || null,
+                ipAddress: payload.ipAddress || "127.0.0.1",
+                userAgent: payload.userAgent || "",
+                sessionId: payload.sessionId || "",
+                correlationId: payload.correlationId || "corr_global",
+                timestamp: admin.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        else if (eventType.startsWith("activity.")) {
+            const activityType = eventType.replace("activity.", "");
+            await db.collection("activity_events").add({
+                eventType: activityType,
+                actorName: payload.actorName || "Sistema",
+                projectId: payload.projectId || null,
+                projectTitle: payload.projectTitle || null,
+                metadata: payload.metadata || {},
+                correlationId: payload.correlationId || "corr_global",
+                timestamp: admin.firestore.FieldValue.serverTimestamp()
+            });
+        }
+        await snap.ref.update({
+            processedStatus: "processed",
+            processedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+    }
+    catch (err) {
+        console.error("Error processing domain event:", err);
+        await snap.ref.update({
+            processedStatus: "error",
+            error: err.message || "Unknown error",
+            processedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
     }
 });
 //# sourceMappingURL=index.js.map

@@ -32,7 +32,23 @@ function getSessionId(): string {
 }
 
 /**
- * Registra um log de auditoria imutável (Event Sourcing Light)
+ * Gera um ID de correlação global para tracing de um fluxo
+ */
+export function getCorrelationId(projectId: string | null, userId: string | null): string {
+  if (projectId && userId) {
+    return `corr_${userId}_${projectId}`;
+  }
+  if (projectId) {
+    return `corr_project_${projectId}`;
+  }
+  if (userId) {
+    return `corr_user_${userId}`;
+  }
+  return "corr_global";
+}
+
+/**
+ * Registra um log de auditoria imutável (Event Sourcing Light) enviando ao Event Bus
  */
 export async function logAudit(
   actor: ActorInfo,
@@ -45,30 +61,26 @@ export async function logAudit(
   try {
     const ipAddress = await getClientIp();
     const sessionId = getSessionId();
+    const correlationId = getCorrelationId(projectId, actor.uid);
     
-    await addDoc(collection(db, "audit_logs"), {
-      action,
-      actorId: actor.uid,
-      actorName: actor.name || actor.email || "Usuário",
-      actorEmail: actor.email || "",
-      actorRole: actor.role || "unknown",
-      projectId: projectId || null,
-      projectTitle: projectTitle || null,
-      before: before || null,
-      after: after || null,
+    await dispatchDomainEvent("audit." + action, {
+      actor,
+      projectId,
+      projectTitle,
+      before,
+      after,
       ipAddress,
       userAgent: navigator.userAgent,
       sessionId,
-      timestamp: serverTimestamp()
+      correlationId
     });
-    console.log(`[AUDIT LOG] Action: ${action} by user ${actor.uid}`);
   } catch (err) {
-    console.error("Erro ao gravar log de auditoria:", err);
+    console.error("Erro ao gravar log de auditoria via Event Bus:", err);
   }
 }
 
 /**
- * Registra um evento operacional para alimentar o feed da timeline
+ * Registra um evento operacional para timeline enviando ao Event Bus
  */
 export async function logActivity(
   eventType: string,
@@ -78,22 +90,27 @@ export async function logActivity(
   metadata: any = {}
 ) {
   try {
-    await addDoc(collection(db, "activity_events"), {
-      eventType,
+    const ipAddress = await getClientIp();
+    const sessionId = getSessionId();
+    const correlationId = getCorrelationId(projectId, null);
+    
+    await dispatchDomainEvent("activity." + eventType, {
       actorName,
-      projectId: projectId || null,
-      projectTitle: projectTitle || null,
+      projectId,
+      projectTitle,
       metadata,
-      timestamp: serverTimestamp()
+      ipAddress,
+      userAgent: navigator.userAgent,
+      sessionId,
+      correlationId
     });
-    console.log(`[ACTIVITY EVENT] ${eventType} recorded.`);
   } catch (err) {
-    console.error("Erro ao gravar evento de atividade:", err);
+    console.error("Erro ao gravar evento de atividade via Event Bus:", err);
   }
 }
 
 /**
- * Despacha um evento de domínio para integrações, notificações e IA
+ * Despacha um evento de domínio para o Event Bus no Firestore
  */
 export async function dispatchDomainEvent(
   eventType: string,

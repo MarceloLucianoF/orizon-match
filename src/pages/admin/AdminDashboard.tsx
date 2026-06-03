@@ -844,6 +844,12 @@ export function AdminDashboard() {
                               <span className="font-mono text-[10px] text-slate-500 truncate max-w-[120px]" title={log.sessionId}>{log.sessionId.slice(0, 15)}...</span>
                             </div>
                           )}
+                          {log.correlationId && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-emerald-500">Tracking:</span>
+                              <span className="font-mono text-[10px] text-emerald-550 truncate max-w-[120px]" title={log.correlationId}>{log.correlationId}</span>
+                            </div>
+                          )}
                         </div>
                       </td>
                       <td className="p-4 max-w-sm">

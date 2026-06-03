@@ -548,3 +548,61 @@ export const adminDeleteUser = functions.region("southamerica-east1").https.onRe
     res.status(500).json({ error: { message: error.message || "Erro ao deletar usuário." } });
   }
 });
+
+export const onDomainEventCreated = functions.region("southamerica-east1").firestore
+  .document("domain_events/{eventId}")
+  .onCreate(async (snap) => {
+    const event = snap.data();
+    if (!event) return;
+
+    const eventType = event.eventType || "";
+    const payload = event.payload || {};
+    
+    try {
+      if (eventType.startsWith("audit.")) {
+        const action = eventType.replace("audit.", "");
+        
+        await db.collection("audit_logs").add({
+          action,
+          actorId: payload.actor?.uid || "",
+          actorName: payload.actor?.name || payload.actor?.email || "Usuário",
+          actorEmail: payload.actor?.email || "",
+          actorRole: payload.actor?.role || "unknown",
+          projectId: payload.projectId || null,
+          projectTitle: payload.projectTitle || null,
+          before: payload.before || null,
+          after: payload.after || null,
+          ipAddress: payload.ipAddress || "127.0.0.1",
+          userAgent: payload.userAgent || "",
+          sessionId: payload.sessionId || "",
+          correlationId: payload.correlationId || "corr_global",
+          timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      } else if (eventType.startsWith("activity.")) {
+        const activityType = eventType.replace("activity.", "");
+        
+        await db.collection("activity_events").add({
+          eventType: activityType,
+          actorName: payload.actorName || "Sistema",
+          projectId: payload.projectId || null,
+          projectTitle: payload.projectTitle || null,
+          metadata: payload.metadata || {},
+          correlationId: payload.correlationId || "corr_global",
+          timestamp: admin.firestore.FieldValue.serverTimestamp()
+        });
+      }
+      
+      await snap.ref.update({
+        processedStatus: "processed",
+        processedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (err: any) {
+      console.error("Error processing domain event:", err);
+      await snap.ref.update({
+        processedStatus: "error",
+        error: err.message || "Unknown error",
+        processedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+    }
+  });
+

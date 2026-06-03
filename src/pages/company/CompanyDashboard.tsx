@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { Loader2, AlertCircle, Filter, TrendingUp, LayoutGrid, Target, Zap, Briefcase } from "lucide-react";
+import { 
+  Loader2, AlertCircle, Filter, TrendingUp, LayoutGrid, Target, Zap, Briefcase,
+  User, Calendar, DollarSign, CheckSquare, Edit, X as XIcon, Save
+} from "lucide-react";
 import { EmptyState } from "../../components/EmptyState";
 import { StatsCard } from "../../components/analytics/StatsCard";
 import { 
@@ -31,6 +34,10 @@ interface Deal {
   ownerUserId?: string;
   nextActionDate?: string;
   probability?: number;
+  ownerName?: string;
+  estimatedValue?: number;
+  expectedCloseDate?: string;
+  nextAction?: string;
 }
 
 const COLUMNS: { id: DealStatus; title: string; color: string }[] = [
@@ -55,6 +62,13 @@ export function CompanyDashboard() {
   const [trlFilter, setTrlFilter] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'radar'>('overview');
   const [activeMobileColumn, setActiveMobileColumn] = useState<DealStatus>('descoberta');
+  
+  const [editingDealId, setEditingDealId] = useState<string | null>(null);
+  const [editOwnerName, setEditOwnerName] = useState("");
+  const [editEstimatedValue, setEditEstimatedValue] = useState(0);
+  const [editExpectedCloseDate, setEditExpectedCloseDate] = useState("");
+  const [editProbability, setEditProbability] = useState(10);
+  const [editNextAction, setEditNextAction] = useState("");
 
   const isPremium = userProfile?.subscriptionStatus === 'premium';
 
@@ -81,16 +95,62 @@ export function CompanyDashboard() {
           companyId: data.companyId,
           ownerUserId: data.ownerUserId,
           nextActionDate: data.nextActionDate,
-          probability: data.probability
+          probability: data.probability !== undefined ? data.probability : 10,
+          ownerName: data.ownerName || 'Marcelo Filho',
+          estimatedValue: data.estimatedValue !== undefined ? data.estimatedValue : 500000,
+          expectedCloseDate: data.expectedCloseDate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          nextAction: data.nextAction || 'Agendar reunião de triagem'
         } as Deal;
       });
 
       if (list.length === 0) {
         // Seed default deals if empty
         const defaultDeals = [
-          { id: `${user.uid}_p1`, projectId: 'p1', projectName: 'Nova Liga Metálica P/ Auto', stage: 'descoberta', score: 92, lastUpdate: 'Há 2 horas', companyId: user.uid, probability: 10, ownerUserId: 'inventor_rafael' },
-          { id: `${user.uid}_p2`, projectId: 'p2', projectName: 'Sensor IoT Agrícola', stage: 'avaliacao', score: 85, lastUpdate: 'Há 1 dia', companyId: user.uid, probability: 40, ownerUserId: 'inventor_rafael' },
-          { id: `${user.uid}_p3`, projectId: 'p3', projectName: 'Plataforma de IA Jurídica', stage: 'due_diligence', score: 88, lastUpdate: 'Há 3 dias', companyId: user.uid, probability: 60, ownerUserId: 'inventor_rafael' },
+          { 
+            id: `${user.uid}_p1`, 
+            projectId: 'p1', 
+            projectName: 'Nova Liga Metálica P/ Auto', 
+            stage: 'descoberta', 
+            score: 92, 
+            lastUpdate: 'Há 2 horas', 
+            companyId: user.uid, 
+            probability: 10, 
+            ownerUserId: 'inventor_rafael',
+            ownerName: 'Marcelo Filho',
+            estimatedValue: 250000,
+            expectedCloseDate: '2026-08-15',
+            nextAction: 'Agendar reunião de triagem'
+          },
+          { 
+            id: `${user.uid}_p2`, 
+            projectId: 'p2', 
+            projectName: 'Sensor IoT Agrícola', 
+            stage: 'avaliacao', 
+            score: 85, 
+            lastUpdate: 'Há 1 dia', 
+            companyId: user.uid, 
+            probability: 40, 
+            ownerUserId: 'inventor_rafael',
+            ownerName: 'Ana Costa',
+            estimatedValue: 120000,
+            expectedCloseDate: '2026-09-30',
+            nextAction: 'Apresentar ao conselho de P&D'
+          },
+          { 
+            id: `${user.uid}_p3`, 
+            projectId: 'p3', 
+            projectName: 'Plataforma de IA Jurídica', 
+            stage: 'due_diligence', 
+            score: 88, 
+            lastUpdate: 'Há 3 dias', 
+            companyId: user.uid, 
+            probability: 60, 
+            ownerUserId: 'inventor_rafael',
+            ownerName: 'Carlos Silva',
+            estimatedValue: 450000,
+            expectedCloseDate: '2026-11-20',
+            nextAction: 'Revisar relatório de Due Diligence'
+          },
         ];
         
         try {
@@ -178,6 +238,61 @@ export function CompanyDashboard() {
     } catch (err) {
       console.error("Erro ao mover deal:", err);
       alert("Erro ao mover o deal.");
+    }
+  };
+
+  const updateDealCRM = async (
+    dealId: string, 
+    fields: { ownerName?: string; estimatedValue?: number; expectedCloseDate?: string; probability?: number; nextAction?: string }
+  ) => {
+    if (!user || !userProfile) return;
+
+    const dealDocRef = doc(db, "deals", dealId);
+    try {
+      const dealDoc = await getDoc(dealDocRef);
+      if (!dealDoc.exists()) return;
+
+      const beforeData = dealDoc.data();
+
+      await updateDoc(dealDocRef, {
+        ...fields,
+        lastUpdate: 'Atualizado agora',
+        updatedAt: serverTimestamp()
+      });
+
+      // Auditing
+      const actor = {
+        uid: user.uid,
+        name: userProfile.name || user.displayName || user.email || "Usuário",
+        email: user.email || "",
+        role: userProfile.role || "industry"
+      };
+
+      await logAudit(
+        actor,
+        "deal.crm.update",
+        beforeData.projectId,
+        beforeData.projectName,
+        {
+          ownerName: beforeData.ownerName || "Sem Responsável",
+          estimatedValue: beforeData.estimatedValue || 0,
+          expectedCloseDate: beforeData.expectedCloseDate || "",
+          probability: beforeData.probability || 10,
+          nextAction: beforeData.nextAction || "Nenhuma ação cadastrada"
+        },
+        {
+          ownerName: fields.ownerName !== undefined ? fields.ownerName : (beforeData.ownerName || "Sem Responsável"),
+          estimatedValue: fields.estimatedValue !== undefined ? fields.estimatedValue : (beforeData.estimatedValue || 0),
+          expectedCloseDate: fields.expectedCloseDate !== undefined ? fields.expectedCloseDate : (beforeData.expectedCloseDate || ""),
+          probability: fields.probability !== undefined ? fields.probability : (beforeData.probability || 10),
+          nextAction: fields.nextAction !== undefined ? fields.nextAction : (beforeData.nextAction || "Nenhuma ação cadastrada")
+        }
+      );
+      
+      setEditingDealId(null);
+    } catch (err) {
+      console.error("Erro ao atualizar campos do CRM:", err);
+      alert("Erro ao salvar alterações no CRM.");
     }
   };
 
@@ -400,28 +515,171 @@ export function CompanyDashboard() {
                         <span className="bg-slate-900/50 text-slate-400 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-700/50">{columnDeals.length}</span>
                       </div>
                       <div className="space-y-3">
-                        {columnDeals.map(deal => (
-                          <div key={deal.id} className="bg-slate-900 border border-slate-700/80 rounded-xl p-4 hover:border-indigo-500/50 transition-all shadow-lg">
-                            <div className="flex justify-between items-start mb-2">
-                              <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
-                                {t("dashboard.investor.fitLabel", { score: deal.score })}
-                              </span>
-                              <span className="text-[10px] text-slate-500">{deal.lastUpdate}</span>
+                        {columnDeals.map(deal => {
+                          const isEditing = editingDealId === deal.id;
+
+                          if (isEditing) {
+                            return (
+                              <div key={deal.id} className="bg-slate-900 border border-indigo-500/50 rounded-xl p-4 transition-all shadow-xl space-y-3">
+                                <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Editar CRM</div>
+                                
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-400 font-bold block uppercase">Responsável</label>
+                                  <input 
+                                    type="text" 
+                                    value={editOwnerName} 
+                                    onChange={e => setEditOwnerName(e.target.value)}
+                                    className="bg-slate-950 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                  />
+                                </div>
+
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-400 font-bold block uppercase">Valor Estimado (R$)</label>
+                                  <input 
+                                    type="number" 
+                                    value={editEstimatedValue} 
+                                    onChange={e => setEditEstimatedValue(Number(e.target.value))}
+                                    className="bg-slate-955 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                  />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div className="space-y-1">
+                                    <label className="text-[10px] text-slate-400 font-bold block uppercase">Probabilidade (%)</label>
+                                    <input 
+                                      type="number" 
+                                      min="0" 
+                                      max="100" 
+                                      value={editProbability} 
+                                      onChange={e => setEditProbability(Number(e.target.value))}
+                                      className="bg-slate-955 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                    />
+                                  </div>
+                                  <div className="space-y-1">
+                                    <label className="text-[10px] text-slate-400 font-bold block uppercase">Data Prevista</label>
+                                    <input 
+                                      type="date" 
+                                      value={editExpectedCloseDate} 
+                                      onChange={e => setEditExpectedCloseDate(e.target.value)}
+                                      className="bg-slate-955 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                    />
+                                  </div>
+                                </div>
+
+                                <div className="space-y-1">
+                                  <label className="text-[10px] text-slate-400 font-bold block uppercase">Próxima Ação</label>
+                                  <input 
+                                    type="text" 
+                                    value={editNextAction} 
+                                    onChange={e => setEditNextAction(e.target.value)}
+                                    className="bg-slate-955 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                  />
+                                </div>
+
+                                <div className="flex gap-2 justify-end pt-2 border-t border-slate-800">
+                                  <button 
+                                    onClick={() => setEditingDealId(null)} 
+                                    className="px-2.5 py-1.5 rounded text-[10px] font-bold text-slate-450 hover:text-slate-200 transition-colors flex items-center gap-1 cursor-pointer"
+                                  >
+                                    <XIcon size={12} /> Cancelar
+                                  </button>
+                                  <button 
+                                    onClick={() => updateDealCRM(deal.id, {
+                                      ownerName: editOwnerName,
+                                      estimatedValue: editEstimatedValue,
+                                      expectedCloseDate: editExpectedCloseDate,
+                                      probability: editProbability,
+                                      nextAction: editNextAction
+                                    })}
+                                    className="bg-indigo-650 hover:bg-indigo-600 px-3 py-1.5 rounded text-[10px] font-bold text-white transition-colors flex items-center gap-1 shadow-md shadow-indigo-600/20 cursor-pointer"
+                                  >
+                                    <Save size={12} /> Salvar
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <div key={deal.id} className="bg-slate-900 border border-slate-700/80 rounded-xl p-4 hover:border-indigo-500/50 transition-all shadow-lg flex flex-col gap-3 group relative">
+                              {/* Edit Button overlay on hover */}
+                              <button 
+                                onClick={() => {
+                                  setEditingDealId(deal.id);
+                                  setEditOwnerName(deal.ownerName || "Marcelo Filho");
+                                  setEditEstimatedValue(deal.estimatedValue || 500000);
+                                  setEditExpectedCloseDate(deal.expectedCloseDate || "");
+                                  setEditProbability(deal.probability !== undefined ? deal.probability : 10);
+                                  setEditNextAction(deal.nextAction || "Agendar reunião de triagem");
+                                }}
+                                className="absolute top-3 right-3 p-1.5 rounded bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                title="Editar CRM"
+                              >
+                                <Edit size={12} />
+                              </button>
+
+                              <div className="flex justify-between items-start">
+                                <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                                  {t("dashboard.investor.fitLabel", { score: deal.score })}
+                                </span>
+                                <span className="text-[10px] text-slate-550 pr-6 group-hover:pr-0 transition-all">{deal.lastUpdate}</span>
+                              </div>
+
+                              <div>
+                                <h4 className="font-bold text-slate-200 text-sm leading-tight">{deal.projectName}</h4>
+                              </div>
+
+                              {/* CRM Metric grid */}
+                              <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 pt-2.5 border-t border-slate-800/60 text-[10px]">
+                                <div className="flex items-center gap-1 text-slate-400">
+                                  <DollarSign size={11} className="text-emerald-500" />
+                                  <span className="font-semibold text-slate-200">
+                                    {deal.estimatedValue ? `R$ ${deal.estimatedValue.toLocaleString("pt-BR")}` : "R$ 500.000"}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1 text-slate-400 justify-end">
+                                  <TrendingUp size={11} className="text-indigo-400" />
+                                  <span className="font-bold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
+                                    {deal.probability !== undefined ? deal.probability : 10}%
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1 text-slate-400">
+                                  <User size={11} className="text-slate-500" />
+                                  <span className="truncate max-w-[80px]" title={deal.ownerName || "Marcelo Filho"}>
+                                    {deal.ownerName || "Marcelo Filho"}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1 text-slate-400 justify-end">
+                                  <Calendar size={11} className="text-slate-500" />
+                                  <span>{deal.expectedCloseDate || "Sem data"}</span>
+                                </div>
+                              </div>
+
+                              {/* Next action callout */}
+                              <div className="bg-slate-950/60 border border-slate-850/80 rounded-lg p-2 flex items-start gap-1.5">
+                                <CheckSquare size={11} className="text-amber-500 mt-0.5 flex-shrink-0" />
+                                <div className="flex flex-col text-[10px]">
+                                  <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">Próxima Ação</span>
+                                  <span className="text-slate-350 leading-tight truncate max-w-[170px]" title={deal.nextAction || "Agendar reunião de triagem"}>
+                                    {deal.nextAction || "Agendar reunião de triagem"}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <select 
+                                className="bg-slate-955 border border-slate-700 text-[11px] text-slate-350 rounded p-1.5 w-full outline-none focus:border-indigo-500 mt-1 cursor-pointer transition-all hover:bg-slate-800 hover:text-slate-200"
+                                value={deal.status}
+                                onChange={(e) => moveDeal(deal.id, e.target.value as DealStatus)}
+                              >
+                                {COLUMNS.map(c => (
+                                  <option key={c.id} value={c.id} className="bg-slate-950 text-slate-300">
+                                    {t("dashboard.investor.moveOption", { col: t(`dashboard.investor.funnelColumns.${c.id}`) })}
+                                  </option>
+                                ))}
+                              </select>
                             </div>
-                            <h4 className="font-bold text-slate-200 text-sm mb-3">{deal.projectName}</h4>
-                            <select 
-                              className="bg-slate-955 border border-slate-700 text-[11px] text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
-                              value={deal.status}
-                              onChange={(e) => moveDeal(deal.id, e.target.value as DealStatus)}
-                            >
-                              {COLUMNS.map(c => (
-                                <option key={c.id} value={c.id} className="bg-slate-950 text-slate-300">
-                                  {t("dashboard.investor.moveOption", { col: t(`dashboard.investor.funnelColumns.${c.id}`) })}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   );

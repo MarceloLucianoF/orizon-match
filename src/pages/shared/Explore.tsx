@@ -68,7 +68,11 @@ export function Explore() {
         lastUpdate: "Adicionado agora",
         updatedAt: serverTimestamp(),
         probability: 10,
-        ownerUserId: project.userId || ""
+        ownerUserId: project.userId || "",
+        ownerName: userProfile.name || "Marcelo Filho",
+        estimatedValue: 500000,
+        expectedCloseDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+        nextAction: "Agendar reunião de triagem"
       };
 
       await setDoc(dealRef, newDeal);
