@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Shield, CheckCircle2, Loader2 } from "lucide-react";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useAuth } from "../hooks/useAuth";
 
@@ -19,15 +19,18 @@ export function SecureNDA({ projectId, projectTitle, onAccept }: SecureNDAProps)
     if (!user) return;
     setLoading(true);
     try {
-      // Registrar o aceite do investidor (Clickwrap)
-      await addDoc(collection(db, 'ndas'), {
+      // Registrar o aceite do investidor (Clickwrap) na colecao correta e com ID previsivel
+      const ndaId = `${user.uid}_${projectId}`;
+      await setDoc(doc(db, 'signed_ndas', ndaId), {
         projectId,
         projectTitle,
         investorId: user.uid,
-        investorName: user.displayName || user.email,
-        investorEmail: user.email,
+        investorName: user.displayName || user.email || "Investidor",
+        investorEmail: user.email || "",
         acceptedAt: serverTimestamp(),
-        status: 'active'
+        signedAt: serverTimestamp(), // Compatibilidade com ndaService
+        status: 'active',
+        version: "1.0-smart-clickwrap"
       });
       
       setAccepted(true);

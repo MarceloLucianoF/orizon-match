@@ -23,6 +23,7 @@ interface AuthContextType {
   impersonatingAdminId: string | null;
   simulatedRole: string | null;
   setSimulatedRole: (role: string | null) => void;
+  isActualAdmin: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,6 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setUserProfile(null);
         setSimulatedRole(null);
+        setImpersonatedUid(null);
       }
       setLoading(false);
     });
@@ -71,6 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Effect to handle Impersonation
   useEffect(() => {
     async function loadImpersonatedProfile() {
+      const originalUser = auth.currentUser;
       if (impersonatedUid) {
         try {
           const userDoc = await getDoc(doc(db, "users", impersonatedUid));
@@ -80,10 +83,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } catch (error) {
           console.error("Error fetching impersonated profile:", error);
         }
-      } else if (user) {
+      } else if (originalUser) {
         // Reset to original profile
         try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
+          const userDoc = await getDoc(doc(db, "users", originalUser.uid));
           if (userDoc.exists()) {
             setUserProfile(userDoc.data());
           }
@@ -91,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     loadImpersonatedProfile();
-  }, [impersonatedUid, user]);
+  }, [impersonatedUid]);
 
   const login = async (email: string, pass: string) => {
     await signInWithEmailAndPassword(auth, email, pass);
@@ -129,13 +132,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const actingUser = user && impersonatedUid 
-    ? new Proxy(user, { get: (target, prop) => prop === 'uid' ? impersonatedUid : target[prop as keyof User] }) 
-    : user;
+  // Automatically sync simulatedRole with impersonatedUid mappings
+  const handleSetSimulatedRole = (role: string | null) => {
+    setSimulatedRole(role);
+    if (!role || role === 'admin') {
+      setImpersonatedUid(null);
+    } else {
+      const mapping: Record<string, string> = {
+        'ict': 'ict_inatel',
+        'industry': 'comp_ericsson',
+        'investor': 'inv_kaszek',
+        'inventor': 'inventor_rafael',
+      };
+      setImpersonatedUid(mapping[role] || null);
+    }
+  };
+
+  const originalUser = user;
+  const actingUser = originalUser && impersonatedUid 
+    ? new Proxy(originalUser, {
+        get: (target, prop) => {
+          if (prop === 'uid') return impersonatedUid;
+          const value = target[prop as keyof User];
+          return typeof value === 'function' ? value.bind(target) : value;
+        }
+      }) 
+    : originalUser;
 
   const actingUserProfile = userProfile && simulatedRole
     ? { ...userProfile, role: simulatedRole }
     : userProfile;
+
+  // The actual logged-in user is admin
+  const isActualAdmin = auth.currentUser?.uid === "nqBV3Da1iqPbU46jGvO1ljBbIze2";
 
   return (
     <AuthContext.Provider value={{ 
@@ -147,13 +176,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       loginWithGoogle, 
       logout,
       setImpersonatedUid,
-      impersonatingAdminId: impersonatedUid && user ? user.uid : null,
+      impersonatingAdminId: impersonatedUid && originalUser ? originalUser.uid : null,
       simulatedRole,
-      setSimulatedRole
+      setSimulatedRole: handleSetSimulatedRole,
+      isActualAdmin
     }}>
       {children}
     </AuthContext.Provider>
   );
 }
+
+export { AuthContext };
 
 export { AuthContext };

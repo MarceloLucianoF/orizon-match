@@ -13,19 +13,33 @@ service cloud.firestore {
     // Qualquer autenticado pode ler perfis (necessario para matching e explore).
     // Apenas o proprio usuario ou admin pode editar.
     // -----------------------------------------------
-    // Duplicate match blocks for users and projects removed. Use the ones in PHASE D section below.
-
     // -----------------------------------------------
     // MATCHES
-    // Leitura: qualquer autenticado (necessario para explore e dashboard de matches).
-    // Criacao: qualquer autenticado (gerado pelo sistema ou funcoes).
-    // Update: qualquer autenticado (savedBy/ignoredBy via updateMatchAction).
+    // Leitura: apenas participantes do match, dono do projeto, empresa relacionada, ICT ou admin.
+    // Criacao: admin ou dono do projeto/empresa.
+    // Update: apenas participantes do match, dono do projeto ou admin.
     // Delete: apenas admin.
     // -----------------------------------------------
     match /matches/{matchId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null;
-      allow update: if request.auth != null;
+      allow read: if request.auth != null && (
+        request.auth.uid == resource.data.targetUserId ||
+        request.auth.uid == get(/databases/$(database)/documents/projects/$(resource.data.ownerProjectId)).data.userId ||
+        (get(/databases/$(database)/documents/projects/$(resource.data.ownerProjectId)).data.orgId != null && 
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(resource.data.ownerProjectId)).data.orgId)).data.managers) ||
+        (get(/databases/$(database)/documents/users/$(resource.data.targetUserId)).data.orgId != null && 
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/users/$(resource.data.targetUserId)).data.orgId)).data.managers) ||
+        isAdmin()
+      );
+      allow create: if request.auth != null && (
+        request.auth.uid == request.resource.data.targetUserId ||
+        request.auth.uid == get(/databases/$(database)/documents/projects/$(request.resource.data.ownerProjectId)).data.userId ||
+        isAdmin()
+      );
+      allow update: if request.auth != null && (
+        request.auth.uid == resource.data.targetUserId ||
+        request.auth.uid == get(/databases/$(database)/documents/projects/$(resource.data.ownerProjectId)).data.userId ||
+        isAdmin()
+      );
       allow delete: if isAdmin();
     }
 
@@ -83,6 +97,14 @@ service cloud.firestore {
     }
 
     // -----------------------------------------------
+    // BILLING EVENTS (Stripe webhook idempotency)
+    // -----------------------------------------------
+    match /billing_events/{eventId} {
+      allow read: if isAdmin();
+      allow write: if request.auth != null || isAdmin();
+    }
+
+    // -----------------------------------------------
     // NOTIFICATIONS
     // -----------------------------------------------
     match /notifications/{notificationId} {
@@ -119,6 +141,66 @@ service cloud.firestore {
         isAdmin() ||
         (resource.data.orgId != null && request.auth.uid in get(/databases/$(database)/documents/organizations/$(resource.data.orgId)).data.managers)
       );
+
+      // Subcollection: private/details
+      match /private/details {
+        allow read: if request.auth != null && (
+          request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
+          isAdmin() ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionStatus == 'premium' ||
+          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionStatus == 'enterprise' ||
+          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid + "_" + projectId)) ||
+          (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
+           request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
+        );
+        allow write: if request.auth != null && (
+          request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
+          isAdmin() ||
+          (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
+           request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
+        );
+      }
+
+      // Subcollection: vdr_files
+      match /vdr_files/{fileId} {
+        allow read: if request.auth != null && (
+          resource.data.accessLevel == 'public' ||
+          request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
+          isAdmin() ||
+          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid + "_" + projectId)) ||
+          (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
+           request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
+        );
+        allow write: if request.auth != null && (
+          request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
+          isAdmin() ||
+          (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
+           request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
+        );
+      }
+
+      // Subcollection: vdr_logs
+      match /vdr_logs/{logId} {
+        allow read: if request.auth != null && (
+          request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
+          isAdmin() ||
+          (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
+           request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
+        );
+        allow create: if request.auth != null;
+        allow update, delete: if isAdmin();
+      }
+
+      // Subcollection: due_diligence
+      match /due_diligence/{itemId} {
+        allow read, write: if request.auth != null && (
+          request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
+          isAdmin() ||
+          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid + "_" + projectId)) ||
+          (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
+           request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
+        );
+      }
     }
 
     match /assets_ip/{assetId} {
@@ -138,7 +220,9 @@ service cloud.firestore {
         isAdmin() ||
         (resource.data.orgId != null && request.auth.uid in get(/databases/$(database)/documents/organizations/$(resource.data.orgId)).data.managers)
       );
-      allow create: if request.auth != null && (request.auth.uid == request.resource.data.investorId || isAdmin());
+      allow create: if request.auth != null && 
+                    (request.auth.uid == request.resource.data.investorId || isAdmin()) &&
+                    ndaId == (request.resource.data.investorId + "_" + request.resource.data.projectId);
     }
   }
 }

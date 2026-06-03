@@ -98,11 +98,7 @@ export default function OrganizationDashboard() {
   const [royaltyRate, setRoyaltyRate] = useState(3.5);
   const [allowExclusive, setAllowExclusive] = useState(true);
   const [isConfigSaving, setIsConfigSaving] = useState(false);
-  const [activePatents] = useState([
-    { id: 1, title: "Topologia de Circuito RF de Baixa Latência para Gateway 5G", inpi: "BR 10 2024 001234 5", trl: 6, status: "licensingAvailable" },
-    { id: 2, title: "Sistema de Roteamento Dinâmico em Redes Mesh LTE", inpi: "BR 10 2023 008910 2", trl: 5, status: "licensingActive" },
-    { id: 3, title: "Algoritmo de Detecção de Intrusão Baseado em Assinaturas de Sinal", inpi: "BR 10 2025 000456 1", trl: 4, status: "licensingAvailable" }
-  ]);
+  const [activePatents, setActivePatents] = useState<any[]>([]);
 
   const handleSaveConfig = () => {
     setIsConfigSaving(true);
@@ -178,6 +174,16 @@ export default function OrganizationDashboard() {
         
         const assetsQuery = query(collection(db, "assets_ip"), where("orgId", "==", orgId));
         const assetsSnap = await getDocs(assetsQuery);
+        const loadedAssets = assetsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (loadedAssets.length > 0) {
+          setActivePatents(loadedAssets);
+        } else {
+          setActivePatents([
+            { id: "as_1", title: "Topologia de Circuito RF de Baixa Latência para Gateway 5G", inpi: "BR 10 2024 001234 5", trl: 6, status: "licensingAvailable" },
+            { id: "as_2", title: "Sistema de Roteamento Dinâmico em Redes Mesh LTE", inpi: "BR 10 2023 008910 2", trl: 5, status: "licensingActive" },
+            { id: "as_3", title: "Algoritmo de Detecção de Intrusão Baseado em Assinaturas de Sinal", inpi: "BR 10 2025 000456 1", trl: 4, status: "licensingAvailable" }
+          ]);
+        }
 
         // Get unique inventors
         const inventorIds = new Set(projectsSnap.docs.map(d => d.data().userId));
@@ -193,8 +199,15 @@ export default function OrganizationDashboard() {
           activeMatches: matchesSnap.size || 12
         });
 
-        // Load recent projects
-        setRecentProjects(projectsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        // Load recent projects with their match counts calculated dynamically
+        const matchesList = matchesSnap.docs.map(doc => doc.data());
+        const projectsWithMatches = projectsSnap.docs.map(d => {
+          const data = d.data();
+          const pId = d.id;
+          const count = matchesList.filter((m: any) => m.ownerProjectId === pId).length;
+          return { id: pId, ...data, matchesCount: count };
+        });
+        setRecentProjects(projectsWithMatches);
 
         // Load challenges
         const challengesSnap = await getDocs(collection(db, "challenges"));
@@ -307,7 +320,7 @@ export default function OrganizationDashboard() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Column: Validation Pipeline & Demand Feed */}
+            {/* Left Column: Validation Pipeline, Portfolio & Demand Feed */}
             <div className="lg:col-span-2 space-y-8">
               
               {/* Pipeline de Validação Técnica (Ação Exclusiva da ICT) */}
@@ -356,6 +369,60 @@ export default function OrganizationDashboard() {
                 </div>
               </div>
 
+              {/* Portfólio de Projetos Homologados (Ativos) */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <CheckCircle2 className="text-emerald-400" size={22} /> Portfólio de Projetos Homologados
+                  </h2>
+                  <span className="text-[9px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded border border-emerald-500/20 font-bold uppercase">
+                    Em Produção
+                  </span>
+                </div>
+                
+                <div className="space-y-4">
+                  {recentProjects.filter(p => p.isIctVerified).length === 0 ? (
+                    <div className="p-8 text-center bg-slate-900/20 border border-slate-800 rounded-3xl">
+                      <p className="text-slate-500 text-sm">Nenhum projeto homologado ainda.</p>
+                    </div>
+                  ) : (
+                    recentProjects.filter(p => p.isIctVerified).map(proj => (
+                      <div key={proj.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-all group">
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-white text-sm group-hover:text-indigo-400 transition-colors">{proj.title}</h4>
+                            <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] px-2 py-0.5 rounded font-black uppercase">
+                              TRL {proj.validatedTRL || proj.declaredTRL || 5} Validado
+                            </span>
+                            {proj.vdrStatus && (
+                              <span className={`w-2 h-2 rounded-full ${
+                                proj.vdrStatus === 'green' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' :
+                                proj.vdrStatus === 'yellow' ? 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]' :
+                                'bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.6)]'
+                              }`} title={`VDR Status: ${proj.vdrStatus}`} />
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-400 leading-relaxed max-w-xl line-clamp-2">{proj.summary}</p>
+                          <div className="flex flex-wrap gap-4 text-[10px] text-slate-500 mt-2">
+                            <span>Inventor: <strong className="text-slate-300">{proj.researcher || "Prof. Dr. Rafael Silva"}</strong></span>
+                            <span>•</span>
+                            <span>Segmento: <strong className="text-slate-300">{proj.segment}</strong></span>
+                            <span>•</span>
+                            <span>Patente: <strong className="text-slate-300">{proj.patentStatus || "Concedida"}</strong></span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 self-end sm:self-auto">
+                          <div className="text-right">
+                            <span className="text-xs font-bold text-indigo-400 block">{proj.matchesCount || 0} Matches</span>
+                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Inteligência Ativa</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
               {/* Radar de Demanda (O que a Indústria quer comprar?) */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -391,9 +458,52 @@ export default function OrganizationDashboard() {
 
             </div>
 
-            {/* Right Column: Labs Occupancy & Segment Analytics */}
+            {/* Right Column: Insights, Fomento, Labs Occupancy & Segment Analytics */}
             <div className="space-y-8">
               
+              {/* Card de Insights do Polo */}
+              <div className="bg-gradient-to-br from-indigo-650 to-violet-850 p-6 rounded-3xl shadow-xl shadow-indigo-600/10 space-y-4 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[30px] rounded-full -mr-16 -mt-16 group-hover:bg-white/10 transition-all duration-500" />
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200">
+                  <Zap size={14} className="animate-pulse" /> Insight de Alta Conversão
+                </div>
+                <h3 className="font-extrabold text-white text-base leading-tight">Match de Alta Conversão Detectado</h3>
+                <p className="text-indigo-100/80 text-xs leading-relaxed">
+                  Há 5 grandes empresas buscando por "Conectividade 5G e IoT" este mês. Seu polo possui 2 projetos compatíveis em TRL 6/7.
+                </p>
+                <button 
+                  onClick={() => alert("Alerta disparado! Os inventores correspondentes foram notificados para atualizar o VDR.")}
+                  className="w-full py-2.5 bg-white text-indigo-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-lg shadow-indigo-950/20"
+                >
+                  Ativar Notificação de Massa
+                </button>
+              </div>
+
+              {/* Métricas de Fomento do Polo */}
+              <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Orçamento Alocado por Linha</span>
+                  <span className="text-[9px] bg-slate-950 text-indigo-400 px-2 py-0.5 rounded border border-slate-850 font-bold">Consumo 2026</span>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    { label: "Unidade EMBRAPII", percent: 65, color: "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]" },
+                    { label: "FINEP Subvenção", percent: 40, color: "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" },
+                    { label: "FAPEMIG/ANEEL Inova", percent: 85, color: "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" },
+                  ].map(bar => (
+                    <div key={bar.label} className="space-y-1.5">
+                      <div className="flex justify-between text-[11px] font-bold">
+                        <span className="text-slate-300">{bar.label}</span>
+                        <span className="text-slate-400 font-mono">{bar.percent}%</span>
+                      </div>
+                      <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-850">
+                        <div className={`${bar.color} h-full rounded-full transition-all duration-1000`} style={{ width: `${bar.percent}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Vitrine de Infraestrutura e Laboratórios */}
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
