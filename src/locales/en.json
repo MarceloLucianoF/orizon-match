@@ -172,11 +172,15 @@
       "geoSub": "Mapping Industrial Clusters and ICTs",
       "premiumActive": "Premium Active",
       "funnelColumns": {
-        "triagem": "Initial Screening",
+        "descoberta": "Discovery",
+        "interesse": "Interest",
+        "nda": "NDA",
         "avaliacao": "Technical Analysis",
         "due_diligence": "Due Diligence",
-        "negociacao": "Active Negotiation",
-        "fechado": "Closed Deal"
+        "comite": "Committee",
+        "negociacao": "Negotiation",
+        "contrato": "Contract",
+        "encerrado": "Closed / Archived"
       },
       "smartPrompts": {
         "dueDiligence": "Project moved to Due Diligence. Would you like to send the Orizon standard NDA template to the Inventor?",

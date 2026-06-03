@@ -7,6 +7,7 @@ import { doc, collection, onSnapshot, setDoc, updateDoc, getDocs } from "firebas
 import { db } from "../firebase/config";
 import { useAuth } from "../hooks/useAuth";
 import { notifyStakeholdersOnVdrCompletion } from "../services/notificationService";
+import { logAudit, logActivity } from "../services/governanceService";
 
 interface ChecklistItem {
   id: string;
@@ -127,6 +128,31 @@ export function DueDiligenceChecklist({ projectId, projectTitle }: { projectId?:
         dueDiligenceProgress: nextProgress,
         isVdrReady: nextIsVdrReady
       });
+
+      // 3. Registrar na Governança
+      const actor = {
+        uid: user.uid,
+        name: user.displayName || user.email || 'Membro do Time',
+        email: user.email || '',
+        role: 'inventor'
+      };
+
+      await logAudit(
+        actor,
+        "project.due_diligence.toggle",
+        projectId,
+        projectTitle || "Projeto",
+        { itemId, label: toggledItem.label, isCompleted: toggledItem.isCompleted },
+        { itemId, label: toggledItem.label, isCompleted: nextIsCompleted }
+      );
+
+      await logActivity(
+        "project.due_diligence.updated",
+        actor.name,
+        projectId,
+        projectTitle || "Projeto",
+        { itemId, label: toggledItem.label, isCompleted: nextIsCompleted }
+      );
     } catch (err) {
       console.error("Erro ao atualizar item do checklist:", err);
       // Revert optimistic update on failure

@@ -5,6 +5,7 @@ import {
   collection, query, where, getDocs, 
   doc, getDoc, updateDoc 
 } from "firebase/firestore";
+import { logAudit, logActivity, dispatchDomainEvent } from "../services/governanceService";
 
 export interface Stats {
   totalProjects: number;
@@ -112,11 +113,57 @@ export function useOrganizationDashboard() {
   const handleValidateTRL = async (projectId: string, declaredTRL: number) => {
     try {
       const projRef = doc(db, "projects", projectId);
+      
+      // 1. Buscar estado atual para auditoria de mudanca (Event Sourcing)
+      const projSnap = await getDoc(projRef);
+      let previousTRL = 1;
+      let projectTitle = "Projeto";
+      if (projSnap.exists()) {
+        const data = projSnap.data();
+        previousTRL = data.validatedTRL || data.declaredTRL || data.maturity || 1;
+        projectTitle = data.title || "Projeto";
+      }
+
+      // 2. Realizar atualizacao
       await updateDoc(projRef, {
         isIctVerified: true,
         validatedTRL: declaredTRL,
         vdrStatus: "green"
       });
+
+      // 3. Registrar na Governança
+      const actor = {
+        uid: user?.uid || "",
+        name: org?.name || user?.displayName || user?.email || "ICT Manager",
+        email: user?.email || "",
+        role: "ict"
+      };
+
+      await logAudit(
+        actor,
+        "project.trl.update",
+        projectId,
+        projectTitle,
+        { trl: previousTRL },
+        { trl: declaredTRL }
+      );
+
+      await logActivity(
+        "project.trl.validated",
+        actor.name,
+        projectId,
+        projectTitle,
+        { previousTRL, newTRL: declaredTRL }
+      );
+
+      await dispatchDomainEvent("project.trl.validated", {
+        projectId,
+        projectTitle,
+        previousTRL,
+        newTRL: declaredTRL,
+        ictId: user?.uid || ""
+      });
+
       setRecentProjects(prev => 
         prev.map(p => p.id === projectId ? { ...p, isIctVerified: true, validatedTRL: declaredTRL, vdrStatus: "green" } : p)
       );

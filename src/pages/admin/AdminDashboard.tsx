@@ -7,7 +7,7 @@ import {
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { 
-  ShieldAlert, Activity, Users, FolderKanban, Network, 
+  ShieldAlert, ShieldCheck, Activity, Users, FolderKanban, Network, 
   Zap, Loader2, ServerCog, CheckCircle, FileSearch,
   Download, TrendingUp, Globe, PieChart, BarChart3,
   LayoutDashboard
@@ -33,6 +33,10 @@ export function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [isEngineRunning, setIsEngineRunning] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [complianceLogs, setComplianceLogs] = useState<any[]>([]);
+  const [loadingCompliance, setLoadingCompliance] = useState(false);
+  const [filterAction, setFilterAction] = useState("");
+  const [filterActor, setFilterActor] = useState("");
 
   // Match Simulator State
   const [simProject, setSimProject] = useState("");
@@ -74,6 +78,33 @@ export function AdminDashboard() {
   useEffect(() => {
     loadData();
   }, []);
+
+  const loadComplianceLogs = async () => {
+    setLoadingCompliance(true);
+    try {
+      const q = query(
+        collection(db, "audit_logs"),
+        orderBy("timestamp", "desc"),
+        limit(100)
+      );
+      const snapshot = await getDocs(q);
+      const data = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      setComplianceLogs(data);
+    } catch (error) {
+      console.error("Erro ao carregar logs de compliance:", error);
+    } finally {
+      setLoadingCompliance(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "compliance") {
+      loadComplianceLogs();
+    }
+  }, [activeTab]);
 
   const handleToggleVerification = async (userId: string, currentStatus: boolean) => {
     try {
@@ -443,19 +474,19 @@ export function AdminDashboard() {
                 <tr key={deal.id} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
                   <td className="p-4">
                     <div className="flex flex-col">
-                       <span className="text-slate-200 font-bold">{deal.projectTitle || `Match ${deal.matchId?.slice(0,6)}`}</span>
+                       <span className="text-slate-200 font-bold">{deal.projectName || `Match ${deal.id?.slice(0,6)}`}</span>
                       <span className="text-[10px] text-slate-500 font-mono mt-1">Ref: {deal.id}</span>
                     </div>
                   </td>
                   <td className="p-4">
                     <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${
-                      deal.stage === 'closed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                      deal.stage === 'negotiation' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                      deal.stage === 'proposal' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                      deal.stage === 'contrato' || deal.stage === 'encerrado' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                      deal.stage === 'negociacao' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                      deal.stage === 'avaliacao' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
                       deal.stage === 'nda' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' :
                       'bg-slate-800 text-slate-400 border-slate-700'
                     }`}>
-                      {deal.stage}
+                      {deal.stage || deal.status}
                     </span>
                   </td>
                   <td className="p-4 text-right text-xs text-slate-400">
@@ -693,6 +724,159 @@ export function AdminDashboard() {
     </div>
   );
 
+  const renderCompliance = () => {
+    const filteredLogs = complianceLogs.filter(log => {
+      const matchAction = filterAction ? log.action?.toLowerCase().includes(filterAction.toLowerCase()) : true;
+      const matchActor = filterActor ? (
+        log.actorName?.toLowerCase().includes(filterActor.toLowerCase()) || 
+        log.actorEmail?.toLowerCase().includes(filterActor.toLowerCase()) ||
+        log.actorRole?.toLowerCase().includes(filterActor.toLowerCase())
+      ) : true;
+      return matchAction && matchActor;
+    });
+
+    return (
+      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="bg-[#0A0514] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                <ShieldCheck className="text-emerald-400 animate-pulse" size={22} /> Auditoria & Compliance Center
+              </h2>
+              <p className="text-xs text-slate-400 mt-1">Registros imutáveis de ações críticas e histórico jurídico (Event Sourcing).</p>
+            </div>
+            <button
+              onClick={loadComplianceLogs}
+              className="bg-slate-900 hover:bg-slate-805 text-slate-350 px-4 py-2 rounded-xl text-xs font-bold border border-slate-800 transition-all flex items-center gap-1.5"
+            >
+              {loadingCompliance ? <Loader2 className="animate-spin" size={14} /> : "Atualizar Logs"}
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-950/40 p-4 rounded-2xl border border-slate-800/80">
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Filtrar por Ação</label>
+              <input
+                type="text"
+                value={filterAction}
+                onChange={e => setFilterAction(e.target.value)}
+                placeholder="Ex: project.due_diligence.toggle, deal.created"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">Filtrar por Usuário (Nome, Email ou Role)</label>
+              <input
+                type="text"
+                value={filterActor}
+                onChange={e => setFilterActor(e.target.value)}
+                placeholder="Buscar ator..."
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-[#0A0514] border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+          {loadingCompliance ? (
+            <div className="flex justify-center items-center py-20">
+              <Loader2 className="animate-spin text-indigo-500" size={36} />
+            </div>
+          ) : filteredLogs.length === 0 ? (
+            <div className="p-12 text-center text-slate-550 italic">
+              Nenhum registro de auditoria encontrado com os filtros atuais.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider bg-slate-900/60">
+                    <th className="p-4 font-bold">{t("dashboard.admin.tableHeaders.dateTime")}</th>
+                    <th className="p-4 font-bold">Ação</th>
+                    <th className="p-4 font-bold">Ator (Usuário)</th>
+                    <th className="p-4 font-bold">Contexto</th>
+                    <th className="p-4 font-bold">Telemetria (IP/Sessão)</th>
+                    <th className="p-4 font-bold">Alterações (Diff)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/40 text-slate-300">
+                  {filteredLogs.map(log => (
+                    <tr key={log.id} className="hover:bg-slate-800/10 transition-colors">
+                      <td className="p-4 whitespace-nowrap text-slate-400">
+                        {log.timestamp?.seconds ? new Date(log.timestamp.seconds * 1000).toLocaleString() : "Recent"}
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider border ${
+                          log.action?.includes("toggle") ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
+                          log.action?.includes("create") ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
+                          log.action?.includes("update") ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" :
+                          "bg-slate-800 text-slate-400 border-slate-700"
+                        }`}>
+                          {log.action}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col">
+                          <span className="font-bold text-slate-200">{log.actorName}</span>
+                          <span className="text-[10px] text-slate-500 font-mono mt-0.5">{log.actorEmail}</span>
+                          <span className="text-[9px] text-slate-500 mt-1 uppercase font-bold tracking-tight">Role: {log.actorRole}</span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        {log.projectId ? (
+                          <div className="flex flex-col">
+                            <span className="font-bold text-slate-200">{log.projectTitle || "Sem Título"}</span>
+                            <span className="text-[9px] text-slate-500 font-mono mt-0.5">ID: {log.projectId}</span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-500 italic">Global</span>
+                        )}
+                      </td>
+                      <td className="p-4">
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-1">
+                            <span className="text-slate-450">IP:</span>
+                            <span className="font-mono text-indigo-400">{log.ipAddress || "127.0.0.1"}</span>
+                          </div>
+                          {log.sessionId && (
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] text-slate-500">Sessão:</span>
+                              <span className="font-mono text-[10px] text-slate-500 truncate max-w-[120px]" title={log.sessionId}>{log.sessionId.slice(0, 15)}...</span>
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                      <td className="p-4 max-w-sm">
+                        {log.before || log.after ? (
+                          <div className="space-y-1.5">
+                            {log.before && (
+                              <div className="bg-red-500/5 border border-red-500/10 rounded p-1.5">
+                                <span className="text-[9px] uppercase font-black tracking-widest text-red-400 block mb-0.5">Antes</span>
+                                <pre className="text-[10px] font-mono text-red-300 truncate max-w-full overflow-hidden">{JSON.stringify(log.before)}</pre>
+                              </div>
+                            )}
+                            {log.after && (
+                              <div className="bg-emerald-500/5 border border-emerald-500/10 rounded p-1.5">
+                                <span className="text-[9px] uppercase font-black tracking-widest text-emerald-400 block mb-0.5">Depois</span>
+                                <pre className="text-[10px] font-mono text-emerald-300 truncate max-w-full overflow-hidden">{JSON.stringify(log.after)}</pre>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-slate-500 italic">Sem payload</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="space-y-6 pb-12 font-sans animate-in fade-in duration-700">
       
@@ -753,6 +937,7 @@ export function AdminDashboard() {
           { id: 'users', label: t("dashboard.admin.tabs.users"), icon: Users },
           { id: 'deals', label: t("dashboard.admin.tabs.deals"), icon: Activity },
           { id: 'logs', label: t("dashboard.admin.tabs.logs"), icon: FileSearch },
+          { id: 'compliance', label: "Auditoria & Compliance", icon: ShieldCheck },
           { id: 'simulator', label: "Simulador de Match", icon: ServerCog },
         ].map(tab => (
           <button
@@ -776,6 +961,7 @@ export function AdminDashboard() {
         {activeTab === 'users' && renderUsers()}
         {activeTab === 'deals' && renderDeals()}
         {activeTab === 'logs' && renderLogs()}
+        {activeTab === 'compliance' && renderCompliance()}
         {activeTab === 'simulator' && renderSimulator()}
       </div>
 

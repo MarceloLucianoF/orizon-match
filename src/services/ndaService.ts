@@ -1,5 +1,6 @@
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
+import { logAudit, logActivity, dispatchDomainEvent } from "./governanceService";
 
 export interface NDASignRequest {
   investorId: string;
@@ -25,6 +26,37 @@ export async function signNDA(request: NDASignRequest) {
       signedAt: serverTimestamp(),
       version: "1.0-smart-clickwrap",
       status: "active"
+    });
+
+    // 2. Registro na camada de Governança
+    const actor = {
+      uid: request.investorId,
+      name: request.investorName,
+      email: "",
+      role: "investor"
+    };
+
+    await logAudit(
+      actor,
+      "nda.signed",
+      request.projectId,
+      request.projectTitle,
+      null,
+      { status: "active", version: "1.0-smart-clickwrap" }
+    );
+
+    await logActivity(
+      "nda.signed",
+      request.investorName,
+      request.projectId,
+      request.projectTitle,
+      { investorId: request.investorId }
+    );
+
+    await dispatchDomainEvent("nda.signed", {
+      investorId: request.investorId,
+      projectId: request.projectId,
+      projectTitle: request.projectTitle
     });
 
     return ndaId;

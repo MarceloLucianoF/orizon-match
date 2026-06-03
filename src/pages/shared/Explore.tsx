@@ -7,10 +7,14 @@ import { createOrGetConversation } from "../../services/chatService";
 import { explainMatch, getMatchTier, getScoreColor } from "../../lib/matching";
 import {
   Loader2, Search, Filter, Compass, ArrowRight, ShieldCheck,
-  SlidersHorizontal, X
+  SlidersHorizontal, X, CheckCircle
 } from "lucide-react";
 import { EmptyState } from "../../components/EmptyState";
 import { useTranslation } from "react-i18next";
+import { generateProjectAiBriefing } from "../../services/reportService";
+import { logAudit, logActivity } from "../../services/governanceService";
+import { collection, query, where, onSnapshot, doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../../firebase/config";
 
 const FIESC_CHAMBERS = [
   "Agroindústria", "Alimentos e Bebidas", "Bens de Capital",
@@ -24,6 +28,80 @@ export function Explore() {
   const { user, userProfile } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const isCorporate = userProfile?.role === 'industry' || userProfile?.role === 'investor' || userProfile?.role === 'admin';
+  const [dealIdsInPipeline, setDealIdsInPipeline] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!user || !isCorporate) return;
+
+    const q = query(collection(db, "deals"), where("companyId", "==", user.uid));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const ids = new Set<string>();
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.projectId) {
+          ids.add(data.projectId);
+        }
+      });
+      setDealIdsInPipeline(ids);
+    }, (error) => {
+      console.error("Erro ao escutar deals:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user, isCorporate]);
+
+  const handleAddToDealFlow = async (project: any) => {
+    if (!user || !userProfile) return;
+    try {
+      const dealId = `${user.uid}_${project.id}`;
+      const dealRef = doc(db, "deals", dealId);
+      
+      const newDeal = {
+        id: dealId,
+        projectId: project.id,
+        projectName: project.title || "Projeto Confidencial",
+        companyId: user.uid,
+        stage: "descoberta",
+        score: project.score || 70,
+        lastUpdate: "Adicionado agora",
+        updatedAt: serverTimestamp(),
+        probability: 10,
+        ownerUserId: project.userId || ""
+      };
+
+      await setDoc(dealRef, newDeal);
+
+      const actor = {
+        uid: user.uid,
+        name: userProfile.name || user.displayName || user.email || "Usuário",
+        email: user.email || "",
+        role: userProfile.role || "industry"
+      };
+
+      await logAudit(
+        actor,
+        "deal.created",
+        project.id,
+        project.title || "Projeto",
+        null,
+        newDeal
+      );
+
+      await logActivity(
+        "deal.created",
+        actor.name,
+        project.id,
+        project.title || "Projeto",
+        { stage: "descoberta" }
+      );
+
+    } catch (err) {
+      console.error("Erro ao adicionar projeto ao funil:", err);
+      alert("Erro ao adicionar projeto ao funil.");
+    }
+  };
   
   const [results, setResults] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +122,80 @@ export function Explore() {
 
   const [userProjects, setUserProjects] = useState<any[]>([]);
   const [reloadTrigger, setReloadTrigger] = useState(0);
+
+  // States and Handlers for AI Scouting Briefing (Virtual Analyst)
+  const [briefingProject, setBriefingProject] = useState<any | null>(null);
+  const [generatingBriefing, setGeneratingBriefing] = useState(false);
+  const [aiBriefingText, setAiBriefingText] = useState("");
+
+  const handleOpenBriefing = async (project: any) => {
+    setBriefingProject(project);
+    
+    // Log do inicio de leitura no Audit Trail
+    const actor = {
+      uid: user?.uid || "",
+      name: userProfile?.name || user?.displayName || user?.email || "Usuário",
+      email: user?.email || "",
+      role: userProfile?.role || "industry"
+    };
+
+    await logAudit(
+      actor,
+      "ai.scout.view",
+      project.id,
+      project.title || "Projeto",
+      null,
+      { action: "open_briefing" }
+    );
+
+    if (project.lastAiReport?.content) {
+      setAiBriefingText(project.lastAiReport.content);
+    } else {
+      setAiBriefingText("");
+    }
+  };
+
+  const handleTriggerBriefing = async () => {
+    if (!briefingProject) return;
+    setGeneratingBriefing(true);
+    try {
+      const content = await generateProjectAiBriefing(briefingProject.id);
+      
+      // Update local state and results list so it displays instantly
+      setAiBriefingText(content);
+      setResults(prev => prev.map(p => p.id === briefingProject.id ? {
+        ...p,
+        lastAiReport: {
+          content,
+          generatedAt: new Date(),
+          version: "1.0"
+        }
+      } : p));
+
+      // Log do trigger no Audit Trail
+      const actor = {
+        uid: user?.uid || "",
+        name: userProfile?.name || user?.displayName || user?.email || "Usuário",
+        email: user?.email || "",
+        role: userProfile?.role || "industry"
+      };
+
+      await logAudit(
+        actor,
+        "ai.scout.generate",
+        briefingProject.id,
+        briefingProject.title || "Projeto",
+        null,
+        { version: "1.0", poweredBy: "NVIDIA NIM (Llama 3.1)" }
+      );
+
+    } catch (err) {
+      console.error("Erro ao gerar briefing:", err);
+      alert("Falha ao gerar inteligência. Tente novamente em instantes.");
+    } finally {
+      setGeneratingBriefing(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -396,11 +548,11 @@ export function Explore() {
                 </div>
 
                 {/* Action */}
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 flex flex-col gap-2">
                   <button 
                     onClick={() => handleConnect(project)}
                     disabled={connecting === project.id || userProjects.length === 0}
-                    className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-800 disabled:text-slate-500 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.2)] w-full md:w-auto justify-center"
+                    className="bg-indigo-650 hover:bg-indigo-600 disabled:bg-slate-900 disabled:text-slate-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.2)] w-full md:w-auto justify-center"
                   >
                     {connecting === project.id ? (
                       <Loader2 className="animate-spin" size={16} />
@@ -408,6 +560,37 @@ export function Explore() {
                       <>{t("explore.startConnection")} <ArrowRight size={16} /></>
                     )}
                   </button>
+
+                  {isCorporate && (
+                    dealIdsInPipeline.has(project.id) ? (
+                      <div className="flex items-center justify-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-4 py-2 rounded-xl text-xs font-bold w-full md:w-auto">
+                        <CheckCircle size={14} />
+                        <span>No Pipeline</span>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleAddToDealFlow(project)}
+                        className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 w-full md:w-auto"
+                      >
+                        <span>➕ Pipeline</span>
+                      </button>
+                    )
+                  )}
+
+                  {(userProfile?.subscriptionStatus === 'premium' || 
+                    userProfile?.subscriptionStatus === 'enterprise' || 
+                    userProfile?.role === 'admin' ||
+                    userProfile?.role === 'ict' ||
+                    userProfile?.role === 'investor' ||
+                    userProfile?.role === 'industry') && (
+                    <button
+                      onClick={() => handleOpenBriefing(project)}
+                      className="bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(217,70,239,0.15)] w-full md:w-auto"
+                    >
+                      <span>✨ Analista IA</span>
+                    </button>
+                  )}
+
                   {userProjects.length === 0 && (
                     <p className="text-[10px] text-amber-400 mt-1 text-center">{t("explore.registerProjectFirst")}</p>
                   )}
@@ -429,6 +612,114 @@ export function Explore() {
           )}
         </div>
       )}
+      {/* AI Scouting Radar Virtual Analyst Briefing (Slide-Over / Modal) */}
+      {briefingProject && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="w-full max-w-2xl bg-slate-900 border-l border-slate-800 h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-300">
+            
+            {/* Header */}
+            <div className="p-6 border-b border-slate-800 bg-slate-900/90 flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-gradient-to-r from-fuchsia-500/10 to-indigo-500/10 text-fuchsia-400 border border-fuchsia-500/20">
+                  <Compass size={22} className="animate-pulse" />
+                </div>
+                <div>
+                  <h4 className="text-base font-bold text-white flex items-center gap-2">
+                    AI Scouting Briefing
+                    <span className="text-[9px] px-2 py-0.5 rounded bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 font-bold uppercase tracking-wider">
+                      Virtual Analyst
+                    </span>
+                  </h4>
+                  <p className="text-xs text-slate-500">Relatório Estratégico de Inovação Profunda</p>
+                </div>
+              </div>
+              <button 
+                onClick={() => setBriefingProject(null)}
+                className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-slate-950/20">
+              
+              {/* Project Abstract */}
+              <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 space-y-3">
+                <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Projeto Alvo</h5>
+                <h3 className="text-lg font-bold text-slate-100">{briefingProject.title}</h3>
+                <div className="flex flex-wrap gap-2 pt-1 text-[10px] font-bold">
+                  <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">
+                    Maturidade: TRL {briefingProject.declaredTRL || briefingProject.maturity || 1}
+                  </span>
+                  <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded">
+                    Fomento: {briefingProject.fomento || "N/A"}
+                  </span>
+                  <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-0.5 rounded">
+                    Região: {briefingProject.location?.region || "Sul"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Briefing body */}
+              {generatingBriefing ? (
+                <div className="py-20 flex flex-col items-center justify-center space-y-4">
+                  <Loader2 className="animate-spin text-fuchsia-500" size={40} />
+                  <div className="text-center space-y-1">
+                    <p className="text-sm font-bold text-slate-300 animate-pulse">Llama 3.1 Executando Prospecção...</p>
+                    <p className="text-xs text-slate-500">Mapeando TRL, market-fit, incentivos fiscais e SWOT com NVIDIA NIM.</p>
+                  </div>
+                </div>
+              ) : aiBriefingText ? (
+                <div className="prose prose-invert prose-xs max-w-none text-slate-300 leading-relaxed font-sans space-y-4">
+                  {aiBriefingText.split("\n").map((line, idx) => {
+                    if (line.trim().startsWith("### ")) {
+                      return <h4 key={idx} className="text-sm font-bold text-slate-200 mt-6 mb-2">{line.replace("### ", "")}</h4>;
+                    }
+                    if (line.trim().startsWith("## ")) {
+                      return <h3 key={idx} className="text-base font-bold text-indigo-400 mt-8 mb-3 border-b border-slate-800 pb-2">{line.replace("## ", "")}</h3>;
+                    }
+                    if (line.trim().startsWith("# ")) {
+                      return <h2 key={idx} className="text-lg font-bold text-white mt-10 mb-4">{line.replace("# ", "")}</h2>;
+                    }
+                    if (line.trim().startsWith("- ") || line.trim().startsWith("* ")) {
+                      return <li key={idx} className="ml-4 list-disc text-xs text-slate-400">{line.trim().substring(2)}</li>;
+                    }
+                    return <p key={idx} className="text-xs text-slate-400 leading-normal">{line}</p>;
+                  })}
+                </div>
+              ) : (
+                // Unprocessed / CTA to generate
+                <div className="border border-dashed border-slate-800 rounded-2xl p-10 text-center space-y-6 py-16 bg-slate-900/20">
+                  <div className="w-16 h-16 rounded-full bg-fuchsia-500/10 text-fuchsia-400 flex items-center justify-center mx-auto">
+                    <Compass size={28} className="animate-pulse" />
+                  </div>
+                  <div className="max-w-md mx-auto space-y-2">
+                    <h4 className="text-slate-200 font-bold">Relatório do Analista Virtual Não Gerado</h4>
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      Ainda não compilamos o briefing executivo inteligente para este ativo deep tech. Clique no botão abaixo para rodar o radar cognitivo.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleTriggerBriefing}
+                    className="bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white px-6 py-3 rounded-xl font-bold text-xs shadow-[0_0_20px_rgba(217,70,239,0.3)] transition-all"
+                  >
+                    Solicitar Briefing do Analista Virtual (NVIDIA NIM)
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 border-t border-slate-800 bg-slate-900/90 flex justify-between items-center text-[10px] text-slate-500 font-mono shrink-0">
+              <span>Powered by NVIDIA NIM & Llama 3.1</span>
+              <span>Classificação: Confidencial Enterprise</span>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

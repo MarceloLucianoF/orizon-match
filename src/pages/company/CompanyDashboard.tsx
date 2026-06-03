@@ -11,8 +11,14 @@ import { useNavigate } from "react-router-dom";
 import { ProRadarMap } from "../../components/analytics/ProRadarMap";
 import { LayoutDashboard, Map as MapIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { 
+  collection, query, where, onSnapshot, doc, 
+  setDoc, updateDoc, getDoc, serverTimestamp 
+} from "firebase/firestore";
+import { db } from "../../firebase/config";
+import { logAudit, logActivity } from "../../services/governanceService";
 
-type DealStatus = 'triagem' | 'avaliacao' | 'due_diligence' | 'negociacao' | 'fechado';
+type DealStatus = 'descoberta' | 'interesse' | 'nda' | 'avaliacao' | 'due_diligence' | 'comite' | 'negociacao' | 'contrato' | 'encerrado';
 
 interface Deal {
   id: string;
@@ -21,18 +27,26 @@ interface Deal {
   status: DealStatus;
   score: number;
   lastUpdate: string;
+  companyId: string;
+  ownerUserId?: string;
+  nextActionDate?: string;
+  probability?: number;
 }
 
 const COLUMNS: { id: DealStatus; title: string; color: string }[] = [
-  { id: 'triagem', title: 'Triagem Inicial', color: 'border-slate-700 bg-slate-800/30' },
-  { id: 'avaliacao', title: 'Análise Técnica', color: 'border-blue-500/30 bg-blue-500/10' },
+  { id: 'descoberta', title: 'Descoberta', color: 'border-slate-700 bg-slate-800/30' },
+  { id: 'interesse', title: 'Interesse', color: 'border-blue-500/30 bg-blue-500/10' },
+  { id: 'nda', title: 'NDA', color: 'border-cyan-500/30 bg-cyan-500/10' },
+  { id: 'avaliacao', title: 'Análise Técnica', color: 'border-indigo-500/30 bg-indigo-500/10' },
   { id: 'due_diligence', title: 'Due Diligence', color: 'border-amber-500/30 bg-amber-500/10' },
-  { id: 'negociacao', title: 'Negociação Ativa', color: 'border-purple-500/30 bg-purple-500/10' },
-  { id: 'fechado', title: 'Deal Fechado', color: 'border-emerald-500/30 bg-emerald-500/10' },
+  { id: 'comite', title: 'Comitê', color: 'border-fuchsia-500/30 bg-fuchsia-500/10' },
+  { id: 'negociacao', title: 'Negociação', color: 'border-purple-500/30 bg-purple-500/10' },
+  { id: 'contrato', title: 'Contrato', color: 'border-emerald-500/30 bg-emerald-500/10' },
+  { id: 'encerrado', title: 'Encerrado', color: 'border-rose-500/30 bg-rose-500/10' },
 ];
 
 export function CompanyDashboard() {
-  const { userProfile } = useAuth();
+  const { userProfile, user } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -40,7 +54,7 @@ export function CompanyDashboard() {
   const [smartPrompt, setSmartPrompt] = useState<{ dealId: string, message: string, action: string } | null>(null);
   const [trlFilter, setTrlFilter] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'radar'>('overview');
-  const [activeMobileColumn, setActiveMobileColumn] = useState<DealStatus>('triagem');
+  const [activeMobileColumn, setActiveMobileColumn] = useState<DealStatus>('descoberta');
 
   const isPremium = userProfile?.subscriptionStatus === 'premium';
 
@@ -49,34 +63,121 @@ export function CompanyDashboard() {
   };
 
   useEffect(() => {
-    // Dados demonstrativos do pipeline - em produção, busca da collection "deals"
-    setTimeout(() => {
-      setDeals([
-        { id: '1', projectId: 'p1', projectName: 'Nova Liga Metálica P/ Auto', status: 'triagem', score: 92, lastUpdate: 'Há 2 horas' },
-        { id: '2', projectId: 'p2', projectName: 'Sensor IoT Agrícola', status: 'avaliacao', score: 85, lastUpdate: 'Há 1 dia' },
-        { id: '3', projectId: 'p3', projectName: 'Plataforma de IA Jurídica', status: 'due_diligence', score: 88, lastUpdate: 'Há 3 dias' },
-      ]);
-      setLoading(false);
-    }, 800);
-  }, []);
+    if (!user) return;
 
-  const moveDeal = (dealId: string, newStatus: DealStatus) => {
-    setDeals(prev => prev.map(d => d.id === dealId ? { ...d, status: newStatus } : d));
+    setLoading(true);
+    const q = query(collection(db, "deals"), where("companyId", "==", user.uid));
     
-    if (newStatus === 'due_diligence') {
-      setSmartPrompt({
-        dealId,
-        message: t("dashboard.investor.smartPrompts.dueDiligence"),
-        action: t("dashboard.investor.smartPrompts.sendNda")
+    const unsubscribe = onSnapshot(q, async (snapshot) => {
+      let list = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          projectId: data.projectId,
+          projectName: data.projectName,
+          status: (data.stage || data.status) as DealStatus,
+          score: data.score || 85,
+          lastUpdate: data.lastUpdate || 'Há 1 dia',
+          companyId: data.companyId,
+          ownerUserId: data.ownerUserId,
+          nextActionDate: data.nextActionDate,
+          probability: data.probability
+        } as Deal;
       });
-    } else if (newStatus === 'negociacao') {
+
+      if (list.length === 0) {
+        // Seed default deals if empty
+        const defaultDeals = [
+          { id: `${user.uid}_p1`, projectId: 'p1', projectName: 'Nova Liga Metálica P/ Auto', stage: 'descoberta', score: 92, lastUpdate: 'Há 2 horas', companyId: user.uid, probability: 10, ownerUserId: 'inventor_rafael' },
+          { id: `${user.uid}_p2`, projectId: 'p2', projectName: 'Sensor IoT Agrícola', stage: 'avaliacao', score: 85, lastUpdate: 'Há 1 dia', companyId: user.uid, probability: 40, ownerUserId: 'inventor_rafael' },
+          { id: `${user.uid}_p3`, projectId: 'p3', projectName: 'Plataforma de IA Jurídica', stage: 'due_diligence', score: 88, lastUpdate: 'Há 3 dias', companyId: user.uid, probability: 60, ownerUserId: 'inventor_rafael' },
+        ];
+        
+        try {
+          await Promise.all(
+            defaultDeals.map(d => setDoc(doc(db, "deals", d.id), {
+              ...d,
+              updatedAt: serverTimestamp()
+            }))
+          );
+        } catch (err) {
+          console.error("Erro ao semear deals:", err);
+        }
+      } else {
+        setDeals(list);
+        setLoading(false);
+      }
+    }, (error) => {
+      console.error("Erro ao escutar deals:", error);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const moveDeal = async (dealId: string, newStatus: DealStatus) => {
+    if (!user || !userProfile) return;
+
+    const dealDocRef = doc(db, "deals", dealId);
+    try {
+      const dealDoc = await getDoc(dealDocRef);
+      if (!dealDoc.exists()) return;
+
+      const beforeData = dealDoc.data();
+      const oldStage = beforeData.stage || beforeData.status;
+
+      // Update deal in Firestore
+      await updateDoc(dealDocRef, {
+        stage: newStatus,
+        status: newStatus,
+        lastUpdate: 'Atualizado agora',
+        updatedAt: serverTimestamp()
+      });
+
+      // Auditing
+      const actor = {
+        uid: user.uid,
+        name: userProfile.name || user.displayName || user.email || "Usuário",
+        email: user.email || "",
+        role: userProfile.role || "industry"
+      };
+
+      await logAudit(
+        actor,
+        "deal.stage.update",
+        beforeData.projectId,
+        beforeData.projectName,
+        { stage: oldStage },
+        { stage: newStatus }
+      );
+
+      await logActivity(
+        "deal.stage.updated",
+        actor.name,
+        beforeData.projectId,
+        beforeData.projectName,
+        { fromStage: oldStage, toStage: newStatus }
+      );
+
+      if (newStatus === 'due_diligence') {
         setSmartPrompt({
-            dealId,
-            message: t("dashboard.investor.smartPrompts.negotiation"),
-            action: t("dashboard.investor.smartPrompts.requestVdr")
+          dealId,
+          message: t("dashboard.investor.smartPrompts.dueDiligence"),
+          action: t("dashboard.investor.smartPrompts.sendNda")
         });
-    } else {
-      setSmartPrompt(null);
+      } else if (newStatus === 'negociacao') {
+        setSmartPrompt({
+          dealId,
+          message: t("dashboard.investor.smartPrompts.negotiation"),
+          action: t("dashboard.investor.smartPrompts.requestVdr")
+        });
+      } else {
+        setSmartPrompt(null);
+      }
+
+    } catch (err) {
+      console.error("Erro ao mover deal:", err);
+      alert("Erro ao mover o deal.");
     }
   };
 
@@ -93,7 +194,17 @@ export function CompanyDashboard() {
     value: deals.filter(d => d.status === col.id).length,
   }));
 
-  const FUNNEL_COLORS = ['#64748b', '#3b82f6', '#f59e0b', '#a855f7', '#10b981'];
+  const FUNNEL_COLORS = [
+    '#64748b', // descoberta
+    '#3b82f6', // interesse
+    '#06b6d4', // nda
+    '#6366f1', // avaliacao
+    '#f59e0b', // due_diligence
+    '#d946ef', // comite
+    '#a855f7', // negociacao
+    '#10b981', // contrato
+    '#f43f5e'  // encerrado
+  ];
 
   return (
     <div className="space-y-6 md:space-y-8 flex flex-col">
@@ -137,7 +248,7 @@ export function CompanyDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatsCard 
               label={t("dashboard.investor.inScreening")} 
-              value={deals.filter(d => d.status === 'triagem').length} 
+              value={deals.filter(d => d.status === 'descoberta' || d.status === 'interesse' || d.status === 'nda').length} 
               icon={Zap} 
               color="indigo" 
             />
@@ -149,7 +260,7 @@ export function CompanyDashboard() {
             />
             <StatsCard 
               label={t("dashboard.investor.closedDeals")} 
-              value={deals.filter(d => d.status === 'fechado').length} 
+              value={deals.filter(d => d.status === 'contrato' || d.status === 'encerrado').length} 
               icon={Briefcase} 
               color="emerald" 
             />
@@ -271,7 +382,7 @@ export function CompanyDashboard() {
                 <EmptyState icon={LayoutGrid} title={t("dashboard.investor.emptyTitle")} description={t("dashboard.investor.emptyDesc")} ctaLabel={t("dashboard.investor.emptyCta")} ctaLink="/explore" />
               </div>
             ) : (
-              <div className="flex flex-col sm:flex-row gap-6 min-w-full sm:min-w-max">
+              <div className="flex flex-col sm:flex-row gap-6 min-w-full sm:min-w-max text-slate-200">
                 {COLUMNS.map(column => {
                   const columnDeals = deals.filter(d => d.status === column.id);
                   const columnTitle = t(`dashboard.investor.funnelColumns.${column.id}`);
@@ -299,12 +410,12 @@ export function CompanyDashboard() {
                             </div>
                             <h4 className="font-bold text-slate-200 text-sm mb-3">{deal.projectName}</h4>
                             <select 
-                              className="bg-slate-950 border border-slate-700 text-[11px] text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                              className="bg-slate-955 border border-slate-700 text-[11px] text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
                               value={deal.status}
                               onChange={(e) => moveDeal(deal.id, e.target.value as DealStatus)}
                             >
                               {COLUMNS.map(c => (
-                                <option key={c.id} value={c.id}>
+                                <option key={c.id} value={c.id} className="bg-slate-950 text-slate-300">
                                   {t("dashboard.investor.moveOption", { col: t(`dashboard.investor.funnelColumns.${c.id}`) })}
                                 </option>
                               ))}

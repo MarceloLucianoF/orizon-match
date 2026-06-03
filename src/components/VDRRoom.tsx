@@ -16,6 +16,7 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { db, storage } from "../firebase/config";
 import { checkExistingNDA } from "../services/ndaService";
 import { useTranslation } from "react-i18next";
+import { logAudit, logActivity } from "../services/governanceService";
 
 interface VDRFile {
   id: string;
@@ -53,7 +54,7 @@ export function VDRRoom({
   isPublic?: boolean; 
   inpiStatus?: string;
 }) {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const { t } = useTranslation();
   const [activeFolder, setActiveFolder] = useState<string | null>(null);
   const [hasSignedNDA, setHasSignedNDA] = useState(false);
@@ -61,6 +62,33 @@ export function VDRRoom({
   const [checkingNDA, setCheckingNDA] = useState(true);
   const [files, setFiles] = useState<VDRFile[]>([]);
   const [loadingFiles, setLoadingFiles] = useState(true);
+
+  // States for VDR Cleanroom Secure Viewer
+  const [viewerFile, setViewerFile] = useState<VDRFile | null>(null);
+  const [viewerStartTime, setViewerStartTime] = useState<number | null>(null);
+  const [viewerIp, setViewerIp] = useState<string>("127.0.0.1");
+
+  useEffect(() => {
+    async function fetchIp() {
+      try {
+        const res = await fetch("https://api.ipify.org?format=json");
+        const data = await res.json();
+        if (data.ip) setViewerIp(data.ip);
+      } catch (err) {
+        console.error("Erro ao obter IP para VDR:", err);
+      }
+    }
+    fetchIp();
+  }, []);
+
+  const getSessionId = () => {
+    let sid = sessionStorage.getItem("orizon_session_id");
+    if (!sid) {
+      sid = "sess_" + Math.random().toString(36).substring(2, 15) + "_" + Date.now();
+      sessionStorage.setItem("orizon_session_id", sid);
+    }
+    return sid;
+  };
   
   // State for Upload Modal
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -244,6 +272,30 @@ export function VDRRoom({
         timestamp: serverTimestamp()
       });
 
+      const actor = {
+        uid: user.uid,
+        name: user.displayName || user.email || "Membro da Equipe",
+        email: user.email || "",
+        role: userProfile?.role || "ict"
+      };
+
+      await logAudit(
+        actor,
+        "file.upload",
+        projectId,
+        projectTitle || "Projeto",
+        null,
+        { fileId: fileDocRef.id, fileName: uploadFile.name, category: uploadCategory }
+      );
+
+      await logActivity(
+        "vdr.file.uploaded",
+        actor.name,
+        projectId,
+        projectTitle || "Projeto",
+        { fileName: uploadFile.name, category: uploadCategory }
+      );
+
       // Cleanup & Refresh
       setUploadFile(null);
       setShowUploadModal(false);
@@ -275,7 +327,24 @@ export function VDRRoom({
   const activeFolderFiles = files.filter(file => file.category === activeFolder);
 
   const handleDownloadFile = async (file: VDRFile) => {
+    const actor = {
+      uid: user?.uid || "",
+      name: user?.displayName || user?.email || "Usuário VDR",
+      email: user?.email || "",
+      role: userProfile?.role || "visitor"
+    };
+
+    await logAudit(
+      actor,
+      "file.download",
+      projectId || null,
+      projectTitle || null,
+      null,
+      { fileId: file.id, fileName: file.name, category: file.category }
+    );
+
     await logAccess(file, 'download');
+
     if (file.downloadUrl && file.downloadUrl !== "#") {
       window.open(file.downloadUrl, "_blank");
     } else {
@@ -285,13 +354,118 @@ export function VDRRoom({
   };
 
   const handleViewFile = async (file: VDRFile) => {
+    const startTime = Date.now();
+    setViewerFile(file);
+    setViewerStartTime(startTime);
+
+    const actor = {
+      uid: user?.uid || "",
+      name: user?.displayName || user?.email || "Usuário VDR",
+      email: user?.email || "",
+      role: userProfile?.role || "visitor"
+    };
+
+    await logAudit(
+      actor,
+      "file.view.start",
+      projectId || null,
+      projectTitle || null,
+      null,
+      { fileId: file.id, fileName: file.name, category: file.category }
+    );
+
     await logAccess(file, 'view');
-    if (file.downloadUrl && file.downloadUrl !== "#") {
-      window.open(file.downloadUrl, "_blank");
-    } else {
-      alert(`[Modo Simulação] Visualização simulada de ${file.name}.`);
-    }
   };
+
+  const handleCloseViewer = async () => {
+    if (!viewerFile || !viewerStartTime) {
+      setViewerFile(null);
+      setViewerStartTime(null);
+      return;
+    }
+
+    const duration = Math.round((Date.now() - viewerStartTime) / 1000);
+
+    const actor = {
+      uid: user?.uid || "",
+      name: user?.displayName || user?.email || "Usuário VDR",
+      email: user?.email || "",
+      role: userProfile?.role || "visitor"
+    };
+
+    await logAudit(
+      actor,
+      "file.view.end",
+      projectId || null,
+      projectTitle || null,
+      null,
+      { 
+        fileId: viewerFile.id, 
+        fileName: viewerFile.name, 
+        category: viewerFile.category,
+        durationSeconds: duration
+      }
+    );
+
+    setViewerFile(null);
+    setViewerStartTime(null);
+  };
+
+  const handlePrintAttempt = async () => {
+    if (!viewerFile) return;
+
+    const actor = {
+      uid: user?.uid || "",
+      name: user?.displayName || user?.email || "Usuário VDR",
+      email: user?.email || "",
+      role: userProfile?.role || "visitor"
+    };
+
+    await logAudit(
+      actor,
+      "file.print",
+      projectId || null,
+      projectTitle || null,
+      null,
+      { fileId: viewerFile.id, fileName: viewerFile.name }
+    );
+
+    alert("Aviso de Conformidade: Impressão bloqueada e registrada nos logs de auditoria.");
+  };
+
+  useEffect(() => {
+    if (!viewerFile) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Block Ctrl+P / Cmd+P
+      if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
+        e.preventDefault();
+        handlePrintAttempt();
+      }
+      // Block Ctrl+S / Cmd+S
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        alert("Aviso de Conformidade: Download e salvamento de arquivos a partir do visualizador seguro são bloqueados.");
+      }
+      // Block Ctrl+C / Cmd+C
+      if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+        e.preventDefault();
+        alert("Aviso de Conformidade: Cópia de texto bloqueada no visualizador seguro.");
+      }
+    };
+
+    const handleBeforePrint = () => {
+      handlePrintAttempt();
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('beforeprint', handleBeforePrint);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('beforeprint', handleBeforePrint);
+    };
+  }, [viewerFile, viewerStartTime]);
 
   return (
     <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col min-h-[600px] relative">
@@ -614,6 +788,128 @@ export function VDRRoom({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* VDR Cleanroom Secure Doc Viewer Modal */}
+      {viewerFile && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-10 bg-slate-950/90 backdrop-blur-md"
+          onContextMenu={(e) => e.preventDefault()}
+        >
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden relative shadow-2xl animate-in zoom-in-95 duration-200">
+            
+            {/* Watermark Diagonal overlay */}
+            <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-[0.05] z-40 flex flex-col justify-around rotate-[-25deg] scale-125">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="whitespace-nowrap text-xs font-mono font-bold tracking-widest text-slate-100 flex justify-between gap-8 py-2">
+                  {Array.from({ length: 4 }).map((_, j) => (
+                    <span key={j}>
+                      CONFIDENTIAL VDR - {user?.email || "stakeholder@orizon"} - IP: {viewerIp} - Session: {getSessionId()} - {new Date().toLocaleDateString('pt-BR')}
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+
+            {/* Header */}
+            <div className="p-5 border-b border-slate-800 bg-slate-900/90 flex justify-between items-center z-50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                  <ShieldCheck size={20} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                    Visualizador Seguro VDR
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-bold uppercase tracking-wider">
+                      CONFIDENCIAL
+                    </span>
+                  </h4>
+                  <p className="text-xs text-slate-500">{viewerFile.name} (v{viewerFile.version})</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handlePrintAttempt}
+                  className="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:text-white transition text-xs font-bold"
+                >
+                  Imprimir
+                </button>
+                <button
+                  onClick={handleCloseViewer}
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                >
+                  Fechar Visualizador
+                </button>
+              </div>
+            </div>
+
+            {/* Content Area */}
+            <div className="flex-1 overflow-auto bg-slate-950 p-6 flex items-center justify-center relative select-none z-30">
+              {viewerFile.downloadUrl && viewerFile.downloadUrl !== "#" ? (
+                <iframe 
+                  src={`${viewerFile.downloadUrl}#toolbar=0&navpanes=0`} 
+                  className="w-full h-full border-0 rounded-2xl bg-slate-950" 
+                  title="Secure Doc Frame"
+                />
+              ) : (
+                // Mock doc display for high-fidelity simulation
+                <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 space-y-6 text-slate-300 font-serif leading-relaxed shadow-lg">
+                  <div className="text-center space-y-2 border-b border-slate-800 pb-6">
+                    <h2 className="text-xl font-bold font-sans text-slate-100 uppercase tracking-wide">
+                      Orizon Match - Acordo de Homologação
+                    </h2>
+                    <p className="text-xs font-mono text-slate-500 tracking-wider">
+                      CÓDIGO DE CONTROLE: OM-VDR-{viewerFile.id.toUpperCase()}-SECURE
+                    </p>
+                  </div>
+                  
+                  <div className="space-y-4 text-xs font-sans text-slate-400 leading-normal">
+                    <p>
+                      <strong>PROJETO:</strong> {projectTitle || "Inovação Orizon"} <br />
+                      <strong>CATEGORIA:</strong> {viewerFile.category.toUpperCase()} • <strong>NÍVEL:</strong> RESTRIITO (NDA)
+                    </p>
+                    <p>
+                      Este documento é de propriedade intelectual exclusiva e contém informações comerciais confidenciais, segredos industriais e dados laboratoriais protegidos nos termos da Lei Federal nº 9.279/96 (Propriedade Industrial) e sob o amparo do Acordo de Confidencialidade firmado previamente por clique digital (clickwrap) sob a chave de hash do investidor.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-slate-800">
+                    <h3 className="text-sm font-bold font-sans text-slate-200">1. Descrição dos Ensaios e Validações</h3>
+                    <p className="text-xs">
+                      Os testes e ensaios técnicos descritos neste relatório foram executados nos laboratórios credenciados pela ICT (Inatel - Wireless & AI Lab). O TRL certificado corresponde a maturidade tecnológica homologada, apresentando estabilidade operacional superior a 99.4% em ambiente simulado de rede LTE Mesh.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-slate-800">
+                    <h3 className="text-sm font-bold font-sans text-slate-200">2. Propriedade Intelectual e Royalties</h3>
+                    <p className="text-xs">
+                      A patente descrita neste documento de PI encontra-se sob o regime de compartilhamento e transferência tecnológica exclusiva/não-exclusiva, com termos de licenciamento sob taxa de royalties base estipulada em 3.5% sobre faturamento líquido das unidades integradoras de RF.
+                    </p>
+                  </div>
+
+                  <div className="pt-8 flex justify-between text-[10px] font-sans text-slate-500">
+                    <div>
+                      <p className="font-bold text-slate-400">Assinado Digitalmente por:</p>
+                      <p>Inatel NIT Management - Sistema Orizon</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-slate-400">Hash de Validação:</p>
+                      <p className="font-mono">SHA256: {viewerFile.id.slice(0, 16).toUpperCase()}...</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="p-4 bg-slate-900 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-500 font-mono z-50">
+              <div>Sessão Ativa: {getSessionId().slice(0, 20)}...</div>
+              <div>Visualizado por: {user?.email} ({viewerIp})</div>
+            </div>
+
           </div>
         </div>
       )}

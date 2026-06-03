@@ -70,74 +70,122 @@ export async function handleWebhook(body: any, signature: string) {
     throw new Error(`Webhook Error: ${err.message}`);
   }
 
-  // 1. Idempotency Check: Evitar processar evento duplicado
-  const eventRef = db.collection("billing_events").doc(event.id);
-  const eventDoc = await eventRef.get();
-  if (eventDoc.exists) {
-    console.log(`[STRIPE WEBHOOK] Event ${event.id} already processed.`);
-    return { received: true, duplicate: true };
-  }
-
-  // 2. Auditoria e Logs: Salvar evento de faturamento antes do processamento
-  await eventRef.set({
-    eventId: event.id,
-    type: event.type,
-    created: event.created,
-    processedAt: admin.firestore.FieldValue.serverTimestamp(),
-    livemode: event.livemode,
-  });
-
-  // 3. Processamento de Eventos Core
-  console.log(`[STRIPE WEBHOOK] Processing event ${event.id} of type ${event.type}`);
+  // Pre-resolve the userId outside of the transaction block to avoid querying inside the transaction.
+  let userId: string | null = null;
 
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as any;
-    const userId = session.metadata?.userId;
-
-    if (userId) {
-      await db.collection("users").doc(userId).update({
-        subscriptionStatus: 'premium',
-        stripeCustomerId: session.customer,
-        subscriptionId: session.subscription,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-      console.log(`[STRIPE WEBHOOK] User ${userId} upgraded to premium. Customer: ${session.customer}`);
-    }
+    userId = session.metadata?.userId || null;
   } 
   else if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object as any;
     const customerId = invoice.customer;
-
     if (customerId) {
-      const userQuery = await db.collection("users").where("stripeCustomerId", "==", customerId).get();
+      const userQuery = await db.collection("users").where("stripeCustomerId", "==", customerId).limit(1).get();
       if (!userQuery.empty) {
-        const userDocRef = userQuery.docs[0].ref;
-        await userDocRef.update({
-          subscriptionStatus: 'premium',
-          lastPaymentStatus: 'succeeded',
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        console.log(`[STRIPE WEBHOOK] Recurring payment succeeded for customer ${customerId}`);
+        userId = userQuery.docs[0].id;
       }
     }
   } 
   else if (event.type === 'customer.subscription.deleted') {
     const subscription = event.data.object as any;
     const customerId = subscription.customer;
-
     if (customerId) {
-      const userQuery = await db.collection("users").where("stripeCustomerId", "==", customerId).get();
+      const userQuery = await db.collection("users").where("stripeCustomerId", "==", customerId).limit(1).get();
       if (!userQuery.empty) {
-        const userDocRef = userQuery.docs[0].ref;
-        await userDocRef.update({
-          subscriptionStatus: 'free',
-          subscriptionId: null,
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        });
-        console.log(`[STRIPE WEBHOOK] Subscription deleted for customer ${customerId}. Downgraded to free.`);
+        userId = userQuery.docs[0].id;
       }
     }
   }
 
-  return { received: true };
+  console.log(`[STRIPE WEBHOOK] Resolved userId: ${userId} for event ${event.id} of type ${event.type}`);
+
+  const eventRef = db.collection("billing_events").doc(event.id);
+
+  // Wrap all state changes and logging inside a Firestore transaction.
+  const result = await db.runTransaction(async (transaction) => {
+    // 1. Idempotency Check: Avoid processing duplicate events
+    const eventDoc = await transaction.get(eventRef);
+    if (eventDoc.exists) {
+      console.log(`[STRIPE WEBHOOK] Event ${event.id} already processed.`);
+      return { received: true, duplicate: true };
+    }
+
+    let userRef = null;
+    let userData: any = null;
+
+    if (userId) {
+      userRef = db.collection("users").doc(userId);
+      const userDoc = await transaction.get(userRef);
+      if (userDoc.exists) {
+        userData = userDoc.data();
+      }
+    }
+
+    // 2. Timestamp check for out-of-order deliveries
+    if (userData && userData.lastStripeEventCreated !== undefined) {
+      if (event.created <= userData.lastStripeEventCreated) {
+        console.log(`[STRIPE WEBHOOK] Out-of-order event ${event.id} ignored. Incoming timestamp: ${event.created}, last processed: ${userData.lastStripeEventCreated}`);
+        
+        // Write to billing_events to ensure we don't process this specific event again
+        transaction.set(eventRef, {
+          eventId: event.id,
+          type: event.type,
+          created: event.created,
+          processedAt: admin.firestore.FieldValue.serverTimestamp(),
+          livemode: event.livemode,
+          status: 'ignored_older_timestamp',
+          userId: userId || null
+        });
+        
+        return { received: true, ignored: true };
+      }
+    }
+
+    // 3. Process Subscription Changes
+    const userUpdates: any = {
+      lastStripeEventCreated: event.created,
+      lastStripeEventId: event.id,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      subscriptionVersion: admin.firestore.FieldValue.increment(1)
+    };
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as any;
+      userUpdates.subscriptionStatus = 'premium';
+      userUpdates.stripeCustomerId = session.customer;
+      userUpdates.subscriptionId = session.subscription;
+      console.log(`[STRIPE WEBHOOK] User ${userId} upgrade to premium. Customer: ${session.customer}`);
+    } 
+    else if (event.type === 'invoice.payment_succeeded') {
+      userUpdates.subscriptionStatus = 'premium';
+      userUpdates.lastPaymentStatus = 'succeeded';
+      console.log(`[STRIPE WEBHOOK] Recurring payment succeeded for user ${userId}`);
+    } 
+    else if (event.type === 'customer.subscription.deleted') {
+      userUpdates.subscriptionStatus = 'free';
+      userUpdates.subscriptionId = null;
+      console.log(`[STRIPE WEBHOOK] Subscription deleted for user ${userId}. Downgraded to free.`);
+    }
+
+    // Execute User updates in transaction
+    if (userRef && userData) {
+      transaction.update(userRef, userUpdates);
+    }
+
+    // Log the event under billing_events in transaction
+    transaction.set(eventRef, {
+      eventId: event.id,
+      type: event.type,
+      created: event.created,
+      processedAt: admin.firestore.FieldValue.serverTimestamp(),
+      livemode: event.livemode,
+      status: 'processed',
+      userId: userId || null
+    });
+
+    return { received: true };
+  });
+
+  return result;
 }

@@ -3,6 +3,7 @@ import { Shield, CheckCircle2, Loader2 } from "lucide-react";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { useAuth } from "../hooks/useAuth";
+import { logAudit, logActivity, dispatchDomainEvent } from "../services/governanceService";
 
 interface SecureNDAProps {
   projectId: string;
@@ -11,7 +12,7 @@ interface SecureNDAProps {
 }
 
 export function SecureNDA({ projectId, projectTitle, onAccept }: SecureNDAProps) {
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const [loading, setLoading] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
@@ -33,6 +34,37 @@ export function SecureNDA({ projectId, projectTitle, onAccept }: SecureNDAProps)
         version: "1.0-smart-clickwrap"
       });
       
+      // Registrar na Governança
+      const actor = {
+        uid: user.uid,
+        name: user.displayName || user.email || "Investidor",
+        email: user.email || "",
+        role: userProfile?.role || "investor"
+      };
+
+      await logAudit(
+        actor,
+        "nda.signed",
+        projectId,
+        projectTitle,
+        null,
+        { status: "active", version: "1.0-smart-clickwrap" }
+      );
+
+      await logActivity(
+        "nda.signed",
+        actor.name,
+        projectId,
+        projectTitle,
+        { investorId: user.uid }
+      );
+
+      await dispatchDomainEvent("nda.signed", {
+        investorId: user.uid,
+        projectId,
+        projectTitle
+      });
+
       setAccepted(true);
       setTimeout(onAccept, 1500); // Dar tempo para ver o check
     } catch (error) {

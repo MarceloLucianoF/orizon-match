@@ -36,3 +36,23 @@ export async function exportEcosystemReport() {
     return false;
   }
 }
+
+export async function generateProjectAiBriefing(projectId: string): Promise<string> {
+  try {
+    const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/generateProjectReport', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: { projectId } })
+    });
+
+    if (!response.ok) {
+      throw new Error("Erro de servidor ao gerar briefing de IA");
+    }
+
+    const json = await response.json();
+    return json.data?.report || json.report || "";
+  } catch (error) {
+    console.error("Erro ao chamar generateProjectAiBriefing:", error);
+    throw error;
+  }
+}
