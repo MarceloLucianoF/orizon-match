@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { useAuth } from "../hooks/useAuth";
@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 
 export function MainLayout() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { impersonatingAdminId, setImpersonatedUid, simulatedRole, setSimulatedRole } = useAuth();
 
@@ -28,9 +29,9 @@ export function MainLayout() {
         {simulatedRole && (
           <div className="bg-fuchsia-600 text-white px-4 py-2 flex items-center justify-center gap-3 text-xs font-bold shadow-md z-50 animate-in slide-in-from-top">
             <ServerCog size={16} className="animate-spin" />
-            <span>Visualização ativa como: <span className="uppercase font-black text-fuchsia-100">{simulatedRole}</span> (Modo de Teste Admin)</span>
+            <span>Visualização active como: <span className="uppercase font-black text-fuchsia-100">{simulatedRole}</span> (Modo de Teste Admin)</span>
             <button 
-              onClick={() => setSimulatedRole(null)}
+              onClick={() => { setSimulatedRole(null); navigate("/admin"); }}
               className="ml-4 px-3 py-1 bg-slate-950/40 hover:bg-slate-950/70 border border-white/20 text-white rounded-md text-[10px] uppercase font-bold transition-colors cursor-pointer"
             >
               Voltar ao Admin

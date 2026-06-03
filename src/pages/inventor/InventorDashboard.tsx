@@ -224,7 +224,9 @@ export function InventorDashboard() {
               />
             </div>
 
-            <ProjectPerformanceChart title={t("dashboard.inventor.chartTitle")} />
+            <div className="w-full min-w-0 overflow-hidden">
+              <ProjectPerformanceChart title={t("dashboard.inventor.chartTitle")} />
+            </div>
 
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-4 md:mb-6">
@@ -304,7 +306,9 @@ export function InventorDashboard() {
           </div>
 
           <div className="space-y-4 md:space-y-6 min-w-0 overflow-hidden">
-            <MarketTrendsChart title={t("dashboard.inventor.marketTrends")} />
+            <div className="w-full min-w-0 overflow-hidden">
+              <MarketTrendsChart title={t("dashboard.inventor.marketTrends")} />
+            </div>
 
             <div className="bg-gradient-to-br from-indigo-900/40 to-cyan-900/20 border border-indigo-500/30 rounded-2xl p-5 md:p-6 relative overflow-hidden">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl" />

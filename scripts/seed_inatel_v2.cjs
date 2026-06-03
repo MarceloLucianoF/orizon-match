@@ -202,7 +202,10 @@ async function seedV2() {
       ticketRange: p.ticket,
       status: 'active',
       vdrStatus: p.verified ? 'green' : 'yellow',
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      researcher: p.userId === 'inventor_rafael' ? 'Prof. Rafael Silva' : 'Dra. Camila Santos',
+      patentStatus: p.verified ? 'Concedida (BR 10 2024)' : 'Depositada (BR 10 2025)',
+      ictName: p.verified ? 'Inatel NGTI' : 'Inatel - WAI Lab'
     });
   });
 

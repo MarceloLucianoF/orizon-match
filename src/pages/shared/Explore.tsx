@@ -7,7 +7,7 @@ import { createOrGetConversation } from "../../services/chatService";
 import { explainMatch, getMatchTier, getScoreColor } from "../../lib/matching";
 import {
   Loader2, Search, Filter, Compass, ArrowRight, ShieldCheck,
-  MapPin, SlidersHorizontal, X
+  SlidersHorizontal, X
 } from "lucide-react";
 import { EmptyState } from "../../components/EmptyState";
 import { useTranslation } from "react-i18next";
@@ -296,8 +296,8 @@ export function Explore() {
                 </div>
 
                 {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                <div className="flex-1 min-w-0 space-y-3">
+                  <div className="flex flex-wrap items-center gap-2">
                     <h3 className="text-base font-bold text-slate-100 truncate">
                       {project.title || t("explore.confidentialProject")}
                     </h3>
@@ -321,41 +321,62 @@ export function Explore() {
                     )}
                   </div>
                   
-                  <div className="flex flex-wrap gap-2 text-[11px] mb-2">
-                    {project.segment && (
-                      <span className="bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400">
-                        {project.segment}
+                  {/* The Hook/Summary */}
+                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                    {project.summary || "Sem descrição detalhada disponível."}
+                  </p>
+
+                  {/* Highlights (Invstor-style badges) */}
+                  <div className="flex flex-wrap gap-2 text-[10px] font-bold">
+                    <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded flex items-center gap-1">
+                      💰 Busca: {project.ticketRange === '50k' ? '< R$ 250k' : project.ticketRange === '250k' ? 'R$ 250k - R$ 1M' : project.ticketRange === '1m' ? '> R$ 1M' : 'Sob Consulta'}
+                    </span>
+                    <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-1 rounded flex items-center gap-1">
+                      ⚙️ TRL {project.declaredTRL || project.maturity || 1}
+                    </span>
+                    {project.isIctVerified && (
+                      <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-1 rounded flex items-center gap-1">
+                        🛡️ ICT: {project.ictName || "Inatel"}
                       </span>
-                    )}
-                    {project.validatedMaturity ? (
-                      <>
-                        <span className="bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded text-emerald-400 font-bold">
-                          TRL {project.validatedMaturity} (Validado)
-                        </span>
-                        <span className="bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-500">
-                          TRL {project.maturity || 1} (Declarado)
-                        </span>
-                      </>
-                    ) : (
-                      project.maturity && (
-                        <span className="bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400">
-                          TRL {project.maturity} (Declarado)
-                        </span>
-                      )
                     )}
                     {project.location?.region && (
-                      <span className="bg-slate-800/80 border border-slate-700 px-2 py-0.5 rounded text-slate-400 flex items-center gap-1">
-                        <MapPin size={10} /> {project.location.region}
-                      </span>
-                    )}
-                    {project.fomento && (
-                      <span className="bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded text-amber-400 font-bold uppercase font-mono">
-                        {project.fomento}
+                      <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-1 rounded flex items-center gap-1">
+                        📍 {project.location.region}
                       </span>
                     )}
                   </div>
 
-                  <p className="text-xs text-slate-400">{explainMatch(project.breakdown)}</p>
+                  <p className="text-xs text-slate-500">{explainMatch(project.breakdown)}</p>
+
+                  {/* GATILHO DE ESCASSEZ (PAYWALL / NDA) */}
+                  <div className="border-t border-slate-800/80 pt-3 mt-1">
+                    {userProfile?.subscriptionStatus !== 'premium' ? (
+                      <div className="relative group cursor-pointer" onClick={() => navigate('/pricing')}>
+                        {/* Camada borrada */}
+                        <div className="blur-[4px] opacity-40 select-none text-[11px] text-slate-500 space-y-1">
+                          <p>Pesquisador Principal: Dr. Alberto Ferreira</p>
+                          <p>Patente/Registro: Concedida (BR 10 2024 001234 5)</p>
+                        </div>
+                        {/* Cadeado sobreposto */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="bg-indigo-650 hover:bg-indigo-650 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-1.5 transition-all border border-indigo-500/30">
+                            🔒 Assine o Plano Corporate para ver a Patente
+                          </span>
+                        </div>
+                      </div>
+                    ) : (
+                      // Visão liberada para quem pagou
+                      <div className="text-[11px] space-y-1 text-slate-400">
+                        <p><strong className="text-slate-300">Pesquisador Principal:</strong> {project.researcher || "Prof. Rafael Silva"}</p>
+                        <p>
+                          <strong className="text-slate-300">Patente/Registro:</strong>{" "}
+                          <span className="text-indigo-400 font-bold hover:underline cursor-pointer">
+                            {project.patentStatus || "Concedida (BR 10 2024)"}
+                          </span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Action */}
