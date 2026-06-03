@@ -3,6 +3,7 @@ import { InventorDashboard } from "../inventor/InventorDashboard";
 import { CompanyDashboard } from "../company/CompanyDashboard";
 import { AdminDashboard } from "../admin/AdminDashboard";
 import { LegalDashboard } from "../legal/LegalDashboard";
+import OrganizationDashboard from "./OrganizationDashboard";
 import { Loader2 } from "lucide-react";
 
 export function Dashboard() {
@@ -40,11 +41,16 @@ export function Dashboard() {
     return <AdminDashboard />;
   }
 
+  // ICT vê o Hub de Organização/Fomento
+  if (userProfile?.role === 'ict') {
+    return <OrganizationDashboard />;
+  }
+
   // Jurídico vê a Gestão de Ativos de PI
   if (userProfile?.role === 'legal') {
     return <LegalDashboard />;
   }
 
-  // Inventor, ICT ou Prestador veem o Dashboard de Performance
+  // Inventor ou Prestador veem o Dashboard de Performance
   return <InventorDashboard />;
 }

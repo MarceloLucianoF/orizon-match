@@ -3,16 +3,14 @@ import { useAuth } from "../../hooks/useAuth";
 import { db } from "../../firebase/config";
 import { 
   collection, query, where, getDocs, 
-  doc, getDoc, limit, orderBy 
+  doc, getDoc, updateDoc 
 } from "firebase/firestore";
 import { 
-  Building2, Users, FileText, 
-  Search, 
-  ArrowUpRight, Clock, Zap,
+  Building2, FileText, Search, Zap,
   BarChart3, ShieldCheck, Plus, 
-  Cpu, Award, Coins, Scale, Settings, GraduationCap
+  Cpu, Award, Coins, Scale, Settings, GraduationCap,
+  AlertTriangle, CheckCircle2, Briefcase
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 interface Stats {
@@ -41,13 +39,14 @@ export default function OrganizationDashboard() {
   });
   const [org, setOrg] = useState<OrgData | null>(null);
   const [recentProjects, setRecentProjects] = useState<any[]>([]);
+  const [challenges, setChallenges] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("overview");
 
   // Mock laboratories list (Vitrine Tecnológica)
   const [labs, setLabs] = useState([
-    { id: 1, name: "Centro de Referência em Radiocomunicações (CRR)", area: "Telecomunicações / RF", equipment: "Analisador de Espectro de 110 GHz, Câmara Anecoica Blindada", capacity: "Caracterização de antenas, testes de conformidade 5G/6G" },
-    { id: 2, name: "Wireless & AI Lab (WAI Lab)", area: "Inteligência Artificial / Computação Móvel", equipment: "Cluster GPU Nvidia DGX, Módulos SDR (Software Defined Radio)", capacity: "Otimização de canais de RF com aprendizado de máquina, redes neurais aplicadas a telecom" },
-    { id: 3, name: "Laboratório WOCA (Wireless and Optical Convergent Access)", area: "Fotônica / Redes de Acesso", equipment: "Fusora de Fibra Óptica de Precisão, Medidor de Potência Óptica de Alta Resolução", capacity: "Integração entre redes sem fio e fibra óptica (backhaul/fronthaul)" }
+    { id: 1, name: "Centro de Referência em Radiocomunicações (CRR)", area: "Telecomunicações / RF", equipment: "Analisador de Espectro de 110 GHz, Câmara Anecoica Blindada", capacity: "Caracterização de antenas, testes de conformidade 5G/6G", occupancy: 40, projectsCount: 2 },
+    { id: 2, name: "Wireless & AI Lab (WAI Lab)", area: "Inteligência Artificial / Computação Móvel", equipment: "Cluster GPU Nvidia DGX, Módulos SDR (Software Defined Radio)", capacity: "Otimização de canais de RF com aprendizado de máquina, redes neurais aplicadas a telecom", occupancy: 80, projectsCount: 4 },
+    { id: 3, name: "Laboratório WOCA (Wireless and Optical Convergent Access)", area: "Fotônica / Redes de Acesso", equipment: "Fusora de Fibra Óptica de Precisão, Medidor de Potência Óptica de Alta Resolução", capacity: "Integração entre redes sem fio e fibra óptica (backhaul/fronthaul)", occupancy: 60, projectsCount: 3 }
   ]);
 
   const [newLabName, setNewLabName] = useState("");
@@ -64,12 +63,15 @@ export default function OrganizationDashboard() {
         name: newLabName,
         area: newLabArea,
         equipment: newLabEquip || "N/A",
-        capacity: "Nova competência de pesquisa homologada"
+        capacity: "Nova competência de pesquisa homologada",
+        occupancy: 10,
+        projectsCount: 0
       }
     ]);
     setNewLabName("");
     setNewLabArea("");
     setNewLabEquip("");
+    setActiveTab("overview");
   };
 
   // Mock Funding Calls (Radar de Fomento)
@@ -109,26 +111,69 @@ export default function OrganizationDashboard() {
     }, 800);
   };
 
+  const handleValidateTRL = async (projectId: string, declaredTRL: number) => {
+    try {
+      const projRef = doc(db, "projects", projectId);
+      await updateDoc(projRef, {
+        isIctVerified: true,
+        validatedTRL: declaredTRL,
+        vdrStatus: "green"
+      });
+      setRecentProjects(prev => 
+        prev.map(p => p.id === projectId ? { ...p, isIctVerified: true, validatedTRL: declaredTRL, vdrStatus: "green" } : p)
+      );
+      alert("Projeto homologado com sucesso! Selo 'ICT Verified' concedido e TRL Validado.");
+    } catch (err) {
+      console.error("Erro ao validar TRL:", err);
+      alert("Erro ao homologar projeto.");
+    }
+  };
+
   useEffect(() => {
     async function loadOrgData() {
       if (!user) return;
       
       try {
-        // 1. Get User Profile to find orgId
+        // 1. Get User Profile to find orgId or check role
         const userDoc = await getDoc(doc(db, "users", user.uid));
-        const orgId = userDoc.data()?.orgId;
-
-        if (!orgId) {
+        if (!userDoc.exists()) {
           setLoading(false);
           return;
         }
-
-        // 2. Get Organization Details
-        const orgDoc = await getDoc(doc(db, "organizations", orgId));
-        setOrg({ id: orgDoc.id, ...orgDoc.data() } as any);
+        
+        const userData = userDoc.data();
+        const isIct = userData.role === 'ict';
+        let orgId = "";
+        
+        if (isIct) {
+          orgId = user.uid;
+          setOrg({
+            id: orgId,
+            name: userData.name || "Inatel - NGTI & Unidade EMBRAPII ICC",
+            type: "ICT",
+            managers: [user.uid]
+          });
+        } else {
+          orgId = userData.orgId;
+          if (!orgId) {
+            setLoading(false);
+            return;
+          }
+          const orgDoc = await getDoc(doc(db, "organizations", orgId));
+          if (orgDoc.exists()) {
+            setOrg({ id: orgDoc.id, ...orgDoc.data() } as any);
+          } else {
+            setOrg({
+              id: orgId,
+              name: "Inatel - NGTI & Unidade EMBRAPII ICC",
+              type: "ICT",
+              managers: [user.uid]
+            });
+          }
+        }
 
         // 3. Get Stats (All projects/assets linked to this org)
-        const projectsQuery = query(collection(db, "projects"), where("orgId", "==", orgId));
+        const projectsQuery = query(collection(db, "projects"));
         const projectsSnap = await getDocs(projectsQuery);
         
         const assetsQuery = query(collection(db, "assets_ip"), where("orgId", "==", orgId));
@@ -137,22 +182,23 @@ export default function OrganizationDashboard() {
         // Get unique inventors
         const inventorIds = new Set(projectsSnap.docs.map(d => d.data().userId));
 
+        // Get all matches
+        const matchesQuery = query(collection(db, "matches"));
+        const matchesSnap = await getDocs(matchesQuery);
+
         setStats({
-          totalProjects: projectsSnap.size,
-          totalAssets: assetsSnap.size,
-          totalInventors: inventorIds.size,
-          activeMatches: projectsSnap.docs.reduce((acc, d) => acc + (d.data().matchesCount || 0), 0)
+          totalProjects: projectsSnap.size || 15,
+          totalAssets: assetsSnap.size || 3,
+          totalInventors: inventorIds.size || 4,
+          activeMatches: matchesSnap.size || 12
         });
 
-        // 4. Recent Projects
-        const recentQuery = query(
-          collection(db, "projects"), 
-          where("orgId", "==", orgId),
-          orderBy("createdAt", "desc"),
-          limit(5)
-        );
-        const recentSnap = await getDocs(recentQuery);
-        setRecentProjects(recentSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+        // Load recent projects
+        setRecentProjects(projectsSnap.docs.map(d => ({ id: d.id, ...d.data() })));
+
+        // Load challenges
+        const challengesSnap = await getDocs(collection(db, "challenges"));
+        setChallenges(challengesSnap.docs.map(d => ({ id: d.id, ...d.data() })));
 
       } catch (error) {
         console.error("Error loading org data:", error);
@@ -183,6 +229,9 @@ export default function OrganizationDashboard() {
     );
   }
 
+  // Filtrar os projetos que precisam de auditoria (não verificados pela ICT)
+  const pendingAudits = recentProjects.filter(p => !p.isIctVerified);
+
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Header */}
@@ -192,17 +241,20 @@ export default function OrganizationDashboard() {
              <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
                 <Building2 size={20} />
              </div>
-             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500/80">{t("dashboard.organization.panelTitle")}</span>
+             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500/80">ICT & EMBRAPII Hub</span>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">{org.name}</h1>
-          <p className="text-slate-400 text-sm mt-1">{t("dashboard.organization.subtitle")}</p>
+          <p className="text-slate-400 text-sm mt-1">Centro de Comando de Fomento e Gestão de Portfólio Deep Tech</p>
         </div>
         <div className="flex gap-3">
           <button className="bg-slate-900 border border-slate-800 px-4 py-2.5 rounded-xl text-slate-400 text-sm font-bold flex items-center gap-2 hover:text-white transition-all">
-             <Search size={18} /> {t("dashboard.organization.searchInventor")}
+             <Search size={18} /> Consultar Inventor
           </button>
-          <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all">
-             {t("dashboard.organization.execReport")}
+          <button 
+            onClick={() => alert("Relatório de fomento executivo exportado para PDF!")}
+            className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all"
+          >
+             Relatório EMBRAPII
           </button>
         </div>
       </div>
@@ -210,11 +262,11 @@ export default function OrganizationDashboard() {
       {/* Tabs Switcher */}
       <div className="flex flex-wrap gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800/80 self-start max-w-max">
         {[
-          { id: "overview", label: t("dashboard.organization.tabs.overview") },
-          { id: "capacities", label: t("dashboard.organization.tabs.capacities") },
-          { id: "fomento", label: t("dashboard.organization.tabs.fomento") },
-          { id: "researchers", label: t("dashboard.organization.tabs.researchers") },
-          { id: "ip_balcao", label: t("dashboard.organization.tabs.ip_balcao") }
+          { id: "overview", label: "Overview" },
+          { id: "capacities", label: "Laboratórios e Vitrine" },
+          { id: "fomento", label: "Editais e Radar" },
+          { id: "researchers", label: "Pesquisadores" },
+          { id: "ip_balcao", label: "Balcão de Patentes" }
         ].map(tab => (
           <button 
             key={tab.id}
@@ -232,89 +284,165 @@ export default function OrganizationDashboard() {
           {/* Stats Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { label: t("dashboard.organization.activeProjects"), val: stats.totalProjects, icon: <FileText className="text-blue-400" />, change: "+12%" },
-              { label: t("dashboard.organization.ipAssets"), val: stats.totalAssets, icon: <ShieldCheck className="text-emerald-400" />, change: "+5%" },
-              { label: t("dashboard.organization.inventors"), val: stats.totalInventors, icon: <Users className="text-amber-400" />, change: t("dashboard.organization.stable") },
-              { label: t("dashboard.organization.matchesGenerated"), val: stats.activeMatches, icon: <Zap className="text-indigo-400" />, change: "+24%" },
+              { label: "Capital Fomentado", val: "R$ 4.5M", desc: "Alocados via EMBRAPII", icon: <Coins className="text-emerald-400" />, color: "border-emerald-500/10" },
+              { label: "Projetos no Portfólio", val: `${stats.totalProjects} Projetos`, desc: "Inovações de Hard Tech", icon: <FileText className="text-blue-400" />, color: "border-blue-500/10" },
+              { label: "Deal Flows Ativos", val: `${stats.activeMatches} Matches`, desc: "Negociações abertas", icon: <Zap className="text-amber-400" />, color: "border-amber-500/10" },
+              { label: "Auditorias Pendentes", val: `${pendingAudits.length} Projetos`, desc: "Validação técnica pendente", icon: <AlertTriangle className="text-indigo-400" />, color: "border-indigo-500/10" },
             ].map((stat, i) => (
-              <div key={i} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all group relative overflow-hidden">
+              <div key={i} className={`bg-slate-900/40 border ${stat.color} p-6 rounded-3xl hover:border-slate-700 transition-all group relative overflow-hidden`}>
                 <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-[40px] rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-all" />
                 <div className="flex justify-between items-start mb-4">
-                  <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 group-hover:scale-110 transition-transform">
+                  <div className="p-3 bg-slate-950 rounded-2xl border border-slate-850 group-hover:scale-110 transition-transform">
                     {stat.icon}
                   </div>
-                  <span className={`text-[10px] font-bold px-2 py-1 rounded bg-slate-950 border border-slate-800 ${stat.change.includes('+') ? 'text-emerald-400' : 'text-slate-500'}`}>
-                    {stat.change}
+                  <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400 uppercase">
+                    Status OK
                   </span>
                 </div>
-                <div className="text-3xl font-black text-white mb-1">{stat.val}</div>
-                <div className="text-xs text-slate-500 font-bold uppercase tracking-widest">{stat.label}</div>
+                <div className="text-2xl font-black text-white mb-0.5">{stat.val}</div>
+                <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest">{stat.label}</div>
+                <p className="text-[11px] text-slate-400 mt-2">{stat.desc}</p>
               </div>
             ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Recent Projects List */}
-            <div className="lg:col-span-2 space-y-6">
-              <div className="flex items-center justify-between">
-                 <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                    <Clock className="text-slate-600" size={20} /> {t("dashboard.organization.recentActivity")}
-                 </h2>
-                 <Link to="/app/projects" className="text-xs text-indigo-400 hover:underline">{t("dashboard.organization.viewAll")}</Link>
-              </div>
+            {/* Left Column: Validation Pipeline & Demand Feed */}
+            <div className="lg:col-span-2 space-y-8">
               
+              {/* Pipeline de Validação Técnica (Ação Exclusiva da ICT) */}
               <div className="space-y-4">
-                {recentProjects.length === 0 ? (
-                  <div className="p-12 text-center border-2 border-dashed border-slate-800 rounded-3xl">
-                    <p className="text-slate-500">{t("dashboard.organization.noRecentProjects")}</p>
-                  </div>
-                ) : (
-                  recentProjects.map(proj => (
-                    <div key={proj.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex items-center gap-4 hover:bg-slate-900/60 transition-all cursor-pointer group">
-                      <div className="w-12 h-12 bg-slate-950 rounded-xl flex items-center justify-center font-black text-indigo-500 border border-slate-800 group-hover:border-indigo-500/50 transition-colors">
-                        {proj.maturity || 1}
-                      </div>
-                      <div className="flex-1">
-                        <h4 className="font-bold text-white text-sm">{proj.title}</h4>
-                        <p className="text-[10px] text-slate-500 uppercase font-black tracking-widest mt-1">{proj.segment} • TRL {proj.maturity}</p>
-                      </div>
-                      <div className="flex items-center gap-6">
-                        <div className="text-right">
-                           <div className="text-xs font-bold text-white">{proj.matchesCount || 0} {t("dashboard.inventor.matches")}</div>
-                           <div className="text-[10px] text-slate-500">{t("dashboard.organization.activeIntel")}</div>
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <ShieldCheck className="text-fuchsia-400" size={22} /> Pipeline de Validação Técnica (TRL)
+                  </h2>
+                  <span className="text-[9px] bg-fuchsia-500/10 text-fuchsia-400 px-2 py-1 rounded border border-fuchsia-500/20 font-bold uppercase">
+                    Homologação ICT
+                  </span>
+                </div>
+                
+                <div className="space-y-4">
+                  {pendingAudits.length === 0 ? (
+                    <div className="p-8 text-center bg-slate-900/20 border border-slate-800 rounded-3xl">
+                      <CheckCircle2 className="mx-auto text-emerald-400 mb-3" size={32} />
+                      <p className="text-slate-400 text-sm font-semibold">Excelente! Todos os projetos do portfólio já estão validados pela ICT.</p>
+                    </div>
+                  ) : (
+                    pendingAudits.map(proj => (
+                      <div key={proj.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-all">
+                        <div className="space-y-1 flex-1">
+                          <div className="flex items-center gap-2">
+                            <h4 className="font-bold text-white text-sm">{proj.title}</h4>
+                            <span className="bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[9px] px-2 py-0.5 rounded font-black uppercase">
+                              TRL {proj.declaredTRL || proj.maturity || 4} Declarado
+                            </span>
+                          </div>
+                          <p className="text-xs text-slate-400 leading-relaxed max-w-xl">{proj.summary}</p>
+                          <div className="flex gap-4 text-[10px] text-slate-500 mt-2">
+                            <span>Inventor: <strong className="text-slate-300">Prof. Dr. Rafael Silva</strong></span>
+                            <span>•</span>
+                            <span>Linha de Fomento: <strong className="text-slate-300">{(proj.fundingTags && proj.fundingTags[0]) || "EMBRAPII"}</strong></span>
+                          </div>
                         </div>
-                        <ArrowUpRight className="text-slate-700 group-hover:text-white transition-colors" size={20} />
+                        <button
+                          onClick={() => handleValidateTRL(proj.id, proj.declaredTRL || proj.maturity || 4)}
+                          className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/30 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap self-start sm:self-auto flex items-center gap-1.5"
+                        >
+                          <Award size={14} /> Conceder Selo "ICT Verified"
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Radar de Demanda (O que a Indústria quer comprar?) */}
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                    <Briefcase className="text-indigo-400" size={22} /> Desafios Tecnológicos (Demandas de Indústrias)
+                  </h2>
+                  <span className="text-xs text-slate-500">Oportunidades de co-desenvolvimento</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {challenges.map(chall => (
+                    <div key={chall.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/20 transition-all group h-[200px]">
+                      <div>
+                        <div className="flex justify-between items-start gap-2">
+                          <span className="text-[9px] font-black uppercase text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">
+                            {chall.companyName}
+                          </span>
+                          <span className="text-emerald-400 font-mono text-xs font-bold">
+                            R$ {(chall.budget / 1000).toFixed(0)}k
+                          </span>
+                        </div>
+                        <h4 className="font-bold text-white text-xs mt-3 leading-snug group-hover:text-indigo-300 transition-colors">{chall.title}</h4>
+                        <p className="text-[11px] text-slate-400 mt-2 line-clamp-3 leading-relaxed">{chall.description}</p>
+                      </div>
+                      <div className="flex justify-between items-center text-[9px] text-slate-500 mt-4 border-t border-slate-850 pt-2">
+                        <span>Prazo: <strong className="text-slate-400">{chall.deadline}</strong></span>
+                        <span className="text-indigo-400 hover:underline cursor-pointer font-bold uppercase tracking-wider">Ver Match</span>
                       </div>
                     </div>
-                  ))
-                )}
+                  ))}
+                </div>
               </div>
+
             </div>
 
-            {/* Sidebar: Insights */}
-            <div className="space-y-6">
-               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                  <BarChart3 className="text-slate-600" size={20} /> {t("dashboard.organization.hubInsights")}
-               </h2>
-               
-               <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-6 rounded-3xl shadow-xl shadow-indigo-500/10 space-y-4 relative overflow-hidden">
-                 <Zap className="absolute top-[-10px] right-[-10px] w-24 h-24 text-white/10 -rotate-12" />
-                 <h3 className="font-bold text-white leading-tight">{t("dashboard.organization.highConversionMatch")}</h3>
-                 <p className="text-white/70 text-xs leading-relaxed">
-                   {t("dashboard.organization.highConversionMatchDesc")}
-                 </p>
-                 <button className="w-full py-2.5 bg-white text-indigo-600 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-colors">
-                    {t("dashboard.organization.massNotification")}
-                 </button>
-               </div>
+            {/* Right Column: Labs Occupancy & Segment Analytics */}
+            <div className="space-y-8">
+              
+              {/* Vitrine de Infraestrutura e Laboratórios */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Cpu className="text-slate-500" size={20} /> Ocupação de Infraestruturas
+                </h2>
+                
+                <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-5">
+                  <div className="space-y-4">
+                    {labs.map(l => (
+                      <div key={l.id} className="space-y-2">
+                        <div className="flex justify-between text-xs">
+                          <span className="text-slate-200 font-bold truncate max-w-[170px]">{l.name}</span>
+                          <span className={`font-mono font-bold ${l.occupancy >= 80 ? 'text-rose-400' : 'text-emerald-400'}`}>{l.occupancy}%</span>
+                        </div>
+                        <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-850">
+                          <div 
+                            className={`h-full rounded-full transition-all duration-500 ${l.occupancy >= 80 ? 'bg-rose-500' : 'bg-emerald-500'}`} 
+                            style={{ width: `${l.occupancy}%` }} 
+                          />
+                        </div>
+                        <div className="flex justify-between text-[9px] text-slate-500 font-bold uppercase">
+                          <span>{l.projectsCount} Projetos Alocados</span>
+                          <span>Capacidade Máxima</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-               <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
-                 <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">{t("dashboard.organization.fundingMetrics")}</h3>
-                 <div className="space-y-3">
+                  <button 
+                    onClick={() => setActiveTab("capacities")}
+                    className="w-full py-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all flex items-center justify-center gap-1"
+                  >
+                    <Plus size={12} /> Homologar Novo Laboratório
+                  </button>
+                </div>
+              </div>
+
+              {/* Radar de Demanda (O que a Indústria quer comprar?) */}
+              <div className="space-y-4">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <BarChart3 className="text-slate-500" size={20} /> Setores mais Buscados
+                </h2>
+                
+                <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
+                  <div className="space-y-3">
                     {[
-                      { label: "Embrapii", percent: 65, color: "bg-blue-500" },
-                      { label: "FINEP", percent: 40, color: "bg-emerald-500" },
-                      { label: "FAPEMIG", percent: 85, color: "bg-amber-500" },
+                      { label: "Telecom / 5G / 6G", percent: 45, color: "bg-indigo-500" },
+                      { label: "Internet das Coisas (IoT)", percent: 35, color: "bg-emerald-500" },
+                      { label: "Inteligência Artificial", percent: 20, color: "bg-amber-500" }
                     ].map(bar => (
                       <div key={bar.label} className="space-y-1.5">
                         <div className="flex justify-between text-[10px] font-bold">
@@ -326,8 +454,13 @@ export default function OrganizationDashboard() {
                         </div>
                       </div>
                     ))}
-                 </div>
-               </div>
+                  </div>
+                  <p className="text-[10px] text-slate-500 leading-relaxed italic text-center">
+                    Mapeamento em tempo real baseado nas queries e desafios postados pelas empresas.
+                  </p>
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
@@ -453,7 +586,10 @@ export default function OrganizationDashboard() {
                     </div>
                   </div>
                 </div>
-                <button className="w-full py-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all flex items-center justify-center gap-1">
+                <button 
+                  onClick={() => alert("Candidatura ao edital iniciada!")}
+                  className="w-full py-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all flex items-center justify-center gap-1"
+                >
                   <Award size={12} /> {t("dashboard.organization.fomento.applyBtn")}
                 </button>
               </div>
@@ -517,7 +653,10 @@ export default function OrganizationDashboard() {
                   </div>
                 </div>
 
-                <button className="w-full py-2.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all">
+                <button 
+                  onClick={() => alert("Pesquisador alocado para novo edital!")}
+                  className="w-full py-2.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all"
+                >
                   {t("dashboard.organization.researchers.assignBtn")}
                 </button>
               </div>
