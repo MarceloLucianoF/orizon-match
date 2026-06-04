@@ -148,7 +148,7 @@ service cloud.firestore {
     // PHASE D: ORGANIZATIONS & MULTI-TENANCY
     // -----------------------------------------------
     match /organizations/{orgId} {
-      allow read: if request.auth != null && (request.auth.uid in resource.data.managers || isAdmin());
+      allow read: if request.auth != null && (resource == null || request.auth.uid in resource.data.managers || isAdmin());
       allow update: if request.auth != null && request.auth.uid in resource.data.managers;
       allow create: if request.auth != null; // Requests for new orgs
     }
@@ -267,9 +267,13 @@ service cloud.firestore {
       allow read: if request.auth != null && (
         resource == null ||
         request.auth.uid == resource.data.investorId || 
-        request.auth.uid == resource.data.ownerId || 
+        request.auth.uid == resource.data.inventorId || 
         isAdmin() ||
-        (resource.data.orgId != null && request.auth.uid in get(/databases/$(database)/documents/organizations/$(resource.data.orgId)).data.managers)
+        (resource.data.projectId != null && 
+         request.auth.uid == get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.userId) ||
+        (resource.data.projectId != null && 
+         get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.orgId != null && 
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(resource.data.projectId)).data.orgId)).data.managers)
       );
       allow create: if request.auth != null && 
                     (request.auth.uid == request.resource.data.investorId || isAdmin()) &&
