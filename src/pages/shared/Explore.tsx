@@ -6,7 +6,7 @@ import { getUserProjects } from "../../services/projectService";
 import { createOrGetConversation } from "../../services/chatService";
 import { explainMatch, getMatchTier, getScoreColor } from "../../lib/matching";
 import {
-  Loader2, Search, Filter, Compass, ArrowRight, ShieldCheck,
+  Loader2, Search, Filter, Compass, ArrowRight, ShieldCheck, ChevronDown,
   SlidersHorizontal, X, CheckCircle
 } from "lucide-react";
 import { EmptyState } from "../../components/EmptyState";
@@ -23,6 +23,31 @@ const FIESC_CHAMBERS = [
 ];
 
 const REGIONS = ["Norte", "Nordeste", "Centro-Oeste", "Sudeste", "Sul"];
+
+function FilterSelect({
+  value,
+  onChange,
+  children,
+  className = ""
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`relative ${className}`}>
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="peer w-full appearance-none bg-slate-950 border border-slate-700/80 text-sm text-slate-200 rounded-xl px-3.5 py-3 pr-10 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all shadow-inner shadow-black/10"
+      >
+        {children}
+      </select>
+      <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 peer-focus:text-indigo-400 transition-colors" size={16} />
+    </div>
+  );
+}
 
 export function Explore() {
   const { user, userProfile } = useAuth();
@@ -318,9 +343,9 @@ export function Explore() {
       </div>
 
       {/* Search + Filters */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 md:p-5 space-y-4">
+      <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-4 md:p-5 space-y-4 shadow-[0_0_30px_rgba(0,0,0,0.18)]">
         {/* Search bar */}
-        <div className="flex gap-3">
+        <div className="flex flex-col md:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
             <input 
@@ -329,111 +354,97 @@ export function Explore() {
               onChange={e => setFilters({ ...filters, search: e.target.value })}
               onKeyDown={e => e.key === "Enter" && handleSearch()}
               placeholder={t("explore.searchPlaceholder")}
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm"
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm"
             />
           </div>
           <button 
             onClick={handleSearch}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all text-sm flex items-center gap-2"
+            className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl font-medium transition-all text-sm flex items-center justify-center gap-2 shrink-0"
           >
             <Search size={16} /> {t("explore.search")}
           </button>
         </div>
 
         {/* Filters row */}
-        <div className={`flex flex-wrap gap-3 items-center ${showFilters ? 'block' : 'hidden md:flex'}`}>
-          <div className="flex items-center gap-1.5 text-slate-500 text-xs">
-            <Filter size={14} /> {t("explore.filters")}:
+        <div className={`${showFilters ? 'grid' : 'hidden md:grid'} grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3`}>
+          <div className="md:col-span-2 xl:col-span-4 flex items-center justify-between gap-3 rounded-xl border border-slate-800/80 bg-slate-950/70 px-3 py-2.5">
+            <div className="flex items-center gap-1.5 text-slate-500 text-[11px] font-semibold uppercase tracking-[0.18em]">
+              <Filter size={14} /> {t("explore.filters")}
+            </div>
+            {hasActiveFilters && (
+              <button onClick={clearFilters} className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition font-medium uppercase tracking-wide">
+                <X size={12} /> {t("explore.clear")}
+              </button>
+            )}
           </div>
-          
-          <select
-            value={filters.segment || ""}
-            onChange={e => setFilters({ ...filters, segment: e.target.value })}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
-          >
+
+          <FilterSelect value={filters.segment || ""} onChange={value => setFilters({ ...filters, segment: value })}>
             <option value="">{t("explore.allSegments")}</option>
             {FIESC_CHAMBERS.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+          </FilterSelect>
 
-          <select
-            value={filters.minTrl || ""}
-            onChange={e => setFilters({ ...filters, minTrl: e.target.value ? Number(e.target.value) : undefined })}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
-          >
+          <FilterSelect value={filters.minTrl ? String(filters.minTrl) : ""} onChange={value => setFilters({ ...filters, minTrl: value ? Number(value) : undefined })}>
             <option value="">{t("explore.allTrls")}</option>
             {[1,2,3,4,5,6,7,8,9].map(n => <option key={n} value={n}>TRL {n}+</option>)}
-          </select>
+          </FilterSelect>
 
-          <select
-            value={filters.region || ""}
-            onChange={e => setFilters({ ...filters, region: e.target.value })}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
-          >
+          <FilterSelect value={filters.region || ""} onChange={value => setFilters({ ...filters, region: value })}>
             <option value="">{t("explore.allRegions")}</option>
             {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
-          </select>
+          </FilterSelect>
 
-          <select
-            value={filters.fomento || ""}
-            onChange={e => setFilters({ ...filters, fomento: e.target.value })}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
-          >
+          <FilterSelect value={filters.fomento || ""} onChange={value => setFilters({ ...filters, fomento: value })}>
             <option value="">{t("explore.allFomentos")}</option>
             {["FINEP", "Embrapii", "CNPq", "FAPESC", "SENAI"].map(f => <option key={f} value={f}>{f}</option>)}
-          </select>
+          </FilterSelect>
 
-          <select
-            value={filters.investmentStage || ""}
-            onChange={e => setFilters({ ...filters, investmentStage: e.target.value })}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
-          >
+          <FilterSelect value={filters.investmentStage || ""} onChange={value => setFilters({ ...filters, investmentStage: value })}>
             <option value="">Estágio de Desenvolvimento</option>
             <option value="concept">Idea / Concept (TRL 1-3)</option>
             <option value="prototype">Prototype / Lab (TRL 4-6)</option>
             <option value="market">Market Ready (TRL 7-9)</option>
-          </select>
+          </FilterSelect>
 
-          <select
-            value={filters.ticketRange || ""}
-            onChange={e => setFilters({ ...filters, ticketRange: e.target.value })}
-            className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-indigo-500"
-          >
+          <FilterSelect value={filters.ticketRange || ""} onChange={value => setFilters({ ...filters, ticketRange: value })}>
             <option value="">Ticket de Financiamento</option>
             <option value="50k">&lt; R$ 250k (Pre-Seed/Seed)</option>
             <option value="250k">R$ 250k - R$ 1M (Growth)</option>
             <option value="1m">&gt; R$ 1M (Corporate VC)</option>
-          </select>
+          </FilterSelect>
 
-          <label htmlFor="ictFilter" className="flex items-center gap-2 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-300 cursor-pointer hover:border-indigo-500 transition duration-200">
-            <input 
-              type="checkbox" 
-              id="ictFilter" 
-              checked={!!filters.onlyIctVerified}
-              onChange={e => setFilters({ ...filters, onlyIctVerified: e.target.checked })}
-              className="w-4 h-4 text-indigo-600 rounded border-slate-700 bg-slate-950 focus:ring-indigo-500 focus:ring-offset-0" 
-            />
-            <span className="flex items-center gap-1.5 font-semibold">
-              <ShieldCheck className="w-4 h-4 text-emerald-400"/> Somente ICT Verified
+          <label
+            htmlFor="ictFilter"
+            className="flex items-center justify-between gap-3 bg-slate-950/90 border border-slate-700/80 rounded-xl px-3.5 py-3 text-sm text-slate-200 cursor-pointer hover:border-indigo-500/70 hover:bg-slate-950 transition duration-200 md:col-span-2 xl:col-span-2 shadow-inner shadow-black/10"
+          >
+            <span className="flex items-center gap-2 min-w-0">
+              <input 
+                type="checkbox" 
+                id="ictFilter" 
+                checked={!!filters.onlyIctVerified}
+                onChange={e => setFilters({ ...filters, onlyIctVerified: e.target.checked })}
+                className="w-4 h-4 shrink-0 text-indigo-600 rounded border-slate-700 bg-slate-950 focus:ring-indigo-500 focus:ring-offset-0"
+              />
+              <span className="flex items-center gap-1.5 font-semibold truncate">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span className="uppercase tracking-[0.12em] text-[11px] text-slate-100">Somente ICT Verified</span>
+              </span>
+            </span>
+            <span className="text-[10px] uppercase tracking-[0.16em] text-emerald-400/90 font-semibold whitespace-nowrap">
+              Filtro premium
             </span>
           </label>
 
-          <div className="flex items-center gap-2 text-xs text-slate-400">
-            <span>{t("explore.minScore")}:</span>
-            <span className="font-bold text-indigo-400">{filters.minScore || 50}%</span>
+          <div className="flex items-center gap-2 text-sm text-slate-400 bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-3 md:col-span-2 xl:col-span-2 shadow-inner shadow-black/10">
+            <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{t("explore.minScore")}</span>
+            <span className="font-bold text-indigo-400 tabular-nums">{filters.minScore || 50}%</span>
             <input 
               type="range" 
               min="0" max="90" step="10"
               value={filters.minScore || 50}
               onChange={e => setFilters({ ...filters, minScore: Number(e.target.value) })}
-              className="w-24 accent-indigo-500"
+              className="flex-1 accent-indigo-500"
             />
           </div>
-
-          {hasActiveFilters && (
-            <button onClick={clearFilters} className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1 transition">
-              <X size={12} /> {t("explore.clear")}
-            </button>
-          )}
         </div>
       </div>
 
@@ -460,9 +471,9 @@ export function Explore() {
             const scoreColor = getScoreColor(project.score);
             
             return (
-              <div key={project.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 md:p-5 hover:border-indigo-500/30 transition-all flex flex-col md:flex-row md:items-center gap-4 md:gap-6 relative overflow-hidden">
+              <div key={project.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 md:p-5 hover:border-indigo-500/30 transition-all flex flex-col md:flex-row md:items-center gap-4 md:gap-6 relative overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.12)]">
                 {/* Score circle */}
-                <div className="flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-slate-800 relative bg-slate-900">
+                <div className="flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-slate-800 relative bg-slate-900 mx-auto md:mx-0">
                   <span className={`text-lg md:text-xl font-bold ${scoreColor}`}>{project.score}%</span>
                   {idx === 0 && (
                     <div className="absolute -top-3 bg-amber-500 text-amber-950 text-[9px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]">
@@ -472,9 +483,9 @@ export function Explore() {
                 </div>
 
                 {/* Info */}
-                <div className="flex-1 min-w-0 space-y-3">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="text-base font-bold text-slate-100 truncate">
+                <div className="flex-1 min-w-0 space-y-3 text-center md:text-left">
+                  <div className="flex flex-wrap items-center gap-2 justify-center md:justify-start">
+                    <h3 className="text-base font-bold text-slate-100 truncate max-w-full">
                       {project.title || t("explore.confidentialProject")}
                     </h3>
                     
@@ -503,7 +514,7 @@ export function Explore() {
                   </p>
 
                   {/* Highlights (Invstor-style badges) */}
-                  <div className="flex flex-wrap gap-2 text-[10px] font-bold">
+                  <div className="flex flex-wrap gap-2 text-[10px] font-bold justify-center md:justify-start">
                     <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded flex items-center gap-1">
                       💰 Busca: {project.ticketRange === '50k' ? '< R$ 250k' : project.ticketRange === '250k' ? 'R$ 250k - R$ 1M' : project.ticketRange === '1m' ? '> R$ 1M' : 'Sob Consulta'}
                     </span>
@@ -525,7 +536,7 @@ export function Explore() {
                   <p className="text-xs text-slate-500">{explainMatch(project.breakdown)}</p>
 
                   {/* GATILHO DE ESCASSEZ (PAYWALL / NDA) */}
-                  <div className="border-t border-slate-800/80 pt-3 mt-1">
+                  <div className="border-t border-slate-800/80 pt-3 mt-1 text-left">
                     {userProfile?.subscriptionStatus !== 'premium' ? (
                       <div className="relative group cursor-pointer" onClick={() => navigate('/pricing')}>
                         {/* Camada borrada */}
@@ -556,7 +567,7 @@ export function Explore() {
                 </div>
 
                 {/* Action */}
-                <div className="flex-shrink-0 flex flex-col gap-2">
+                <div className="flex-shrink-0 flex flex-col gap-2 w-full md:w-auto">
                   <button 
                     onClick={() => handleConnect(project)}
                     disabled={connecting === project.id || userProjects.length === 0}

@@ -31,13 +31,13 @@ export function IpBalcaoTab({
         </h2>
         <div className="space-y-4">
           {activePatents.map(pat => (
-            <div key={pat.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-3xl hover:border-slate-700 transition-all flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+            <div key={pat.id} className="bg-slate-900/40 border border-slate-800/80 p-5 rounded-3xl hover:border-slate-700 transition-all flex flex-col sm:flex-row justify-between sm:items-center gap-4">
               <div className="space-y-2">
                 <h3 className="text-sm font-bold text-white leading-snug">{pat.title}</h3>
                 <div className="flex flex-wrap items-center gap-3 text-[10px]">
                   <span className="text-slate-500 font-bold uppercase tracking-wider">{t("dashboard.organization.ip_balcao.inpiNumber")}: <strong className="text-slate-300 font-mono">{pat.inpi}</strong></span>
-                  <div className="h-3 border-l border-slate-850" />
-                  <span className="bg-slate-950 border border-slate-850 px-2 py-0.5 rounded text-slate-400 font-bold">TRL {pat.trl}</span>
+                  <div className="h-3 border-l border-slate-800/80" />
+                  <span className="bg-slate-950 border border-slate-800/80 px-2 py-0.5 rounded text-slate-400 font-bold">TRL {pat.trl}</span>
                 </div>
               </div>
               <span className={`text-[10px] px-3 py-1.5 rounded-full border font-bold self-start sm:self-auto ${
@@ -54,7 +54,7 @@ export function IpBalcaoTab({
 
       {/* PI Parameters Config */}
       <div>
-        <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-6">
+        <div className="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl space-y-6">
           <h3 className="text-lg font-bold text-white flex items-center gap-2">
             <Settings className="text-indigo-400" size={20} /> {t("dashboard.organization.ip_balcao.title")}
           </h3>
@@ -80,7 +80,7 @@ export function IpBalcaoTab({
               </div>
             </div>
 
-            <div className="border-t border-slate-850 my-4" />
+            <div className="border-t border-slate-800/80 my-4" />
 
             {/* Toggles */}
             <div className="flex items-center justify-between">
@@ -93,7 +93,7 @@ export function IpBalcaoTab({
                     : 'bg-slate-950 border-slate-800'
                 }`}
               >
-                <span className={`absolute top-0.5 left-0.5 bg-white w-4.5 h-4.5 rounded-full shadow transition-all ${
+                <span className={`absolute top-0.5 left-0.5 bg-white w-4 h-4 rounded-full shadow transition-all ${
                   allowExclusive ? 'translate-x-5' : 'translate-x-0'
                 }`} />
               </button>

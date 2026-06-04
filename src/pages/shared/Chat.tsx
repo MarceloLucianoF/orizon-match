@@ -97,16 +97,16 @@ export function Chat() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-8rem)] bg-slate-950/50 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+    <div className="flex min-h-[calc(100vh-8rem)] flex-col md:flex-row bg-slate-950/50 border border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
       
       {/* SIDEBAR CONVERSAS */}
-      <div className="w-1/3 border-r border-slate-800 bg-slate-900/50 flex flex-col">
+      <div className="w-full md:w-1/3 md:max-w-sm lg:max-w-md border-b md:border-b-0 md:border-r border-slate-800 bg-slate-900/50 flex flex-col md:max-h-none">
         <div className="p-4 border-b border-slate-800">
           <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
             <MessageSquare size={20} /> Negociações
           </h2>
         </div>
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-visible md:overflow-y-auto">
           {conversations.length === 0 ? (
             <EmptyState
               icon={MessageSquare}
@@ -155,10 +155,16 @@ export function Chat() {
       </div>
 
       {/* CHAT ÁREA */}
-      <div className="flex-1 flex flex-col relative bg-[#040B1A]">
+      <div className="flex-1 flex flex-col relative bg-[#040B1A] min-h-[56vh] md:min-h-0">
         {activeConv ? (
           <>
-            <DealFlowPipeline currentStage={activeConv.stage} />
+            <div className="hidden md:block">
+              <DealFlowPipeline currentStage={activeConv.stage} />
+            </div>
+            <div className="md:hidden border-b border-slate-800 bg-slate-900/80 px-4 py-3">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-slate-500 font-bold">Deal Flow</p>
+              <p className="text-sm font-semibold text-slate-200 truncate mt-1">{activeConv.projectTitle || `Match #${activeConv.id.slice(0, 5)}`}</p>
+            </div>
             
             {/* DOUBLE OPT-IN STATUS BAR */}
             {activeConv.status === "declined" && (
@@ -327,12 +333,18 @@ export function Chat() {
             </div>
           </>
         ) : (
-          <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
-            <div className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mb-4 border border-slate-800 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-              <MessageSquare size={32} className="text-slate-600" />
+          <div className="flex-1 flex flex-col items-center justify-center text-slate-500 px-6 py-10 md:py-0">
+            <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-900 rounded-full flex items-center justify-center mb-4 border border-slate-800 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+              <MessageSquare size={28} className="text-slate-600 md:hidden" />
+              <MessageSquare size={32} className="text-slate-600 hidden md:block" />
             </div>
-            <h2 className="text-xl font-bold text-slate-300 mb-2">Deal Flow CRM</h2>
-            <p className="text-sm">Selecione uma negociação ao lado para enviar mensagens e propostas.</p>
+            <h2 className="text-lg md:text-xl font-bold text-slate-300 mb-2 text-center">Deal Flow CRM</h2>
+            <p className="text-sm text-center max-w-sm leading-relaxed">Selecione uma negociação ao lado para enviar mensagens e propostas.</p>
+            <div className="md:hidden mt-6 w-full max-w-xs">
+              <a href="/explore" className="w-full inline-flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-3 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)]">
+                Explorar matches
+              </a>
+            </div>
           </div>
         )}
       </div>

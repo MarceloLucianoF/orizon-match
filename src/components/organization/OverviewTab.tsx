@@ -35,7 +35,7 @@ export function OverviewTab({
           <div key={i} className={`bg-slate-900/40 border ${stat.color} p-6 rounded-3xl hover:border-slate-700 transition-all group relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-[40px] rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-all" />
             <div className="flex justify-between items-start mb-4">
-              <div className="p-3 bg-slate-950 rounded-2xl border border-slate-850 group-hover:scale-110 transition-transform">
+              <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800/80 group-hover:scale-110 transition-transform">
                 {stat.icon}
               </div>
               <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-400 uppercase">
@@ -177,7 +177,7 @@ export function OverviewTab({
                     <h4 className="font-bold text-white text-xs mt-3 leading-snug group-hover:text-indigo-300 transition-colors">{chall.title}</h4>
                     <p className="text-[11px] text-slate-400 mt-2 line-clamp-3 leading-relaxed">{chall.description}</p>
                   </div>
-                  <div className="flex justify-between items-center text-[9px] text-slate-500 mt-4 border-t border-slate-850 pt-2">
+                  <div className="flex justify-between items-center text-[9px] text-slate-500 mt-4 border-t border-slate-800/80 pt-2">
                     <span>Prazo: <strong className="text-slate-400">{chall.deadline}</strong></span>
                     <span className="text-indigo-400 hover:underline cursor-pointer font-bold uppercase tracking-wider">Ver Match</span>
                   </div>
@@ -192,7 +192,7 @@ export function OverviewTab({
         <div className="space-y-8">
           
           {/* Card de Insights do Polo */}
-          <div className="bg-gradient-to-br from-indigo-650 to-violet-850 p-6 rounded-3xl shadow-xl shadow-indigo-600/10 space-y-4 relative overflow-hidden group">
+          <div className="bg-gradient-to-br from-indigo-600/20 via-slate-900 to-violet-600/15 p-6 rounded-3xl shadow-xl shadow-indigo-600/10 space-y-4 relative overflow-hidden group border border-slate-800/80">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[30px] rounded-full -mr-16 -mt-16 group-hover:bg-white/10 transition-all duration-500" />
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200">
               <Zap size={14} className="animate-pulse" /> Insight de Alta Conversão
@@ -203,9 +203,9 @@ export function OverviewTab({
             </p>
             <button 
               onClick={() => openModal('mass_notification')}
-              className="w-full py-2.5 bg-white text-indigo-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-lg shadow-indigo-950/20"
+              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-semibold text-[10px] uppercase tracking-[0.12em] leading-none transition-all shadow-[0_0_18px_rgba(79,70,229,0.25)]"
             >
-              Ativar Notificação de Massa
+              Enviar Aviso Geral
             </button>
           </div>
 
@@ -226,7 +226,7 @@ export function OverviewTab({
                     <span className="text-slate-300">{bar.label}</span>
                     <span className="text-slate-400 font-mono">{bar.percent}%</span>
                   </div>
-                  <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-850">
+                  <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800/80">
                     <div className={`${bar.color} h-full rounded-full transition-all duration-1000`} style={{ width: `${bar.percent}%` }} />
                   </div>
                 </div>
@@ -248,7 +248,7 @@ export function OverviewTab({
                       <span className="text-slate-200 font-bold truncate max-w-[170px]">{l.name}</span>
                       <span className={`font-mono font-bold ${l.occupancy >= 80 ? 'text-rose-400' : 'text-emerald-400'}`}>{l.occupancy}%</span>
                     </div>
-                    <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-850">
+                    <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800/80">
                       <div 
                         className={`h-full rounded-full transition-all duration-500 ${l.occupancy >= 80 ? 'bg-rose-500' : 'bg-emerald-500'}`} 
                         style={{ width: `${l.occupancy}%` }} 

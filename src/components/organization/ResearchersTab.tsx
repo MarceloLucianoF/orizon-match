@@ -50,10 +50,10 @@ export function ResearchersTab({
                 <h3 className="text-sm font-bold text-white truncate">{r.name}</h3>
                 <p className="text-[10px] text-slate-500 font-semibold truncate mt-0.5">{r.title}</p>
                 <div className="flex gap-2.5 mt-2">
-                  <span className="text-[9px] bg-slate-950 border border-slate-855 px-2 py-0.5 rounded text-slate-400">
+                  <span className="text-[9px] bg-slate-950 border border-slate-800/80 px-2 py-0.5 rounded text-slate-400">
                     {t("dashboard.organization.researchers.hindex")}: <strong>{r.hIndex}</strong>
                   </span>
-                  <span className="text-[9px] bg-slate-950 border border-slate-855 px-2 py-0.5 rounded text-slate-400">
+                  <span className="text-[9px] bg-slate-950 border border-slate-800/80 px-2 py-0.5 rounded text-slate-400">
                     {t("dashboard.organization.researchers.patents")}: <strong>{r.patents}</strong>
                   </span>
                 </div>

@@ -22,7 +22,7 @@ export function FomentoTab({ fundingCalls, openModal }: FomentoTabProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {fundingCalls.map(call => (
-          <div key={call.id} className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl hover:border-slate-700 transition-all flex flex-col justify-between h-[230px] relative overflow-hidden group">
+          <div key={call.id} className="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl hover:border-slate-700 transition-all flex flex-col justify-between h-[230px] relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/5 blur-[30px] rounded-full group-hover:bg-indigo-500/10 transition-all" />
             <div className="space-y-3">
               <div className="flex justify-between items-center">
@@ -40,7 +40,7 @@ export function FomentoTab({ fundingCalls, openModal }: FomentoTabProps) {
                   <span className="text-[10px] text-slate-500 block uppercase font-bold">{t("dashboard.organization.fomento.fundingAgency")}</span>
                   <strong className="text-slate-200">{call.amount}</strong>
                 </div>
-                <div className="border-l border-slate-850 h-8" />
+                <div className="border-l border-slate-800/80 h-8" />
                 <div>
                   <span className="text-[10px] text-slate-500 block uppercase font-bold">{t("dashboard.organization.fomento.deadline")}</span>
                   <strong className="text-slate-200">{call.deadline}</strong>
