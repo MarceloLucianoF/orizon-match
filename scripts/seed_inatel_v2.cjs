@@ -10,6 +10,47 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 const ADMIN_UID = "nqBV3Da1iqPbU46jGvO1ljBbIze2"; 
+const DEVELOPER_UID = "BfIgQtnAZxRFuHCoiMw4bMkfgWW2";
+
+const KEEPUIDS = new Set([
+  'ict_inatel',
+  'comp_ericsson',
+  'comp_siemens',
+  'comp_weg',
+  'inv_kaszek',
+  'inv_canary',
+  'inventor_rafael',
+  'inventor_camila',
+  'company_qualcomm',
+  'company_cemig',
+  'company_nidec',
+  'company_schneider',
+  'company_embraer',
+  'company_vivo',
+  'company_tim',
+  'investor_xG',
+  ADMIN_UID,
+  DEVELOPER_UID
+]);
+
+async function cleanAuthUsers() {
+  console.log("🧹 Limpando usuários indesejados do Firebase Auth...");
+  let nextPageToken;
+  do {
+    const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
+    for (const userRecord of listUsersResult.users) {
+      if (!KEEPUIDS.has(userRecord.uid)) {
+        console.log(`🗑️ Deletando usuário Auth lixo: ${userRecord.email} (${userRecord.uid})`);
+        try {
+          await admin.auth().deleteUser(userRecord.uid);
+        } catch (err) {
+          console.error(`Erro ao deletar usuário ${userRecord.email}:`, err);
+        }
+      }
+    }
+    nextPageToken = listUsersResult.pageToken;
+  } while (nextPageToken);
+}
 
 async function getOrCreateUser(uid, email, password) {
   try {
@@ -54,7 +95,7 @@ async function clearCollection(collectionPath) {
 
   const batch = db.batch();
   snapshot.docs.forEach((doc) => {
-    if (collectionPath === 'users' && doc.id === ADMIN_UID) return;
+    if (collectionPath === 'users' && (doc.id === ADMIN_UID || doc.id === DEVELOPER_UID)) return;
     batch.delete(doc.ref);
   });
   
@@ -65,7 +106,10 @@ async function clearCollection(collectionPath) {
 async function seedV2() {
   console.log("🚀 Iniciando Orizon Match Seed v3.0 (Merged Portuguese DeepTech Ecosystem & Rich Deal Flow)...");
   
-  const collections = ['users', 'projects', 'matches', 'conversations', 'messages', 'challenges', 'assets_ip', 'logs_ai'];
+  // Clean Firebase Auth
+  await cleanAuthUsers();
+
+  const collections = ['users', 'projects', 'matches', 'conversations', 'messages', 'challenges', 'assets_ip', 'logs_ai', 'organizations'];
   for (const col of collections) {
     await clearCollection(col);
   }
@@ -98,6 +142,7 @@ async function seedV2() {
     'ict_inatel': { 
       id: 'ict_inatel', 
       role: 'ict', 
+      orgId: 'ict_inatel',
       name: 'Inatel - NGTI & Unidade EMBRAPII ICC', 
       email: 'ict@inatel.br',
       segment: 'Telecomunicações, 5G/6G, IoT e IA',
@@ -170,6 +215,7 @@ async function seedV2() {
     'inventor_rafael': { 
       id: 'inventor_rafael', 
       role: 'inventor', 
+      orgId: 'ict_inatel',
       name: 'Prof. Dr. Rafael Silva (CRR)', 
       email: 'inventor@wailab.br',
       verified: true,
@@ -180,11 +226,30 @@ async function seedV2() {
     'inventor_camila': { 
       id: 'inventor_camila', 
       role: 'inventor', 
+      orgId: 'ict_inatel',
       name: 'Pesquisadora Camila Santos (WAI Lab)', 
       email: 'pesquisadora@wailab.br',
       verified: true,
       subscriptionStatus: 'free',
       location: 'Santa Rita do Sapucaí, MG',
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
+    'nqBV3Da1iqPbU46jGvO1ljBbIze2': {
+      id: 'nqBV3Da1iqPbU46jGvO1ljBbIze2',
+      role: 'admin',
+      name: 'Administrador Supremo',
+      email: 'magoteteu@gmail.com',
+      verified: true,
+      subscriptionStatus: 'premium',
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
+    'BfIgQtnAZxRFuHCoiMw4bMkfgWW2': {
+      id: 'BfIgQtnAZxRFuHCoiMw4bMkfgWW2',
+      role: 'admin',
+      name: 'Marcelo Luciano',
+      email: 'marceloluciano30@gmail.com',
+      verified: true,
+      subscriptionStatus: 'premium',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     },
     'company_qualcomm': {
@@ -279,6 +344,21 @@ async function seedV2() {
 
   for (const [id, data] of Object.entries(users)) {
     batch.set(db.collection('users').doc(id), data);
+  }
+
+  // Seeding organizations collection
+  const organizations = {
+    'ict_inatel': {
+      id: 'ict_inatel',
+      name: 'Inatel - NGTI & Unidade EMBRAPII ICC',
+      type: 'ICT',
+      managers: ['ict_inatel'],
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    }
+  };
+
+  for (const [id, data] of Object.entries(organizations)) {
+    batch.set(db.collection('organizations').doc(id), data);
   }
 
   // 2. Projects: 15 Highly Complete, Realistic Portuguese/English Deep Tech projects
@@ -499,6 +579,7 @@ async function seedV2() {
     const projectRef = db.collection('projects').doc(p.id);
     batch.set(projectRef, {
       userId: p.userId,
+      orgId: 'ict_inatel',
       title: p.title,
       summary: p.summary,
       segment: p.segment,
@@ -560,6 +641,7 @@ async function seedV2() {
   matches.forEach(m => {
     batch.set(db.collection('matches').doc(m.id), {
       ...m,
+      orgId: 'ict_inatel',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     });
   });

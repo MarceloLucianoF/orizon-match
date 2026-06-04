@@ -12,7 +12,7 @@ import {
 import { EmptyState } from "../../components/EmptyState";
 import { useTranslation } from "react-i18next";
 import { generateProjectAiBriefing } from "../../services/reportService";
-import { logAudit, logActivity } from "../../services/governanceService";
+import { logAudit, logActivity, generateUUID } from "../../services/governanceService";
 import { collection, query, where, onSnapshot, doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../../firebase/config";
 
@@ -55,6 +55,7 @@ export function Explore() {
   const handleAddToDealFlow = async (project: any) => {
     if (!user || !userProfile) return;
     try {
+      const correlationId = generateUUID();
       const dealId = `${user.uid}_${project.id}`;
       const dealRef = doc(db, "deals", dealId);
       
@@ -72,7 +73,8 @@ export function Explore() {
         ownerName: userProfile.name || "Marcelo Filho",
         estimatedValue: 500000,
         expectedCloseDate: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-        nextAction: "Agendar reunião de triagem"
+        nextAction: "Agendar reunião de triagem",
+        correlationId
       };
 
       await setDoc(dealRef, newDeal);
@@ -90,7 +92,8 @@ export function Explore() {
         project.id,
         project.title || "Projeto",
         null,
-        newDeal
+        newDeal,
+        correlationId
       );
 
       await logActivity(
@@ -98,7 +101,8 @@ export function Explore() {
         actor.name,
         project.id,
         project.title || "Projeto",
-        { stage: "descoberta" }
+        { stage: "descoberta" },
+        correlationId
       );
 
     } catch (err) {

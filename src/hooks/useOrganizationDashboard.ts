@@ -217,7 +217,7 @@ export function useOrganizationDashboard() {
         }
 
         // Get Stats
-        const projectsQuery = query(collection(db, "projects"));
+        const projectsQuery = query(collection(db, "projects"), where("orgId", "==", orgId));
         const projectsSnap = await getDocs(projectsQuery);
         
         const assetsQuery = query(collection(db, "assets_ip"), where("orgId", "==", orgId));
@@ -236,8 +236,8 @@ export function useOrganizationDashboard() {
         // Get unique inventors
         const inventorIds = new Set(projectsSnap.docs.map(d => d.data().userId));
 
-        // Get all matches
-        const matchesQuery = query(collection(db, "matches"));
+        // Get matches for this organization
+        const matchesQuery = query(collection(db, "matches"), where("orgId", "==", orgId));
         const matchesSnap = await getDocs(matchesQuery);
 
         setStats({

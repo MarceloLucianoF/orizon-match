@@ -23,7 +23,10 @@ service cloud.firestore {
     match /matches/{matchId} {
       allow read: if request.auth != null && (
         request.auth.uid == resource.data.targetUserId ||
+        request.auth.uid == resource.data.orgId ||
         request.auth.uid == get(/databases/$(database)/documents/projects/$(resource.data.ownerProjectId)).data.userId ||
+        (resource.data.orgId != null && 
+         request.auth.uid in get(/databases/$(database)/documents/organizations/$(resource.data.orgId)).data.managers) ||
         (get(/databases/$(database)/documents/projects/$(resource.data.ownerProjectId)).data.orgId != null && 
          request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(resource.data.ownerProjectId)).data.orgId)).data.managers) ||
         (get(/databases/$(database)/documents/users/$(resource.data.targetUserId)).data.orgId != null && 
@@ -124,7 +127,10 @@ service cloud.firestore {
     match /domain_events/{eventId} {
       // Queue is internal/system-only. Only Admin/GCF can read or modify.
       allow read: if isAdmin();
-      allow create: if request.auth != null;
+      // Validate that the actorUid matches the authenticated user's UID to prevent forgery.
+      allow create: if request.auth != null && 
+                    request.resource.data.actorUid == request.auth.uid &&
+                    request.resource.data.timestamp == request.time;
       allow update, delete: if isAdmin();
     }
 
@@ -259,6 +265,7 @@ service cloud.firestore {
 
     match /signed_ndas/{ndaId} {
       allow read: if request.auth != null && (
+        resource == null ||
         request.auth.uid == resource.data.investorId || 
         request.auth.uid == resource.data.ownerId || 
         isAdmin() ||
@@ -267,6 +274,14 @@ service cloud.firestore {
       allow create: if request.auth != null && 
                     (request.auth.uid == request.resource.data.investorId || isAdmin()) &&
                     ndaId == (request.resource.data.investorId + "_" + request.resource.data.projectId);
+    }
+
+    match /challenges/{challengeId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && (
+        request.resource.data.companyId == request.auth.uid || 
+        isAdmin()
+      );
     }
   }
 }

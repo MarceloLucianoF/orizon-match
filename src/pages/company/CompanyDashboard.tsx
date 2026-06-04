@@ -19,7 +19,7 @@ import {
   setDoc, updateDoc, getDoc, serverTimestamp 
 } from "firebase/firestore";
 import { db } from "../../firebase/config";
-import { logAudit, logActivity } from "../../services/governanceService";
+import { logAudit, logActivity, generateUUID } from "../../services/governanceService";
 
 type DealStatus = 'descoberta' | 'interesse' | 'nda' | 'avaliacao' | 'due_diligence' | 'comite' | 'negociacao' | 'contrato' | 'encerrado';
 
@@ -38,6 +38,7 @@ interface Deal {
   estimatedValue?: number;
   expectedCloseDate?: string;
   nextAction?: string;
+  correlationId?: string;
 }
 
 const COLUMNS: { id: DealStatus; title: string; color: string }[] = [
@@ -99,7 +100,8 @@ export function CompanyDashboard() {
           ownerName: data.ownerName || 'Marcelo Filho',
           estimatedValue: data.estimatedValue !== undefined ? data.estimatedValue : 500000,
           expectedCloseDate: data.expectedCloseDate || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-          nextAction: data.nextAction || 'Agendar reunião de triagem'
+          nextAction: data.nextAction || 'Agendar reunião de triagem',
+          correlationId: data.correlationId || generateUUID()
         } as Deal;
       });
 
@@ -119,7 +121,8 @@ export function CompanyDashboard() {
             ownerName: 'Marcelo Filho',
             estimatedValue: 250000,
             expectedCloseDate: '2026-08-15',
-            nextAction: 'Agendar reunião de triagem'
+            nextAction: 'Agendar reunião de triagem',
+            correlationId: 'seeded_corr_1_' + user.uid
           },
           { 
             id: `${user.uid}_p2`, 
@@ -134,7 +137,8 @@ export function CompanyDashboard() {
             ownerName: 'Ana Costa',
             estimatedValue: 120000,
             expectedCloseDate: '2026-09-30',
-            nextAction: 'Apresentar ao conselho de P&D'
+            nextAction: 'Apresentar ao conselho de P&D',
+            correlationId: 'seeded_corr_2_' + user.uid
           },
           { 
             id: `${user.uid}_p3`, 
@@ -149,7 +153,8 @@ export function CompanyDashboard() {
             ownerName: 'Carlos Silva',
             estimatedValue: 450000,
             expectedCloseDate: '2026-11-20',
-            nextAction: 'Revisar relatório de Due Diligence'
+            nextAction: 'Revisar relatório de Due Diligence',
+            correlationId: 'seeded_corr_3_' + user.uid
           },
         ];
         
@@ -202,13 +207,16 @@ export function CompanyDashboard() {
         role: userProfile.role || "industry"
       };
 
+      const correlationId = beforeData.correlationId || generateUUID();
+
       await logAudit(
         actor,
         "deal.stage.update",
         beforeData.projectId,
         beforeData.projectName,
         { stage: oldStage },
-        { stage: newStatus }
+        { stage: newStatus },
+        correlationId
       );
 
       await logActivity(
@@ -216,7 +224,8 @@ export function CompanyDashboard() {
         actor.name,
         beforeData.projectId,
         beforeData.projectName,
-        { fromStage: oldStage, toStage: newStatus }
+        { fromStage: oldStage, toStage: newStatus },
+        correlationId
       );
 
       if (newStatus === 'due_diligence') {
@@ -268,6 +277,8 @@ export function CompanyDashboard() {
         role: userProfile.role || "industry"
       };
 
+      const correlationId = beforeData.correlationId || generateUUID();
+
       await logAudit(
         actor,
         "deal.crm.update",
@@ -286,7 +297,8 @@ export function CompanyDashboard() {
           expectedCloseDate: fields.expectedCloseDate !== undefined ? fields.expectedCloseDate : (beforeData.expectedCloseDate || ""),
           probability: fields.probability !== undefined ? fields.probability : (beforeData.probability || 10),
           nextAction: fields.nextAction !== undefined ? fields.nextAction : (beforeData.nextAction || "Nenhuma ação cadastrada")
-        }
+        },
+        correlationId
       );
       
       setEditingDealId(null);

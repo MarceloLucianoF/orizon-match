@@ -523,7 +523,7 @@ exports.onDomainEventCreated = functions.region("southamerica-east1").firestore
             const action = eventType.replace("audit.", "");
             await db.collection("audit_logs").add({
                 action,
-                actorId: ((_a = payload.actor) === null || _a === void 0 ? void 0 : _a.uid) || "",
+                actorId: event.actorUid || ((_a = payload.actor) === null || _a === void 0 ? void 0 : _a.uid) || "",
                 actorName: ((_b = payload.actor) === null || _b === void 0 ? void 0 : _b.name) || ((_c = payload.actor) === null || _c === void 0 ? void 0 : _c.email) || "Usuário",
                 actorEmail: ((_d = payload.actor) === null || _d === void 0 ? void 0 : _d.email) || "",
                 actorRole: ((_e = payload.actor) === null || _e === void 0 ? void 0 : _e.role) || "unknown",

@@ -564,7 +564,7 @@ export const onDomainEventCreated = functions.region("southamerica-east1").fires
         
         await db.collection("audit_logs").add({
           action,
-          actorId: payload.actor?.uid || "",
+          actorId: event.actorUid || payload.actor?.uid || "",
           actorName: payload.actor?.name || payload.actor?.email || "Usuário",
           actorEmail: payload.actor?.email || "",
           actorRole: payload.actor?.role || "unknown",

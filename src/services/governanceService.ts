@@ -1,5 +1,5 @@
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { auth, db } from "../firebase/config";
 
 export interface ActorInfo {
   uid: string;
@@ -32,6 +32,16 @@ function getSessionId(): string {
 }
 
 /**
+ * Gera um ID de correlação aleatório único no formato UUID para rastreamento de workflows
+ */
+export function generateUUID(): string {
+  if (typeof crypto !== "undefined" && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return "corr_" + Math.random().toString(36).substring(2, 15) + "_" + Date.now();
+}
+
+/**
  * Gera um ID de correlação global para tracing de um fluxo
  */
 export function getCorrelationId(projectId: string | null, userId: string | null): string {
@@ -56,12 +66,13 @@ export async function logAudit(
   projectId: string | null,
   projectTitle: string | null,
   before: any | null = null,
-  after: any | null = null
+  after: any | null = null,
+  correlationId?: string | null
 ) {
   try {
     const ipAddress = await getClientIp();
     const sessionId = getSessionId();
-    const correlationId = getCorrelationId(projectId, actor.uid);
+    const finalCorrelationId = correlationId || generateUUID();
     
     await dispatchDomainEvent("audit." + action, {
       actor,
@@ -72,7 +83,7 @@ export async function logAudit(
       ipAddress,
       userAgent: navigator.userAgent,
       sessionId,
-      correlationId
+      correlationId: finalCorrelationId
     });
   } catch (err) {
     console.error("Erro ao gravar log de auditoria via Event Bus:", err);
@@ -87,12 +98,13 @@ export async function logActivity(
   actorName: string,
   projectId: string | null,
   projectTitle: string | null,
-  metadata: any = {}
+  metadata: any = {},
+  correlationId?: string | null
 ) {
   try {
     const ipAddress = await getClientIp();
     const sessionId = getSessionId();
-    const correlationId = getCorrelationId(projectId, null);
+    const finalCorrelationId = correlationId || generateUUID();
     
     await dispatchDomainEvent("activity." + eventType, {
       actorName,
@@ -102,7 +114,7 @@ export async function logActivity(
       ipAddress,
       userAgent: navigator.userAgent,
       sessionId,
-      correlationId
+      correlationId: finalCorrelationId
     });
   } catch (err) {
     console.error("Erro ao gravar evento de atividade via Event Bus:", err);
@@ -117,10 +129,14 @@ export async function dispatchDomainEvent(
   payload: any = {}
 ) {
   try {
+    const user = auth.currentUser;
     await addDoc(collection(db, "domain_events"), {
       eventType,
       payload,
       processedStatus: "pending",
+      actorUid: user ? user.uid : "system",
+      eventVersion: 1,
+      schemaVersion: 1,
       timestamp: serverTimestamp()
     });
     console.log(`[DOMAIN EVENT] ${eventType} dispatched.`);
