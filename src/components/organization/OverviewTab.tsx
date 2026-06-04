@@ -10,8 +10,7 @@ interface OverviewTabProps {
   recentProjects: any[];
   challenges: any[];
   labs: any[];
-  handleValidateTRL: (projectId: string, declaredTRL: number) => void;
-  setActiveTab: (tab: string) => void;
+  openModal: (type: string, data?: any) => void;
 }
 
 export function OverviewTab({
@@ -20,8 +19,7 @@ export function OverviewTab({
   recentProjects,
   challenges,
   labs,
-  handleValidateTRL,
-  setActiveTab
+  openModal
 }: OverviewTabProps) {
 
   return (
@@ -90,7 +88,7 @@ export function OverviewTab({
                       </div>
                     </div>
                     <button
-                      onClick={() => handleValidateTRL(proj.id, proj.declaredTRL || proj.maturity || 4)}
+                      onClick={() => openModal('validate_trl', proj)}
                       className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/30 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap self-start sm:self-auto flex items-center gap-1.5"
                     >
                       <Award size={14} /> Conceder Selo "ICT Verified"
@@ -204,7 +202,7 @@ export function OverviewTab({
               Há 5 grandes empresas buscando por "Conectividade 5G e IoT" este mês. Seu polo possui 2 projetos compatíveis em TRL 6/7.
             </p>
             <button 
-              onClick={() => alert("Alerta disparado! Os inventores correspondentes foram notificados para atualizar o VDR.")}
+              onClick={() => openModal('mass_notification')}
               className="w-full py-2.5 bg-white text-indigo-600 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-colors shadow-lg shadow-indigo-950/20"
             >
               Ativar Notificação de Massa
@@ -265,7 +263,7 @@ export function OverviewTab({
               </div>
 
               <button 
-                onClick={() => setActiveTab("capacities")}
+                onClick={() => openModal('add_lab')}
                 className="w-full py-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all flex items-center justify-center gap-1"
               >
                 <Plus size={12} /> Homologar Novo Laboratório

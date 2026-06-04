@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 
 interface FomentoTabProps {
   fundingCalls: any[];
+  openModal: (type: string, data?: any) => void;
 }
 
-export function FomentoTab({ fundingCalls }: FomentoTabProps) {
+export function FomentoTab({ fundingCalls, openModal }: FomentoTabProps) {
   const { t } = useTranslation();
 
   return (
@@ -47,7 +48,7 @@ export function FomentoTab({ fundingCalls }: FomentoTabProps) {
               </div>
             </div>
             <button 
-              onClick={() => alert("Candidatura ao edital iniciada!")}
+              onClick={() => openModal('prepare_proposal', call)}
               className="w-full py-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all flex items-center justify-center gap-1"
             >
               <Award size={12} /> {t("dashboard.organization.fomento.applyBtn")}

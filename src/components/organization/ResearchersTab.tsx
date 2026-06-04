@@ -5,12 +5,14 @@ interface ResearchersTabProps {
   researchersSearch: string;
   setResearchersSearch: (val: string) => void;
   filteredResearchers: any[];
+  openModal: (type: string, data?: any) => void;
 }
 
 export function ResearchersTab({
   researchersSearch,
   setResearchersSearch,
-  filteredResearchers
+  filteredResearchers,
+  openModal
 }: ResearchersTabProps) {
   const { t } = useTranslation();
 
@@ -69,7 +71,7 @@ export function ResearchersTab({
             </div>
 
             <button 
-              onClick={() => alert("Pesquisador alocado para novo edital!")}
+              onClick={() => openModal('allocate_researcher', r)}
               className="w-full py-2.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all"
             >
               {t("dashboard.organization.researchers.assignBtn")}
