@@ -50,6 +50,7 @@ export function AdminDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
   
   const activeTab = searchParams.get("tab") || "overview";
+  const surfaceClass = "bg-[#0A0514] border border-slate-800 rounded-3xl shadow-[0_24px_80px_rgba(2,6,23,0.38)] backdrop-blur-sm overflow-hidden";
 
   const handleTabChange = (tab: string) => {
     setSearchParams({ tab });
@@ -160,7 +161,7 @@ export function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[#0A0514] border border-slate-800 rounded-2xl p-6 shadow-xl">
+        <div className={surfaceClass}>
           <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-6">
             <PieChart className="text-indigo-400" size={20} /> {t("dashboard.admin.trlDistribution")}
           </h2>
@@ -191,7 +192,7 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        <div className="bg-[#0A0514] border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col justify-center items-center text-center">
+        <div className={surfaceClass + " flex flex-col justify-center items-center text-center"}>
           <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
             <BarChart3 className="text-amber-400" size={20} /> {t("dashboard.admin.ecosystemHealth")}
           </h2>
@@ -216,7 +217,7 @@ export function AdminDashboard() {
       </div>
 
       {/* AI Active Audit Feed */}
-      <div className="bg-[#0A0514] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className={surfaceClass + " p-6 space-y-4"}>
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2">
             <ShieldAlert className="text-fuchsia-500 animate-pulse" size={18} /> {t("dashboard.admin.activeAudit.title")}
@@ -230,7 +231,7 @@ export function AdminDashboard() {
                 <ShieldAlert className={`${log.type === 'alert' ? 'text-red-400' : 'text-amber-400'} mt-0.5 flex-shrink-0`} size={16} />
                 <div>
                   <h4 className="text-xs font-bold text-slate-200">Projeto: {log.projectTitle || (log.projectId === 'proj_gateway_iot' ? 'Gateway IoT Industrial' : (log.projectId === 'proj_scm_embrapii' ? 'Smart City Manager (SCM)' : 'Projeto Inatel'))}</h4>
-                  <p className="text-[11px] text-slate-450 mt-1">{log.message || log.text}</p>
+                  <p className="text-[11px] text-slate-400 mt-1">{log.message || log.text}</p>
                   <div className="flex gap-2 mt-3">
                     <button 
                       onClick={() => alert("Notificação enviada ao inventor!")}
@@ -240,7 +241,7 @@ export function AdminDashboard() {
                     </button>
                     <button 
                       onClick={() => handleTabChange("logs")}
-                      className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
+                      className="text-[9px] bg-slate-900 hover:bg-slate-800 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
                     >
                       Auditar VDR
                     </button>
@@ -254,7 +255,7 @@ export function AdminDashboard() {
                 <ShieldAlert className="text-amber-400 mt-0.5 flex-shrink-0" size={16} />
                 <div>
                   <h4 className="text-xs font-bold text-slate-200">Projeto: Gateway IoT Industrial</h4>
-                  <p className="text-[11px] text-slate-450 mt-1">Auditoria: Este projeto está aderente ao programa MOVER (Mobilidade Verde e Inovação). Sugerimos vincular o laboratório WAI Lab do Inatel para acelerar a subvenção de R$ 300k da EMBRAPII.</p>
+                  <p className="text-[11px] text-slate-400 mt-1">Auditoria: Este projeto está aderente ao programa MOVER (Mobilidade Verde e Inovação). Sugerimos vincular o laboratório WAI Lab do Inatel para acelerar a subvenção de R$ 300k da EMBRAPII.</p>
                   <div className="flex gap-2 mt-3">
                     <button 
                       onClick={() => alert("Notificação enviada ao inventor!")}
@@ -264,7 +265,7 @@ export function AdminDashboard() {
                     </button>
                     <button 
                       onClick={() => handleTabChange("logs")}
-                      className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
+                      className="text-[9px] bg-slate-900 hover:bg-slate-800 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
                     >
                       Auditar VDR
                     </button>
@@ -276,7 +277,7 @@ export function AdminDashboard() {
                 <ShieldAlert className="text-red-400 mt-0.5 flex-shrink-0" size={16} />
                 <div>
                   <h4 className="text-xs font-bold text-slate-200">Projeto: Smart City Manager (SCM)</h4>
-                  <p className="text-[11px] text-slate-450 mt-1">Inconsistência TRL/PI: Declarado TRL 6 mas com pendência de documentos de cessão de direitos autorais de software.</p>
+                  <p className="text-[11px] text-slate-400 mt-1">Inconsistência TRL/PI: Declarado TRL 6 mas com pendência de documentos de cessão de direitos autorais de software.</p>
                   <div className="flex gap-2 mt-3">
                     <button 
                       onClick={() => alert("Notificação enviada ao inventor!")}
@@ -286,7 +287,7 @@ export function AdminDashboard() {
                     </button>
                     <button 
                       onClick={() => handleTabChange("logs")}
-                      className="text-[9px] bg-slate-900 hover:bg-slate-850 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
+                      className="text-[9px] bg-slate-900 hover:bg-slate-800 text-slate-400 px-2.5 py-1 rounded border border-slate-800 font-bold transition-all"
                     >
                       Auditar VDR
                     </button>
@@ -306,7 +307,7 @@ export function AdminDashboard() {
               <TrendingUp size={12} /> +12% MoM
             </div>
           </div>
-          <div className="h-64">
+          <div className="h-64 min-w-0 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <RechartsBarChart data={[
                 { name: 'Jan', users: 400, deals: 240 }, { name: 'Fev', users: 300, deals: 139 },
@@ -324,7 +325,7 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        <div className="bg-[#0A0514] border border-slate-800 rounded-3xl p-6 flex flex-col shadow-xl">
+        <div className={surfaceClass + " flex flex-col"}>
           <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">{t("dashboard.admin.regionalActivity")}</h3>
           <div className="flex-1 flex flex-col justify-center space-y-4">
              {[
@@ -361,7 +362,7 @@ export function AdminDashboard() {
   );
 
   const renderUsers = () => (
-    <div className="bg-[#0A0514] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className={surfaceClass + " animate-in fade-in slide-in-from-bottom-4 duration-500"}>
       <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
@@ -449,7 +450,7 @@ export function AdminDashboard() {
   );
 
   const renderDeals = () => (
-    <div className="bg-[#0A0514] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className={surfaceClass + " animate-in fade-in slide-in-from-bottom-4 duration-500"}>
       <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
         <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
           <Activity className="text-fuchsia-500" size={20} /> {t("dashboard.admin.liveTracker")}
@@ -502,7 +503,7 @@ export function AdminDashboard() {
   );
 
   const renderLogs = () => (
-    <div className="bg-[#0A0514] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className={surfaceClass + " animate-in fade-in slide-in-from-bottom-4 duration-500"}>
       <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
         <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
           <FileSearch className="text-amber-400" size={20} /> {t("dashboard.admin.iaAudit")}
@@ -633,7 +634,7 @@ export function AdminDashboard() {
   };
 
   const renderSimulator = () => (
-    <div className="bg-[#0A0514] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6 max-w-2xl mx-auto animate-in fade-in duration-500">
+    <div className={surfaceClass + " p-6 space-y-6 max-w-2xl mx-auto animate-in fade-in duration-500"}>
       <div>
         <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
           <ServerCog className="text-fuchsia-500 animate-spin" size={22} /> Simulador de Match ("Demo Maker")
@@ -704,7 +705,7 @@ export function AdminDashboard() {
             onChange={e => setSimFullFlow(e.target.checked)}
             className="w-5 h-5 text-fuchsia-500 rounded border-slate-750 focus:ring-fuchsia-500 bg-slate-900"
           />
-          <label htmlFor="simFullFlow" className="text-xs font-bold text-slate-350 cursor-pointer select-none">
+          <label htmlFor="simFullFlow" className="text-xs font-bold text-slate-300 cursor-pointer select-none">
             Simular Fluxo Completo (Criar Chat & Conversas no CRM)
           </label>
         </div>
@@ -737,7 +738,7 @@ export function AdminDashboard() {
 
     return (
       <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="bg-[#0A0514] border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+        <div className={surfaceClass + " p-6 space-y-4"}>
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
@@ -747,7 +748,7 @@ export function AdminDashboard() {
             </div>
             <button
               onClick={loadComplianceLogs}
-              className="bg-slate-900 hover:bg-slate-805 text-slate-350 px-4 py-2 rounded-xl text-xs font-bold border border-slate-800 transition-all flex items-center gap-1.5"
+              className="bg-slate-900 hover:bg-slate-800 text-slate-300 px-4 py-2 rounded-xl text-xs font-bold border border-slate-800 transition-all flex items-center gap-1.5"
             >
               {loadingCompliance ? <Loader2 className="animate-spin" size={14} /> : "Atualizar Logs"}
             </button>
@@ -783,7 +784,7 @@ export function AdminDashboard() {
               <Loader2 className="animate-spin text-indigo-500" size={36} />
             </div>
           ) : filteredLogs.length === 0 ? (
-            <div className="p-12 text-center text-slate-550 italic">
+            <div className="p-12 text-center text-slate-500 italic">
               Nenhum registro de auditoria encontrado com os filtros atuais.
             </div>
           ) : (
@@ -835,7 +836,7 @@ export function AdminDashboard() {
                       <td className="p-4">
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-1">
-                            <span className="text-slate-450">IP:</span>
+                            <span className="text-slate-400">IP:</span>
                             <span className="font-mono text-indigo-400">{log.ipAddress || "127.0.0.1"}</span>
                           </div>
                           {log.sessionId && (
@@ -847,7 +848,7 @@ export function AdminDashboard() {
                           {log.correlationId && (
                             <div className="flex items-center gap-1">
                               <span className="text-[10px] text-emerald-500">Tracking:</span>
-                              <span className="font-mono text-[10px] text-emerald-550 truncate max-w-[120px]" title={log.correlationId}>{log.correlationId}</span>
+                              <span className="font-mono text-[10px] text-emerald-500 truncate max-w-[120px]" title={log.correlationId}>{log.correlationId}</span>
                             </div>
                           )}
                         </div>
@@ -888,12 +889,12 @@ export function AdminDashboard() {
       
       {/* WARNING BANNER FOR PAUSED ENGINE */}
       {!isEngineRunning && (
-        <div className="bg-amber-500/10 border border-amber-500/20 text-amber-405 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
+        <div className="bg-amber-500/10 border border-amber-500/20 text-amber-400 p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 shadow-[0_0_20px_rgba(245,158,11,0.05)]">
           <div className="flex items-center gap-3">
             <ShieldAlert size={20} className="text-amber-500 flex-shrink-0 animate-pulse" />
             <div>
               <h4 className="text-xs font-black uppercase tracking-wider">{t("dashboard.admin.warningBanner.enginePausedTitle")}</h4>
-              <p className="text-[11px] text-slate-450 mt-0.5">{t("dashboard.admin.warningBanner.enginePausedDesc")}</p>
+              <p className="text-[11px] text-slate-400 mt-0.5">{t("dashboard.admin.warningBanner.enginePausedDesc")}</p>
             </div>
           </div>
           <button 
@@ -906,7 +907,7 @@ export function AdminDashboard() {
       )}
       
       {/* HEADER PRINCIPAL */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-fuchsia-900/30 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-fuchsia-500/10 rounded-2xl flex items-center justify-center border border-fuchsia-500/20 shadow-[0_0_30px_rgba(217,70,239,0.15)]">
             <ShieldAlert size={28} className="text-fuchsia-500" />

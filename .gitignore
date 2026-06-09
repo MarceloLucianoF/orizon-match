@@ -28,3 +28,4 @@ serviceAccountKey.json
 firebase-debug.log
 .firebase/
 .firebaserc
+.gemini/*

@@ -177,9 +177,7 @@ service cloud.firestore {
         allow read: if request.auth != null && (
           request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
           isAdmin() ||
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionStatus == 'premium' ||
-          get(/databases/$(database)/documents/users/$(request.auth.uid)).data.subscriptionStatus == 'enterprise' ||
-          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid + "_" + projectId)) ||
+          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid)_$(projectId)) ||
           (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
            request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
         );
@@ -197,7 +195,7 @@ service cloud.firestore {
           resource.data.accessLevel == 'public' ||
           request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
           isAdmin() ||
-          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid + "_" + projectId)) ||
+          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid)_$(projectId)) ||
           (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
            request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
         );
@@ -226,7 +224,7 @@ service cloud.firestore {
         allow read, write: if request.auth != null && (
           request.auth.uid == get(/databases/$(database)/documents/projects/$(projectId)).data.userId ||
           isAdmin() ||
-          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid + "_" + projectId)) ||
+          exists(/databases/$(database)/documents/signed_ndas/$(request.auth.uid)_$(projectId)) ||
           (get(/databases/$(database)/documents/projects/$(projectId)).data.orgId != null && 
            request.auth.uid in get(/databases/$(database)/documents/organizations/$(get(/databases/$(database)/documents/projects/$(projectId)).data.orgId)).data.managers)
         );

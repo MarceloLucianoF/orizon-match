@@ -58,7 +58,7 @@ export function Sidebar({ onClose }: SidebarProps) {
   };
 
   return (
-    <aside className="w-64 border-r border-slate-800 bg-slate-900/50 backdrop-blur-xl flex flex-col h-full shrink-0">
+    <aside className="w-[19rem] xl:w-[21rem] border-r border-slate-800 bg-slate-900/50 backdrop-blur-xl flex flex-col h-full shrink-0">
       <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800">
         <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
           Orizon Match
@@ -91,7 +91,7 @@ export function Sidebar({ onClose }: SidebarProps) {
                   navigate("/dashboard");
                 }
               }}
-              className="w-full bg-slate-950 border border-slate-800 text-xs text-slate-300 rounded-lg p-2 outline-none focus:border-fuchsia-500 transition-all font-semibold"
+              className="w-full bg-slate-950 border border-slate-800 text-[11px] text-slate-300 rounded-lg px-3 py-2 outline-none focus:border-fuchsia-500 transition-all font-semibold"
             >
               <option value="admin">Administrador (Padrão)</option>
               <option value="inventor">Inventor</option>
@@ -115,14 +115,14 @@ export function Sidebar({ onClose }: SidebarProps) {
                   key={link.to}
                   to={link.to}
                   onClick={handleLinkClick}
-                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 min-w-0 ${
                     isActive
-                      ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.1)]"
+                      ? "bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 shadow-[0_0_10px_rgba(99,102,241,0.1)]"
                       : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent"
                   }`}
                 >
                   <Icon size={20} />
-                  <span className="font-medium text-sm">{link.label}</span>
+                  <span className="min-w-0 font-medium text-sm leading-tight whitespace-normal break-words">{link.label}</span>
                 </Link>
               );
             })}
@@ -139,14 +139,14 @@ export function Sidebar({ onClose }: SidebarProps) {
               <Link
                 to="/admin"
                 onClick={handleLinkClick}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 ${
+                className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 min-w-0 ${
                   pathname.startsWith('/admin')
-                    ? "bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 shadow-[0_0_15px_rgba(217,70,239,0.1)]"
-                    : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent"
+                      ? "bg-fuchsia-500/10 text-fuchsia-300 border border-fuchsia-500/20 shadow-[0_0_15px_rgba(217,70,239,0.1)]"
+                      : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200 border border-transparent"
                 }`}
               >
                 <ShieldAlert size={20} />
-                <span className="font-medium text-sm">{t("sidebar.adminpanel")}</span>
+                  <span className="min-w-0 font-medium text-sm leading-tight whitespace-normal break-words">{t("sidebar.adminpanel")}</span>
               </Link>
             </div>
           </div>

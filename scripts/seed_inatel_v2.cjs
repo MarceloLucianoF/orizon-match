@@ -109,7 +109,7 @@ async function seedV2() {
   // Clean Firebase Auth
   await cleanAuthUsers();
 
-  const collections = ['users', 'projects', 'matches', 'conversations', 'messages', 'challenges', 'assets_ip', 'logs_ai', 'organizations'];
+  const collections = ['users', 'projects', 'matches', 'conversations', 'messages', 'challenges', 'assets_ip', 'logs_ai', 'organizations', 'deals', 'signed_ndas', 'audit_logs', 'activity_events', 'domain_events'];
   for (const col of collections) {
     await clearCollection(col);
   }

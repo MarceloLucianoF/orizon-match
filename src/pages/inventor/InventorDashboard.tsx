@@ -206,35 +206,38 @@ export function InventorDashboard() {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 min-w-0">
-          <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0 overflow-hidden">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <StatsCard 
-                label={t("dashboard.inventor.views")} 
-                value={stats.views} 
-                icon={Eye} 
-                trend={12} 
-                color="indigo"
-              />
-              <StatsCard 
-                label={t("dashboard.inventor.saves")} 
-                value={stats.saves} 
-                icon={Heart} 
-                trend={5} 
-                color="emerald"
-              />
-              <StatsCard 
-                label={t("dashboard.inventor.matches")} 
-                value={stats.matches} 
-                icon={Star} 
-                trend={8} 
-                color="amber"
-              />
-            </div>
+        <div className="space-y-6 md:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          {/* Stats Cards - Spanning full width */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <StatsCard 
+              label={t("dashboard.inventor.views")} 
+              value={stats.views} 
+              icon={Eye} 
+              trend={12} 
+              color="indigo"
+            />
+            <StatsCard 
+              label={t("dashboard.inventor.saves")} 
+              value={stats.saves} 
+              icon={Heart} 
+              trend={5} 
+              color="emerald"
+            />
+            <StatsCard 
+              label={t("dashboard.inventor.matches")} 
+              value={stats.matches} 
+              icon={Star} 
+              trend={8} 
+              color="amber"
+              description="Matches identificados pelo motor de IA"
+            />
+          </div>
 
-            <div className="w-full min-w-0 overflow-hidden">
-              <ProjectPerformanceChart title={t("dashboard.inventor.chartTitle")} />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 min-w-0">
+            <div className="lg:col-span-2 space-y-4 md:space-y-6 min-w-0 overflow-hidden">
+              <div className="w-full min-w-0 overflow-hidden">
+                <ProjectPerformanceChart title={t("dashboard.inventor.chartTitle")} />
+              </div>
 
             <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-4 md:p-6">
               <div className="flex items-center justify-between mb-4 md:mb-6">
@@ -504,6 +507,7 @@ export function InventorDashboard() {
             })()}
           </div>
         </div>
+      </div>
       )}
 
       {/* TRL MODAL */}

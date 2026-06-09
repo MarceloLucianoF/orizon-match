@@ -541,7 +541,7 @@ export function CompanyDashboard() {
                                     type="text" 
                                     value={editOwnerName} 
                                     onChange={e => setEditOwnerName(e.target.value)}
-                                    className="bg-slate-950 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                    className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
                                   />
                                 </div>
 
@@ -551,7 +551,7 @@ export function CompanyDashboard() {
                                     type="number" 
                                     value={editEstimatedValue} 
                                     onChange={e => setEditEstimatedValue(Number(e.target.value))}
-                                    className="bg-slate-955 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                    className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
                                   />
                                 </div>
 
@@ -564,7 +564,7 @@ export function CompanyDashboard() {
                                       max="100" 
                                       value={editProbability} 
                                       onChange={e => setEditProbability(Number(e.target.value))}
-                                      className="bg-slate-955 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                      className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
                                     />
                                   </div>
                                   <div className="space-y-1">
@@ -573,7 +573,7 @@ export function CompanyDashboard() {
                                       type="date" 
                                       value={editExpectedCloseDate} 
                                       onChange={e => setEditExpectedCloseDate(e.target.value)}
-                                      className="bg-slate-955 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                      className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
                                     />
                                   </div>
                                 </div>
@@ -584,14 +584,14 @@ export function CompanyDashboard() {
                                     type="text" 
                                     value={editNextAction} 
                                     onChange={e => setEditNextAction(e.target.value)}
-                                    className="bg-slate-955 border border-slate-700 text-xs text-slate-250 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                    className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
                                   />
                                 </div>
 
                                 <div className="flex gap-2 justify-end pt-2 border-t border-slate-800">
                                   <button 
                                     onClick={() => setEditingDealId(null)} 
-                                    className="px-2.5 py-1.5 rounded text-[10px] font-bold text-slate-450 hover:text-slate-200 transition-colors flex items-center gap-1 cursor-pointer"
+                                    className="px-2.5 py-1.5 rounded text-[10px] font-bold text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1 cursor-pointer"
                                   >
                                     <XIcon size={12} /> Cancelar
                                   </button>
@@ -634,7 +634,7 @@ export function CompanyDashboard() {
                                 <span className="text-[10px] font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
                                   {t("dashboard.investor.fitLabel", { score: deal.score })}
                                 </span>
-                                <span className="text-[10px] text-slate-550 pr-6 group-hover:pr-0 transition-all">{deal.lastUpdate}</span>
+                                <span className="text-[10px] text-slate-500 pr-6 group-hover:pr-0 transition-all">{deal.lastUpdate}</span>
                               </div>
 
                               <div>
@@ -668,18 +668,18 @@ export function CompanyDashboard() {
                               </div>
 
                               {/* Next action callout */}
-                              <div className="bg-slate-950/60 border border-slate-850/80 rounded-lg p-2 flex items-start gap-1.5">
+                              <div className="bg-slate-950/60 border border-slate-800/80 rounded-lg p-2 flex items-start gap-1.5">
                                 <CheckSquare size={11} className="text-amber-500 mt-0.5 flex-shrink-0" />
                                 <div className="flex flex-col text-[10px]">
                                   <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">Próxima Ação</span>
-                                  <span className="text-slate-350 leading-tight truncate max-w-[170px]" title={deal.nextAction || "Agendar reunião de triagem"}>
+                                  <span className="text-slate-300 leading-tight truncate max-w-[170px]" title={deal.nextAction || "Agendar reunião de triagem"}>
                                     {deal.nextAction || "Agendar reunião de triagem"}
                                   </span>
                                 </div>
                               </div>
 
                               <select 
-                                className="bg-slate-955 border border-slate-700 text-[11px] text-slate-350 rounded p-1.5 w-full outline-none focus:border-indigo-500 mt-1 cursor-pointer transition-all hover:bg-slate-800 hover:text-slate-200"
+                                className="bg-slate-950 border border-slate-700 text-[11px] text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500 mt-1 cursor-pointer transition-all hover:bg-slate-800 hover:text-slate-200"
                                 value={deal.status}
                                 onChange={(e) => moveDeal(deal.id, e.target.value as DealStatus)}
                               >

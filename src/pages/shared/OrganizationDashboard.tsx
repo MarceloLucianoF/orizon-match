@@ -668,7 +668,7 @@ export default function OrganizationDashboard() {
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">Projeto Vinculado do Portfólio</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Projeto Vinculado do Portfólio</label>
                           <select 
                             value={selectedProject}
                             onChange={e => setSelectedProject(e.target.value)}
@@ -681,7 +681,7 @@ export default function OrganizationDashboard() {
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">Orçamento Total Proposto (R$)</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Orçamento Total Proposto (R$)</label>
                           <input 
                             type="text" 
                             required
@@ -693,7 +693,7 @@ export default function OrganizationDashboard() {
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">Escopo de Trabalho Resumido</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Escopo de Trabalho Resumido</label>
                           <textarea 
                             required
                             value={proposalScope}
@@ -887,11 +887,11 @@ export default function OrganizationDashboard() {
                         </div>
 
                         <div className="space-y-1.5">
-                          <label className="text-[10px] font-black text-slate-450 uppercase tracking-widest">Vincular ao Projeto Ativo</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Vincular ao Projeto Ativo</label>
                           <select 
                             value={selectedProject}
                             onChange={e => setSelectedProject(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-350 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
                           >
                             {recentProjects.map(p => (
                               <option key={p.id} value={p.id}>{p.title}</option>
@@ -901,11 +901,11 @@ export default function OrganizationDashboard() {
 
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">Dedicação Semanal</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Dedicação Semanal</label>
                             <select 
                               value={allocationHours}
                               onChange={e => setAllocationHours(e.target.value)}
-                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-350 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
                             >
                               <option value="10">10h / semana</option>
                               <option value="20">20h / semana</option>
@@ -913,11 +913,11 @@ export default function OrganizationDashboard() {
                             </select>
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-455 uppercase tracking-widest">Papel de Alocação</label>
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Papel de Alocação</label>
                             <select 
                               value={allocationRole}
                               onChange={e => setAllocationRole(e.target.value)}
-                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-350 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
                             >
                               <option value="coordinator">Coordenador do Projeto</option>
                               <option value="researcher">Pesquisador Principal</option>
@@ -964,12 +964,12 @@ export default function OrganizationDashboard() {
                                 </div>
 
                                 {isOverloaded ? (
-                                  <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[10px] text-rose-455 flex items-start gap-2 leading-relaxed">
+                                  <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-xl text-[10px] text-rose-400 flex items-start gap-2 leading-relaxed">
                                     <AlertTriangle className="shrink-0 mt-0.5 text-rose-400" size={14} />
                                     <span>Aviso: O pesquisador ficará com carga horária crítica superior a 85%. Recomenda-se remanejamento de outros subprojetos.</span>
                                   </div>
                                 ) : (
-                                  <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[10px] text-emerald-450 flex items-start gap-2 leading-relaxed">
+                                  <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-[10px] text-emerald-400 flex items-start gap-2 leading-relaxed">
                                     <CheckCircle2 className="shrink-0 mt-0.5 text-emerald-400" size={14} />
                                     <span>Alocação segura. A carga horária total projetada permanece dentro das diretrizes operacionais do Polo.</span>
                                   </div>
@@ -994,7 +994,7 @@ export default function OrganizationDashboard() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Left: General info and selectors */}
                       <div className="space-y-4">
-                        <div className="p-5 bg-slate-950/60 rounded-2xl border border-slate-855 space-y-4 shadow-inner">
+                        <div className="p-5 bg-slate-950/60 rounded-2xl border border-slate-800 space-y-4 shadow-inner">
                           <div className="flex justify-between items-center text-xs border-b border-slate-900 pb-2.5">
                             <span className="text-slate-450 font-semibold">Orçamento Total 2026:</span>
                             <span className="text-white font-mono font-bold">R$ 4.50M</span>
