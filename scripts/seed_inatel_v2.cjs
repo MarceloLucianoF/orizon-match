@@ -29,6 +29,7 @@ const KEEPUIDS = new Set([
   'company_vivo',
   'company_tim',
   'investor_xG',
+  'ict_outra',
   ADMIN_UID,
   DEVELOPER_UID
 ]);
@@ -134,11 +135,28 @@ async function seedV2() {
   await getOrCreateUser('company_vivo', 'vivo@orizon.com', 'orizon123');
   await getOrCreateUser('company_tim', 'tim@orizon.com', 'orizon123');
   await getOrCreateUser('investor_xG', 'xg@orizon.com', 'orizon123');
+  await getOrCreateUser('ict_outra', 'ict_outra@orizon.com', 'orizon123');
 
   const batch = db.batch();
 
   // 1. Users Firestore Profiles
   const users = {
+    'ict_outra': { 
+      id: 'ict_outra', 
+      role: 'ict', 
+      orgId: 'ict_outra_org',
+      name: 'Universidade Federal de Itajubá - UNIFEI', 
+      email: 'ict_outra@orizon.com',
+      segment: 'Energia Limpa, Hidrogênio e Smart Grids',
+      verified: true,
+      subscriptionStatus: 'premium',
+      location: 'Itajubá, MG',
+      capabilities: [
+        'Centro de Hidrogênio Verde (CH2V)',
+        'Instituto de Sistemas Elétricos e Energia (ISEE)'
+      ],
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
     'ict_inatel': { 
       id: 'ict_inatel', 
       role: 'ict', 
@@ -348,6 +366,13 @@ async function seedV2() {
 
   // Seeding organizations collection
   const organizations = {
+    'ict_outra_org': {
+      id: 'ict_outra_org',
+      name: 'Universidade Federal de Itajubá - UNIFEI',
+      type: 'ICT',
+      managers: ['ict_outra'],
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
     'ict_inatel': {
       id: 'ict_inatel',
       name: 'Inatel - NGTI & Unidade EMBRAPII ICC',
@@ -572,6 +597,21 @@ async function seedV2() {
       patentStatus: 'Depositada (BR 10 2025)',
       ictName: 'Inatel NGTI',
       fundingTags: ['Lei de TIC', 'EMBRAPII']
+    },
+    {
+      id: 'proj_outra_ict',
+      title: 'Conversor de Hidrogênio Verde de Alta Eficiência',
+      segment: 'Energia',
+      trl: 5,
+      verified: true,
+      userId: 'ict_outra',
+      orgId: 'ict_outra_org',
+      summary: 'Conversor estático otimizado para eletrolisadores de hidrogênio verde, reduzindo perdas harmônicas em até 12%.',
+      ticket: '500k',
+      researcher: 'Prof. Dr. Itajubá (CH2V)',
+      patentStatus: 'Depositada (BR 10 2026)',
+      ictName: 'UNIFEI CH2V',
+      fundingTags: ['FINEP', 'CNPq']
     }
   ];
 
@@ -579,7 +619,7 @@ async function seedV2() {
     const projectRef = db.collection('projects').doc(p.id);
     batch.set(projectRef, {
       userId: p.userId,
-      orgId: 'ict_inatel',
+      orgId: p.orgId || 'ict_inatel',
       title: p.title,
       summary: p.summary,
       segment: p.segment,

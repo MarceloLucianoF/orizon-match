@@ -1,0 +1,55 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper para verificar se o usuário é Administrador Supremo ou Desenvolvedor Admin
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.uid == "nqBV3Da1iqPbU46jGvO1ljBbIze2" || 
+        request.auth.uid == "BfIgQtnAZxRFuHCoiMw4bMkfgWW2"
+      );
+    }
+
+    // Helper para verificar se o usuário é proprietário do projeto
+    function isProjectOwner(projectId) {
+      return request.auth != null && 
+        firestore.get(/databases/(default)/documents/projects/$(projectId)).data.userId == request.auth.uid;
+    }
+
+    // Helper para verificar se o usuário é gerente da organização proprietária do projeto
+    function isOrgManager(projectId) {
+      return request.auth != null && 
+        firestore.get(/databases/(default)/documents/projects/$(projectId)).data.orgId != null &&
+        request.auth.uid in firestore.get(/databases/(default)/documents/organizations/$(firestore.get(/databases/(default)/documents/projects/$(projectId)).data.orgId)).data.managers;
+    }
+
+    // Helper para verificar se existe um NDA assinado
+    function hasSignedNDA(projectId) {
+      return request.auth != null && 
+        firestore.exists(/databases/(default)/documents/signed_ndas/$(request.auth.uid + '_' + projectId));
+    }
+
+    // Regras para arquivos do VDR de Projetos
+    match /projects/{projectId}/vdr/{category}/{allPaths=**} {
+      allow read: if request.auth != null && (
+        category == 'public' ||
+        isProjectOwner(projectId) ||
+        isOrgManager(projectId) ||
+        hasSignedNDA(projectId) ||
+        isAdmin()
+      );
+      
+      allow write: if request.auth != null && (
+        isProjectOwner(projectId) ||
+        isOrgManager(projectId) ||
+        isAdmin()
+      );
+    }
+    
+    // Regras para Avatares de Usuários
+    match /users/{userId}/avatar/{allPaths=**} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && (request.auth.uid == userId || isAdmin());
+    }
+  }
+}

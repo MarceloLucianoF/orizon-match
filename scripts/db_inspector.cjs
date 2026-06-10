@@ -8,21 +8,9 @@ admin.initializeApp({
 const db = admin.firestore();
 
 async function inspect() {
-  const usersSnap = await db.collection("users").limit(1).get();
-  console.log("=== SAMPLE USER ===");
-  usersSnap.forEach(doc => {
-    console.log(doc.id, "=>", doc.data());
-  });
-
-  const projectsSnap = await db.collection("projects").limit(1).get();
-  console.log("\n=== SAMPLE PROJECT ===");
-  projectsSnap.forEach(doc => {
-    console.log(doc.id, "=>", doc.data());
-  });
-
-  const matchesSnap = await db.collection("matches").limit(1).get();
-  console.log("\n=== SAMPLE MATCH ===");
-  matchesSnap.forEach(doc => {
+  const ndasSnap = await db.collection("signed_ndas").get();
+  console.log("=== SIGNED NDAS ===");
+  ndasSnap.forEach(doc => {
     console.log(doc.id, "=>", doc.data());
   });
 }
