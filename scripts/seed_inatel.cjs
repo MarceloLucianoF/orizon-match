@@ -62,6 +62,7 @@ async function seedInatelEcosystem() {
   
   // Criar usuários no Firebase Auth
   await getOrCreateUser('ict_inatel_icc', 'ict@inatel.br', 'orizon123');
+  await getOrCreateUser('ict_fai', 'ict_fai@orizon.com', 'orizon123');
   await getOrCreateUser('company_ericsson', 'empresa@ericsson.com', 'orizon123');
   await getOrCreateUser('inventor_rafael', 'inventor@wailab.br', 'orizon123');
   await getOrCreateUser('inventor_camila', 'pesquisadora@wailab.br', 'orizon123');
@@ -72,6 +73,20 @@ async function seedInatelEcosystem() {
 
   // Perfis no Firestore
   const users = {
+    'ict_fai': {
+      id: 'ict_fai',
+      email: 'ict_fai@orizon.com',
+      name: 'FAI - Centro de Ensino Superior em Gestão, Tecnologia e Educação',
+      role: 'ict',
+      segment: 'Gestão, Tecnologia, Sistemas de Informação e Educação',
+      location: 'Santa Rita do Sapucaí, MG',
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      capabilities: [
+        'Núcleo de Prática em Gestão e TI',
+        'Pesquisa Científica Aplicada em Tecnologia e Negócios'
+      ],
+      verified: true
+    },
     'ict_inatel_icc': {
       id: 'ict_inatel_icc',
       email: 'ict@inatel.br',
@@ -429,6 +444,22 @@ async function seedInatelEcosystem() {
       investmentTarget: 480000,
       status: 'active',
       vdrStatus: 'yellow',
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
+    'proj_fai_1': {
+      title: 'Sistema de Apoio à Decisão e BI para Gestão Tecnológica',
+      summary: 'Plataforma inteligente de análise de dados e BI baseada em inteligência artificial para otimização de processos de gestão e tomada de decisão estratégica em micro e pequenas empresas do Vale da Eletrônica.',
+      segment: 'Tecnologia',
+      declaredTRL: 5,
+      validatedTRL: 5,
+      isIctVerified: true,
+      ictId: 'ict_fai',
+      userId: 'ict_fai',
+      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      fundingTags: ['FAPEMIG', 'Editais FAI'],
+      investmentTarget: 100000,
+      status: 'active',
+      vdrStatus: 'green',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     }
   };

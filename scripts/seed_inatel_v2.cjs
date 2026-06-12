@@ -14,6 +14,7 @@ const DEVELOPER_UID = "BfIgQtnAZxRFuHCoiMw4bMkfgWW2";
 
 const KEEPUIDS = new Set([
   'ict_inatel',
+  'ict_fai',
   'comp_ericsson',
   'comp_siemens',
   'comp_weg',
@@ -34,16 +35,28 @@ const KEEPUIDS = new Set([
   DEVELOPER_UID
 ]);
 
+async function retry(fn, retries = 3, delay = 2500) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      console.warn(`⚠️ Falha de rede temporária (${err.message || err}). Tentativa ${i + 1}/${retries}. Retentando em ${delay/1000}s...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+}
+
 async function cleanAuthUsers() {
   console.log("🧹 Limpando usuários indesejados do Firebase Auth...");
   let nextPageToken;
   do {
-    const listUsersResult = await admin.auth().listUsers(1000, nextPageToken);
+    const listUsersResult = await retry(() => admin.auth().listUsers(1000, nextPageToken));
     for (const userRecord of listUsersResult.users) {
       if (!KEEPUIDS.has(userRecord.uid)) {
         console.log(`🗑️ Deletando usuário Auth lixo: ${userRecord.email} (${userRecord.uid})`);
         try {
-          await admin.auth().deleteUser(userRecord.uid);
+          await retry(() => admin.auth().deleteUser(userRecord.uid));
         } catch (err) {
           console.error(`Erro ao deletar usuário ${userRecord.email}:`, err);
         }
@@ -55,13 +68,13 @@ async function cleanAuthUsers() {
 
 async function getOrCreateUser(uid, email, password) {
   try {
-    const userRecord = await admin.auth().getUser(uid);
+    const userRecord = await retry(() => admin.auth().getUser(uid));
     if (userRecord.email === email) {
       console.log(`👤 Usuário Auth ${email} já existe com o UID correto.`);
       return userRecord;
     }
     console.log(`🔄 UID ${uid} existe mas com email diferente. Deletando...`);
-    await admin.auth().deleteUser(uid);
+    await retry(() => admin.auth().deleteUser(uid));
   } catch (error) {
     if (error.code !== 'auth/user-not-found') {
       throw error;
@@ -69,21 +82,21 @@ async function getOrCreateUser(uid, email, password) {
   }
 
   try {
-    const userByEmail = await admin.auth().getUserByEmail(email);
+    const userByEmail = await retry(() => admin.auth().getUserByEmail(email));
     console.log(`🗑️ Email ${email} já em uso pelo UID ${userByEmail.uid}. Deletando conflito...`);
-    await admin.auth().deleteUser(userByEmail.uid);
+    await retry(() => admin.auth().deleteUser(userByEmail.uid));
   } catch (error) {
     if (error.code !== 'auth/user-not-found') {
       throw error;
     }
   }
 
-  const userRecord = await admin.auth().createUser({
+  const userRecord = await retry(() => admin.auth().createUser({
     uid: uid,
     email: email,
     password: password,
     emailVerified: true
-  });
+  }));
   console.log(`👤 Usuário Auth ${email} criado com sucesso.`);
   return userRecord;
 }
@@ -118,6 +131,7 @@ async function seedV2() {
   // Create Users in Firebase Auth
   console.log("🔑 Criando/atualizando contas no Firebase Auth...");
   await getOrCreateUser('ict_inatel', 'ict@inatel.br', 'orizon123');
+  await getOrCreateUser('ict_fai', 'ict_fai@orizon.com', 'orizon123');
   await getOrCreateUser('comp_ericsson', 'empresa@ericsson.com', 'orizon123');
   await getOrCreateUser('comp_siemens', 'siemens@orizon.com', 'orizon123');
   await getOrCreateUser('comp_weg', 'weg@orizon.com', 'orizon123');
@@ -141,6 +155,22 @@ async function seedV2() {
 
   // 1. Users Firestore Profiles
   const users = {
+    'ict_fai': { 
+      id: 'ict_fai', 
+      role: 'ict', 
+      orgId: 'ict_fai_org',
+      name: 'FAI - Centro de Ensino Superior em Gestão, Tecnologia e Educação', 
+      email: 'ict_fai@orizon.com',
+      segment: 'Gestão, Tecnologia, Sistemas de Informação e Educação',
+      verified: true,
+      subscriptionStatus: 'premium',
+      location: 'Santa Rita do Sapucaí, MG',
+      capabilities: [
+        'Núcleo de Prática em Gestão e TI',
+        'Pesquisa Científica Aplicada em Tecnologia e Negócios'
+      ],
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
     'ict_outra': { 
       id: 'ict_outra', 
       role: 'ict', 
@@ -366,6 +396,13 @@ async function seedV2() {
 
   // Seeding organizations collection
   const organizations = {
+    'ict_fai_org': {
+      id: 'ict_fai_org',
+      name: 'FAI - Centro de Ensino Superior em Gestão, Tecnologia e Educação',
+      type: 'ICT',
+      managers: ['ict_fai'],
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
     'ict_outra_org': {
       id: 'ict_outra_org',
       name: 'Universidade Federal de Itajubá - UNIFEI',
@@ -612,6 +649,21 @@ async function seedV2() {
       patentStatus: 'Depositada (BR 10 2026)',
       ictName: 'UNIFEI CH2V',
       fundingTags: ['FINEP', 'CNPq']
+    },
+    {
+      id: 'proj_fai_1',
+      title: 'Sistema de Apoio à Decisão e BI para Gestão Tecnológica',
+      segment: 'Tecnologia e Inovação',
+      trl: 5,
+      verified: true,
+      userId: 'ict_fai',
+      orgId: 'ict_fai_org',
+      summary: 'Plataforma inteligente de análise de dados e BI baseada em inteligência artificial para otimização de processos de gestão e tomada de decisão estratégica em micro e pequenas empresas do Vale da Eletrônica.',
+      ticket: '100k',
+      researcher: 'Prof. Msc. FAI de Santa Rita',
+      patentStatus: 'Registro de Software Depositado',
+      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      fundingTags: ['FAPEMIG', 'Editais FAI']
     }
   ];
 

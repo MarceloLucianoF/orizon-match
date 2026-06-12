@@ -164,7 +164,7 @@ export function OverviewTab({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {challenges.map(chall => (
-                <div key={chall.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/20 transition-all group h-[200px]">
+                <div key={chall.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/20 transition-all group min-h-[200px]">
                   <div>
                     <div className="flex justify-between items-start gap-2">
                       <span className="text-[9px] font-black uppercase text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">
@@ -224,7 +224,7 @@ export function OverviewTab({
                 <div key={bar.label} className="space-y-1.5">
                   <div className="flex justify-between text-[11px] font-bold">
                     <span className="text-slate-300">{bar.label}</span>
-                    <span className="text-slate-400 font-mono">{bar.percent}%</span>
+                    <span className="text-slate-450 font-mono">{bar.percent}%</span>
                   </div>
                   <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800/80">
                     <div className={`${bar.color} h-full rounded-full transition-all duration-1000`} style={{ width: `${bar.percent}%` }} />
@@ -236,9 +236,17 @@ export function OverviewTab({
 
           {/* Vitrine de Infraestrutura e Laboratórios */}
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <Cpu className="text-slate-500" size={20} /> Ocupação de Infraestruturas
-            </h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <Cpu className="text-slate-500" size={20} /> Ocupação de Infraestruturas
+              </h2>
+              <button 
+                onClick={() => openModal('add_lab')}
+                className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/30 px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 hover:scale-105 active:scale-95 animate-in fade-in"
+              >
+                <Plus size={12} /> Homologar
+              </button>
+            </div>
             
             <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-5">
               <div className="space-y-4">
@@ -261,13 +269,6 @@ export function OverviewTab({
                   </div>
                 ))}
               </div>
-
-              <button 
-                onClick={() => openModal('add_lab')}
-                className="w-full py-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-900 text-slate-300 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all flex items-center justify-center gap-1"
-              >
-                <Plus size={12} /> Homologar Novo Laboratório
-              </button>
             </div>
           </div>
 

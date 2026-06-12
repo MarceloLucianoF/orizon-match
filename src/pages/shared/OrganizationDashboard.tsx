@@ -321,7 +321,7 @@ export default function OrganizationDashboard() {
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-slate-950/60 animate-in fade-in duration-200">
           <div className={`relative w-full ${
-            ['validate_trl', 'prepare_proposal', 'embrapit_report', 'consult_inventor'].includes(activeModal) 
+            ['validate_trl', 'prepare_proposal', 'embrapit_report', 'consult_inventor', 'add_lab'].includes(activeModal) 
               ? 'max-w-3xl' 
               : 'max-w-lg'
           } bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-6 overflow-hidden max-h-[90vh] overflow-y-auto transition-all`}>
@@ -828,43 +828,45 @@ export default function OrganizationDashboard() {
 
                       {/* Right: Live Preview & Submit */}
                       <div className="space-y-4 flex flex-col justify-between">
-                        <div className="p-5 bg-slate-950/60 border border-slate-850 rounded-3xl space-y-4 flex-1">
-                          <div className="flex justify-between items-center border-b border-slate-900 pb-3">
-                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Live Preview da Infraestrutura</span>
-                            <span className="text-[8px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-black uppercase">Homologação Ativa</span>
+                        <div className="p-5 bg-slate-950/60 border border-slate-850 rounded-3xl space-y-4 flex-1 flex flex-col justify-between">
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center border-b border-slate-900 pb-3">
+                              <span className="text-[10px] font-black text-slate-505 uppercase tracking-wider">Live Preview da Infraestrutura</span>
+                              <span className="text-[8px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-black uppercase">Homologação Ativa</span>
+                            </div>
+
+                            <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl space-y-4 shadow-lg">
+                              <div className="space-y-1">
+                                <h5 className="font-extrabold text-sm text-white truncate">{newLabName || "Nome do Laboratório"}</h5>
+                                <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">{newLabArea || "Área de Concentração"}</p>
+                              </div>
+
+                              <div className="space-y-1.5">
+                                <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Recursos Cadastrados:</span>
+                                <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
+                                  {newLabEquip || "Nenhum equipamento listado ainda. Descreva as capacidades técnicas da infraestrutura."}
+                                </p>
+                              </div>
+
+                              <div className="space-y-1">
+                                <div className="flex justify-between text-[10px] font-bold">
+                                  <span className="text-slate-450">Taxa de Ocupação Padrão</span>
+                                  <span className="text-emerald-400 font-mono">10%</span>
+                                </div>
+                                <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-850">
+                                  <div className="bg-emerald-500 h-full rounded-full" style={{ width: '10%' }} />
+                                </div>
+                              </div>
+                            </div>
                           </div>
 
-                          <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl space-y-4 shadow-lg">
-                            <div className="space-y-1">
-                              <h5 className="font-extrabold text-sm text-white truncate">{newLabName || "Nome do Laboratório"}</h5>
-                              <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">{newLabArea || "Área de Concentração"}</p>
-                            </div>
-
-                            <div className="space-y-1.5">
-                              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Recursos Cadastrados:</span>
-                              <p className="text-xs text-slate-300 leading-relaxed line-clamp-3">
-                                {newLabEquip || "Nenhum equipamento listado ainda. Descreva as capacidades técnicas da infraestrutura."}
-                              </p>
-                            </div>
-
-                            <div className="space-y-1">
-                              <div className="flex justify-between text-[10px] font-bold">
-                                <span className="text-slate-450">Taxa de Ocupação Padrão</span>
-                                <span className="text-emerald-400 font-mono">10%</span>
-                              </div>
-                              <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-850">
-                                <div className="bg-emerald-500 h-full rounded-full" style={{ width: '10%' }} />
-                              </div>
-                            </div>
-                          </div>
+                          <button 
+                            type="submit"
+                            className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)] flex items-center justify-center gap-1.5 uppercase tracking-widest mt-4"
+                          >
+                            <Cpu size={14} /> Homologar Infraestrutura
+                          </button>
                         </div>
-
-                        <button 
-                          type="submit"
-                          className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)] flex items-center justify-center gap-1.5 uppercase tracking-widest"
-                        >
-                          <Cpu size={14} /> Homologar Infraestrutura
-                        </button>
                       </div>
                     </form>
                   )}
@@ -1096,7 +1098,7 @@ export default function OrganizationDashboard() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto pr-1">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[460px] overflow-y-auto pr-1 custom-scrollbar">
                         {[
                           { id: 1, name: "Prof. Dr. Rafael Silva", title: "Coordenador no CRR / Inatel", hIndex: 34, patents: 8, expertise: "Antenas inteligentes, Redes 5G/6G, Hardware RF", email: "rafael.silva@inatel.br", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" },
                           { id: 2, name: "Dr. André Lourenço", title: "Pesquisador Sênior no WAI Lab", hIndex: 28, patents: 4, expertise: "Redes Neurais, IoT Industrial, Algoritmos de Borda", email: "andre.lourenco@inatel.br", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" },
@@ -1104,19 +1106,26 @@ export default function OrganizationDashboard() {
                         ]
                         .filter(i => i.name.toLowerCase().includes(inventorQuery.toLowerCase()) || i.expertise.toLowerCase().includes(inventorQuery.toLowerCase()))
                         .map((inv, idx) => (
-                          <div key={idx} className="p-4 bg-slate-950/40 border border-slate-850 rounded-2xl flex flex-col justify-between hover:border-indigo-500/20 hover:bg-slate-900/10 transition-all group">
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-3">
-                                <img src={inv.image} alt={inv.name} className="w-10 h-10 rounded-xl object-cover border border-slate-800 shadow" />
+                          <div key={idx} className="p-5 bg-slate-950/60 border border-slate-850 rounded-2xl flex flex-col justify-between hover:border-indigo-500/30 hover:bg-slate-900/15 transition-all group shadow-md">
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-3.5">
+                                <img src={inv.image} alt={inv.name} className="w-12 h-12 rounded-2xl object-cover border border-slate-800 shadow-lg group-hover:scale-105 transition-transform" />
                                 <div className="min-w-0">
                                   <h4 className="font-extrabold text-white text-xs truncate group-hover:text-indigo-400 transition-colors">{inv.name}</h4>
-                                  <p className="text-[9px] text-slate-500 font-semibold truncate">{inv.title}</p>
+                                  <p className="text-[9px] text-slate-500 font-semibold truncate mt-0.5">{inv.title}</p>
                                 </div>
                               </div>
 
-                              <div className="flex gap-2">
-                                <span className="text-[8px] bg-slate-950 px-2 py-0.5 rounded border border-slate-800 font-mono text-slate-400">H-Index: {inv.hIndex}</span>
-                                <span className="text-[8px] bg-slate-950 px-2 py-0.5 rounded border border-slate-800 font-mono text-slate-400">Patentes: {inv.patents}</span>
+                              {/* Matrix Visual */}
+                              <div className="grid grid-cols-2 gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-900/80 shadow-inner">
+                                <div className="text-center">
+                                  <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider block">H-Index</span>
+                                  <span className="text-xs font-black text-indigo-400">{inv.hIndex}</span>
+                                </div>
+                                <div className="text-center border-l border-slate-900">
+                                  <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider block">Patentes</span>
+                                  <span className="text-xs font-black text-emerald-400">{inv.patents}</span>
+                                </div>
                               </div>
 
                               <p className="text-[10px] text-slate-400 leading-relaxed">
@@ -1124,17 +1133,17 @@ export default function OrganizationDashboard() {
                               </p>
                             </div>
 
-                            <div className="flex gap-2.5 mt-4 pt-3 border-t border-slate-900">
+                            <div className="flex gap-2 mt-4 pt-3 border-t border-slate-900">
                               <button
                                 type="button"
                                 onClick={() => openModal('allocate_researcher', inv)}
-                                className="flex-1 py-2 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/30 rounded-xl text-[10px] font-bold transition-all uppercase tracking-wider text-center"
+                                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[9px] font-extrabold transition-all uppercase tracking-wider text-center shadow-[0_0_12px_rgba(79,70,229,0.15)]"
                               >
-                                Alocar em Projeto
+                                Alocar
                               </button>
                               <a 
                                 href={`mailto:${inv.email}`} 
-                                className="flex-1 py-2 bg-slate-950 hover:bg-slate-900 text-slate-350 hover:text-white border border-slate-850 hover:border-slate-700 rounded-xl text-[10px] font-bold transition-all uppercase tracking-wider text-center"
+                                className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 hover:border-slate-700 rounded-xl text-[9px] font-extrabold transition-all uppercase tracking-wider text-center"
                               >
                                 Contato
                               </a>

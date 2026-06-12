@@ -17,6 +17,7 @@ const MOCK_INNOVATION_HUBS = [
   { id: 1, name: 'Inatel - Prédio NGTI', lat: -22.2568, lng: -45.7027, type: 'ICT' },
   { id: 2, name: 'Wireless & AI Lab (WAI Lab)', lat: -22.2575, lng: -45.7032, type: 'Laboratório' },
   { id: 3, name: 'Centro de Radiocomunicações (CRR)', lat: -22.2560, lng: -45.7020, type: 'Pesquisa' },
+  { id: 4, name: 'FAI - Centro de Ensino Superior em Gestão, Tecnologia e Educação', lat: -22.2515, lng: -45.7145, type: 'ICT' },
 ];
 
 interface ProRadarMapProps {
