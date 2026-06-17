@@ -215,6 +215,20 @@ export function useOrganizationDashboard() {
             });
           }
         }
+        
+        if (orgId && orgId.toLowerCase().includes("fai")) {
+          setLabs([
+            { id: 1, name: "Núcleo de Prática em Gestão (NPG)", area: "Gestão / Empreendedorismo", equipment: "Sistemas ERP (Totvs/SAP), Plataformas de BI (PowerBI/Tableau), Sala de Reunião Executiva", capacity: "Consultoria administrativa, assessoria em gestão empresarial, modelagem de negócios", occupancy: 50, projectsCount: 1 },
+            { id: 2, name: "Fábrica de Software & Sistemas de Informação", area: "Software / TI", equipment: "Ambientes Cloud (AWS/Azure), Servidores Git, Workstations de Desenvolvimento", capacity: "Desenvolvimento de software customizado, apps web e mobile, testes de usabilidade e arquitetura de sistemas", occupancy: 75, projectsCount: 2 },
+            { id: 3, name: "Núcleo de Empreendedorismo e Inovação (NEI)", area: "Inovação / Startups", equipment: "Espaço Coworking, Sala de Pitching, Conexão Direta com Empresas do Vale da Eletrônica", capacity: "Incubação de projetos acadêmicos (FAITEC), mentorias para startups, captação de recursos", occupancy: 60, projectsCount: 1 }
+          ]);
+        } else {
+          setLabs([
+            { id: 1, name: "Centro de Referência em Radiocomunicações (CRR)", area: "Telecomunicações / RF", equipment: "Analisador de Espectro de 110 GHz, Câmara Anecoica Blindada", capacity: "Caracterização de antenas, testes de conformidade 5G/6G", occupancy: 40, projectsCount: 2 },
+            { id: 2, name: "Wireless & AI Lab (WAI Lab)", area: "Inteligência Artificial / Computação Móvel", equipment: "Cluster GPU Nvidia DGX, Módulos SDR (Software Defined Radio)", capacity: "Otimização de canais de RF com aprendizado de máquina, redes neurais aplicadas a telecom", occupancy: 80, projectsCount: 4 },
+            { id: 3, name: "Laboratório WOCA (Wireless and Optical Convergent Access)", area: "Fotônica / Redes de Acesso", equipment: "Fusora de Fibra Óptica de Precisão, Medidor de Potência Óptica de Alta Resolução", capacity: "Integração entre redes sem fio e fibra óptica (backhaul/fronthaul)", occupancy: 60, projectsCount: 3 }
+          ]);
+        }
 
         // Get Stats
         const projectsQuery = query(collection(db, "projects"), where("orgId", "==", orgId));

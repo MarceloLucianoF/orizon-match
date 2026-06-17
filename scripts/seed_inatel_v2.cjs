@@ -166,8 +166,11 @@ async function seedV2() {
       subscriptionStatus: 'premium',
       location: 'Santa Rita do Sapucaí, MG',
       capabilities: [
-        'Núcleo de Prática em Gestão e TI',
-        'Pesquisa Científica Aplicada em Tecnologia e Negócios'
+        'Núcleo de Prática em Gestão (NPG)',
+        'Fábrica de Software e Sistemas de Informação',
+        'Núcleo de Empreendedorismo e Inovação (NEI)',
+        'Projetos Tecnológicos e Inovação da FAITEC',
+        'Consultoria Organizacional e Governança Corporativa'
       ],
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     },
@@ -391,7 +394,13 @@ async function seedV2() {
   };
 
   for (const [id, data] of Object.entries(users)) {
-    batch.set(db.collection('users').doc(id), data);
+    const segments = data.segment 
+      ? data.segment.split(/, | e | & |\/| e /).map(s => s.trim()).filter(Boolean)
+      : [];
+    if (data.segment && !segments.includes(data.segment)) {
+      segments.push(data.segment);
+    }
+    batch.set(db.collection('users').doc(id), { ...data, segments });
   }
 
   // Seeding organizations collection
@@ -664,6 +673,36 @@ async function seedV2() {
       patentStatus: 'Registro de Software Depositado',
       ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
       fundingTags: ['FAPEMIG', 'Editais FAI']
+    },
+    {
+      id: 'proj_fai_2',
+      title: 'Rastreabilidade de Café Especial via Blockchain (FAITEC)',
+      segment: 'Software & Agro',
+      trl: 6,
+      verified: true,
+      userId: 'ict_fai',
+      orgId: 'ict_fai_org',
+      summary: 'Plataforma descentralizada baseada em blockchain para rastreamento da cadeia de custódia de cafés especiais no Sul de Minas, conectando produtores a compradores globais com verificação de sustentabilidade.',
+      ticket: '150k',
+      researcher: 'Prof. Dr. Inovação FAI (FAITEC)',
+      patentStatus: 'Registro de Software Solicitado',
+      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      fundingTags: ['Lei do Bem', 'FAITEC']
+    },
+    {
+      id: 'proj_fai_3',
+      title: 'Dispositivo IoT de Baixo Custo para Eficiência Hídrica (FAITEC)',
+      segment: 'Hardware & Agro',
+      trl: 7,
+      verified: true,
+      userId: 'ict_fai',
+      orgId: 'ict_fai_org',
+      summary: 'Sensores de umidade do solo conectados via LoRaWAN com algoritmo de otimização de irrigação por IA, desenvolvidos especificamente para agricultura familiar e pequenas fazendas da microrregião de Santa Rita.',
+      ticket: '80k',
+      researcher: 'Coord. Engenharia FAI (FAITEC)',
+      patentStatus: 'Patente Depositada (BR 10 2026)',
+      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      fundingTags: ['FAPEMIG', 'FAITEC']
     }
   ];
 

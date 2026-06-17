@@ -82,8 +82,11 @@ async function seedInatelEcosystem() {
       location: 'Santa Rita do Sapucaí, MG',
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       capabilities: [
-        'Núcleo de Prática em Gestão e TI',
-        'Pesquisa Científica Aplicada em Tecnologia e Negócios'
+        'Núcleo de Prática em Gestão (NPG)',
+        'Fábrica de Software e Sistemas de Informação',
+        'Núcleo de Empreendedorismo e Inovação (NEI)',
+        'Projetos Tecnológicos e Inovação da FAITEC',
+        'Consultoria Organizacional e Governança Corporativa'
       ],
       verified: true
     },
@@ -221,7 +224,13 @@ async function seedInatelEcosystem() {
   };
 
   for (const [id, data] of Object.entries(users)) {
-    batch.set(db.collection('users').doc(id), data);
+    const segments = data.segment 
+      ? data.segment.split(/, | e | & |\/| e /).map(s => s.trim()).filter(Boolean)
+      : [];
+    if (data.segment && !segments.includes(data.segment)) {
+      segments.push(data.segment);
+    }
+    batch.set(db.collection('users').doc(id), { ...data, segments });
   }
 
   // ==========================================
@@ -458,6 +467,38 @@ async function seedInatelEcosystem() {
       ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
       fundingTags: ['FAPEMIG', 'Editais FAI'],
       investmentTarget: 100000,
+      status: 'active',
+      vdrStatus: 'green',
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
+    'proj_fai_2': {
+      title: 'Rastreabilidade de Café Especial via Blockchain (FAITEC)',
+      summary: 'Plataforma descentralizada baseada em blockchain para rastreamento da cadeia de custódia de cafés especiais no Sul de Minas, conectando produtores a compradores globais com verificação de sustentabilidade.',
+      segment: 'Software & Agro',
+      declaredTRL: 6,
+      validatedTRL: 6,
+      isIctVerified: true,
+      ictId: 'ict_fai',
+      userId: 'ict_fai',
+      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      fundingTags: ['Lei do Bem', 'FAITEC'],
+      investmentTarget: 150000,
+      status: 'active',
+      vdrStatus: 'green',
+      createdAt: admin.firestore.FieldValue.serverTimestamp()
+    },
+    'proj_fai_3': {
+      title: 'Dispositivo IoT de Baixo Custo para Eficiência Hídrica (FAITEC)',
+      summary: 'Sensores de umidade do solo conectados via LoRaWAN com algoritmo de otimização de irrigação por IA, desenvolvidos especificamente para agricultura familiar e pequenas fazendas da microrregião de Santa Rita.',
+      segment: 'Hardware & Agro',
+      declaredTRL: 7,
+      validatedTRL: 7,
+      isIctVerified: true,
+      ictId: 'ict_fai',
+      userId: 'ict_fai',
+      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      fundingTags: ['FAPEMIG', 'FAITEC'],
+      investmentTarget: 80000,
       status: 'active',
       vdrStatus: 'green',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
