@@ -219,7 +219,7 @@ export function Explore() {
         briefingProject.id,
         briefingProject.title || "Projeto",
         null,
-        { version: "1.0", poweredBy: "NVIDIA NIM (Llama 3.1)" }
+        { version: "1.0", poweredBy: "Google Gemini" }
       );
 
     } catch (err) {
@@ -685,8 +685,8 @@ export function Explore() {
                 <div className="py-20 flex flex-col items-center justify-center space-y-4">
                   <Loader2 className="animate-spin text-fuchsia-500" size={40} />
                   <div className="text-center space-y-1">
-                    <p className="text-sm font-bold text-slate-300 animate-pulse">Llama 3.1 Executando Prospecção...</p>
-                    <p className="text-xs text-slate-500">Mapeando TRL, market-fit, incentivos fiscais e SWOT com NVIDIA NIM.</p>
+                    <p className="text-sm font-bold text-slate-300 animate-pulse">Gemini Executando Prospecção...</p>
+                    <p className="text-xs text-slate-500">Mapeando TRL, market-fit, incentivos fiscais e SWOT com Gemini.</p>
                   </div>
                 </div>
               ) : aiBriefingText ? (
@@ -723,7 +723,7 @@ export function Explore() {
                     onClick={handleTriggerBriefing}
                     className="bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white px-6 py-3 rounded-xl font-bold text-xs shadow-[0_0_20px_rgba(217,70,239,0.3)] transition-all"
                   >
-                    Solicitar Briefing do Analista Virtual (NVIDIA NIM)
+                    Solicitar Briefing do Analista Virtual (Gemini)
                   </button>
                 </div>
               )}
@@ -731,7 +731,7 @@ export function Explore() {
 
             {/* Footer */}
             <div className="p-4 border-t border-slate-800 bg-slate-900/90 flex justify-between items-center text-[10px] text-slate-500 font-mono shrink-0">
-              <span>Powered by NVIDIA NIM & Llama 3.1</span>
+              <span>Powered by Google Gemini</span>
               <span>Classificação: Confidencial Enterprise</span>
             </div>
 

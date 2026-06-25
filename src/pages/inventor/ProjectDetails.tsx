@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs, updateDoc, increment } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { 
   ArrowLeft, Eye, Star, Zap, 
@@ -13,6 +13,7 @@ import { checkExistingNDA } from "../../services/ndaService";
 import { useAuth } from "../../hooks/useAuth";
 import ReactMarkdown from 'react-markdown';
 import { Loader2, Printer } from "lucide-react";
+import { generateProjectAiBriefing } from "../../services/reportService";
 
 interface ProjectData {
   id: string;
@@ -64,11 +65,9 @@ export function ProjectDetails() {
             setAiReport(projectData.lastAiReport.content);
           }
 
-          // Record view analytics via fetch para evitar problemas de CORS em southamerica-east1
-          fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/recordView', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ data: { projectId: id } })
+          // Record view analytics directly in Firestore (bypassing cloud function due to Spark plan)
+          updateDoc(doc(db, "projects", id), {
+            "stats.views": increment(1)
           }).catch(err => console.error("Analytics error:", err));
 
           // Check for existing NDA
@@ -91,15 +90,8 @@ export function ProjectDetails() {
     if (!id) return;
     setGeneratingReport(true);
     try {
-      const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/generateProjectReport', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: { projectId: id } })
-      });
-
-      if (!response.ok) throw new Error("Erro ao gerar relatório");
-      const result = await response.json();
-      setAiReport(result.data.report);
+      const reportText = await generateProjectAiBriefing(id);
+      setAiReport(reportText);
     } catch (err) {
       console.error(err);
       alert("Falha ao gerar inteligência. Tente novamente em instantes.");
@@ -266,21 +258,21 @@ export function ProjectDetails() {
 
           {/* AI INTELLIGENCE REPORT SECTION */}
           {aiReport && (
-            <div className="bg-slate-900 border border-indigo-500/30 rounded-3xl overflow-hidden print-container">
-              <div className="bg-gradient-to-r from-indigo-900/40 to-slate-900 p-8 border-b border-indigo-500/20 flex justify-between items-center no-print">
+            <div className="bg-[#0C061A]/70 border border-indigo-500/15 rounded-[32px] shadow-[0_24px_80px_rgba(99,102,241,0.08)] backdrop-blur-md overflow-hidden print-container">
+              <div className="bg-gradient-to-r from-indigo-950/40 via-transparent to-transparent p-8 border-b border-slate-800/60 flex justify-between items-center no-print">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
+                  <div className="p-2.5 bg-indigo-500/10 rounded-xl text-indigo-400 border border-indigo-500/20">
                     <Zap size={20} />
                   </div>
                   <div>
                     <h3 className="text-lg font-bold text-white">Executive Briefing</h3>
-                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">AI-Powered Intelligence by LLaMA 3.1</p>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">AI-Powered Intelligence by Gemini</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <button 
                     onClick={handlePrint}
-                    className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition flex items-center gap-2 text-xs font-bold"
+                    className="p-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-xl transition flex items-center gap-2 text-xs font-bold border border-slate-700/50"
                   >
                     <Printer size={16} /> 
                     <span className="hidden sm:inline">Imprimir / PDF</span>
@@ -302,7 +294,7 @@ export function ProjectDetails() {
                 </div>
               </div>
 
-              <div className="p-8 prose prose-invert max-w-none prose-sm prose-headings:text-white prose-p:text-slate-300 prose-strong:text-indigo-400">
+              <div className="p-10 md:p-12 prose prose-invert max-w-none">
                 <ReactMarkdown>{aiReport}</ReactMarkdown>
               </div>
 

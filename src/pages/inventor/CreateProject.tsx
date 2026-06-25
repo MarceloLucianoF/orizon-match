@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import app from "../../firebase/config";
 import { useAuth } from "../../hooks/useAuth";
 import { createProject } from "../../services/projectService";
 import { 
@@ -1096,32 +1097,92 @@ export function CreateProject() {
                         setTimeout(() => setAiStatus("Estruturando proposta de valor..."), 1500);
                         setTimeout(() => setAiStatus("Lapidando tom de voz executivo..."), 3000);
 
-                        // Mudamos para fetch manual para evitar problemas de CORS em southamerica-east1
-                        const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/enhancePitch', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            data: {
-                              ...formData.summaryQuestions,
-                              userId: user?.uid
-                            }
-                          })
-                        });
+                        let summary = "";
+                        try {
+                          console.log("Tentando lapidar pitch via Vertex AI em Firebase (sem chaves / Spark plan)...");
+                          try {
+                            // @ts-ignore
+                            const { getAI, getGenerativeModel } = await import("firebase/ai");
+                            const ai = getAI(app);
+                            const model = getGenerativeModel(ai, { model: "gemini-2.0-flash" });
+                            const prompt = `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}`;
+                            const response = await model.generateContent({
+                              contents: [{ role: "user", parts: [{ text: prompt }] }],
+                              systemInstruction: "Você é um especialista em inovação B2B. Sua tarefa é transformar as respostas do inventor em um 'Executive Summary' de alto impacto, profissional e objetivo, adequado para investidores e empresas parceiras. Não use jargões desnecessários. Crie um texto único, coeso e persuasivo (máximo de 3 parágrafos). Não inclua saudações, vá direto ao texto.",
+                              generationConfig: {
+                                temperature: 0.5,
+                                maxOutputTokens: 1024
+                              }
+                            });
+                            summary = response.response.text() || "";
+                          } catch (vertexError) {
+                            console.warn("Vertex AI em Firebase falhou ou não está habilitado. Tentando via chave de API direta...", vertexError);
+                            
+                            // Chamada direta do cliente para a API do Gemini
+                            const geminiApiKey = (import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.VITE_FIREBASE_API_KEY || "").trim();
+                            const modelName = "gemini-2.0-flash";
+                            const directResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`, {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json"
+                              },
+                              body: JSON.stringify({
+                                contents: [{
+                                  role: "user",
+                                  parts: [{ text: `Problema: ${formData.summaryQuestions.problem}\nSolução: ${formData.summaryQuestions.solution}\nDiferencial: ${formData.summaryQuestions.difference}` }]
+                                }],
+                                systemInstruction: {
+                                  parts: [{ text: "Você é um especialista em inovação B2B. Sua tarefa é transformar as respostas do inventor em um 'Executive Summary' de alto impacto, profissional e objetivo, adequado para investidores e empresas parceiras. Não use jargões desnecessários. Crie um texto único, coeso e persuasivo (máximo de 3 parágrafos). Não inclua saudações, vá direto ao texto." }]
+                                },
+                                generationConfig: {
+                                  temperature: 0.5,
+                                  maxOutputTokens: 1024
+                                }
+                              })
+                            });
 
-                        if (!response.ok) {
-                          const errorData = await response.json();
-                          throw new Error(errorData.error?.message || "Falha ao processar com IA.");
+                            if (!directResponse.ok) {
+                              if (directResponse.status === 403) {
+                                throw new Error("Erro de autenticação da API (403): Ative a 'Generative Language API' no console do Google Cloud para a sua chave do Firebase, ou configure VITE_GEMINI_API_KEY no arquivo .env.local com uma chave gratuita do Google AI Studio.");
+                              }
+                              throw new Error("Falha na chamada direta à API do Gemini.");
+                            }
+
+                            const directResult = await directResponse.json();
+                            summary = directResult.candidates?.[0]?.content?.parts?.[0]?.text || "";
+                          }
+                        } catch (clientAiError) {
+                          console.warn("Chamadas cliente falharam. Tentando Cloud Function como último recurso...", clientAiError);
+                          
+                          // Fallback final: manual fetch para a Cloud Function
+                          const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/enhancePitch', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              data: {
+                                ...formData.summaryQuestions,
+                                userId: user?.uid
+                              }
+                            })
+                          });
+
+                          if (!response.ok) {
+                            throw new Error("Falha na Cloud Function de backup.");
+                          }
+
+                          const result = await response.json();
+                          summary = result.data.summary;
                         }
 
-                        const result = await response.json();
-                        const summary = result.data.summary;
-                        updateField('summary', summary);
-                        updateField('summaryMethod', 'text');
-                      } catch (err: any) {
-                        console.error(err);
-                        const msg = err.message || "Falha na comunicação com a IA.";
-                        setError(`${msg} Você pode prosseguir com o texto manual abaixo.`);
-                        updateField('summaryMethod', 'text');
+                         updateField('summary', summary);
+                         updateField('summaryMethod', 'text');
+                       } catch (err: any) {
+                         console.error(err);
+                         const errorMsg = err.message?.includes("403") || err.message?.includes("autenticação")
+                           ? "Erro de autenticação da IA: Ative a 'Generative Language API' no console do Google Cloud para a sua chave do Firebase, ou configure VITE_GEMINI_API_KEY no seu arquivo .env.local com uma chave do Google AI Studio."
+                           : "Não foi possível conectar com a IA devido às restrições do plano do Firebase. Por favor, configure a chave VITE_GEMINI_API_KEY no arquivo .env.local ou insira o texto manualmente.";
+                         setError(errorMsg);
+                         updateField('summaryMethod', 'text');
                       } finally {
                         setIsAiProcessing(false);
                       }

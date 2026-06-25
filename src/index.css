@@ -111,9 +111,14 @@ code {
 }
 
 /* Custom scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(99, 102, 241, 0.25) rgba(15, 23, 42, 0.3);
+}
+
 .custom-scrollbar::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -122,13 +127,13 @@ code {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.2);
+  background: rgba(99, 102, 241, 0.25);
   border-radius: 10px;
   border: 1px solid rgba(99, 102, 241, 0.1);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.4);
+  background: rgba(99, 102, 241, 0.45);
 }
 
 /* Sidebar backdrop for mobile */
@@ -208,3 +213,138 @@ code {
 .toggle-switch.inactive .toggle-knob {
   transform: translateX(0.2rem);
 }
+
+/* Custom Markdown Prose Styling */
+.prose {
+  line-height: 1.85;
+  font-family: var(--font-sans);
+}
+
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.prose h2 {
+  font-size: 1.45rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+  padding-bottom: 0.5rem;
+  background: linear-gradient(to right, #ffffff, #c7d2fe);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.prose h3 {
+  font-size: 1.2rem;
+  margin-top: 1.85rem;
+  margin-bottom: 0.75rem;
+  color: rgb(165, 180, 252); /* indigo-300 */
+}
+
+.prose p {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  color: rgb(203, 213, 225); /* slate-300 */
+}
+
+.prose strong {
+  font-weight: 700;
+  color: rgb(129, 140, 248); /* indigo-400 */
+}
+
+.prose ul {
+  list-style-type: disc;
+  margin-top: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-left: 1.75rem;
+}
+
+.prose ol {
+  list-style-type: decimal;
+  margin-top: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-left: 1.75rem;
+}
+
+.prose li {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: rgb(203, 213, 225); /* slate-300 */
+  line-height: 1.75;
+}
+
+.prose blockquote {
+  font-style: italic;
+  border-left: 4px solid rgb(99, 102, 241);
+  padding-left: 1.25rem;
+  margin: 1.75rem 0;
+  color: rgb(148, 163, 184);
+}
+
+/* Hide print-only elements on screen */
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}
+
+/* Print Utilities for PDF/Paper */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-container {
+    border: none !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .print-header {
+    border-bottom: 2px solid #4F46E5 !important;
+    padding-bottom: 1.5rem !important;
+    margin-bottom: 2rem !important;
+    display: block !important;
+  }
+  .print-header h1 {
+    color: #4F46E5 !important;
+    margin-bottom: 0.25rem !important;
+  }
+  .print-header p, .print-header span {
+    color: #475569 !important;
+  }
+  .print-footer {
+    border-top: 1px solid #cbd5e1 !important;
+    padding-top: 1rem !important;
+    margin-top: 2rem !important;
+    text-align: center !important;
+    font-size: 10px !important;
+    color: #64748b !important;
+    display: block !important;
+  }
+  .prose {
+    color: black !important;
+  }
+  .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+    color: black !important;
+  }
+  .prose p, .prose li {
+    color: #1e293b !important;
+  }
+  .prose strong {
+    color: #312e81 !important; /* dark indigo for high print contrast */
+  }
+}
+
+

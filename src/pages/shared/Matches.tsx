@@ -206,13 +206,19 @@ export function Matches() {
                   <div className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-1.5 rounded-full" style={{ width: `${match.score}%` }}></div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 text-xs mb-3">
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.segment")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.segment} {t("matches.pts")}</span></span>
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.maturity")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.maturity} {t("matches.pts")}</span></span>
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.readiness")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.readiness} {t("matches.pts")}</span></span>
-                  <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.needs")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.needs} {t("matches.pts")}</span></span>
-                </div>
-                <p className="text-sm text-slate-300">{explainMatch(match.breakdown)}</p>
+                {match.breakdown && (
+                  <div className="flex flex-wrap gap-2 text-xs mb-3">
+                    <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.segment")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.segment || 0} {t("matches.pts")}</span></span>
+                    <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.maturity")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.maturity || 0} {t("matches.pts")}</span></span>
+                    <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.readiness")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.readiness || 0} {t("matches.pts")}</span></span>
+                    <span className="bg-slate-800/80 border border-slate-700 px-2.5 py-1 rounded text-slate-400">{t("matches.needs")}: <span className="text-indigo-400 font-bold ml-1">{match.breakdown.needs || 0} {t("matches.pts")}</span></span>
+                  </div>
+                )}
+                <p className="text-sm text-slate-300">
+                  {match.breakdown 
+                    ? explainMatch(match.breakdown) 
+                    : "Compatibilidade calculada por IA com base em setor, maturidade TRL e demandas."}
+                </p>
               </div>
 
               <div className="flex-shrink-0 flex md:flex-col gap-2 w-full md:w-auto">

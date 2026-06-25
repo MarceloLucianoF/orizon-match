@@ -68,17 +68,36 @@ async function generateIntelligenceReport(projectId) {
     - Tipo de Inovação: ${projectData === null || projectData === void 0 ? void 0 : projectData.innovationType}
     - Necessidades: ${JSON.stringify(projectData === null || projectData === void 0 ? void 0 : projectData.needs)}
 
-    ESTRUTURA DO RELATÓRIO (Use Markdown):
-    1. **Sumário Executivo**: Visão geral do potencial de disrupção.
-    2. **Análise SWOT Estratégica**:
-       - Forças (Internas)
-       - Fraquezas (Internas)
-       - Oportunidades (Mercado)
-       - Ameaças (Competição/Regulação)
-    3. **Roadmap de Parceria**: 3 fases sugeridas para escala.
-    4. **Conclusão Consultiva**: Recomendação final da Orizon.
+    ESTRUTURA DO RELATÓRIO:
+    Você DEVE usar cabeçalhos de Markdown (## e ###) para cada seção para garantir uma formatação bonita em tela. Organize exatamente assim:
 
-    Importante: Não use saudações. Vá direto ao Sumário. Use formatação Markdown profissional.
+    ## Sumário Executivo
+    (Escreva aqui uma visão geral executiva detalhada do potencial de disrupção e relevância de mercado do projeto. Máximo 2 parágrafos.)
+
+    ## Análise SWOT Estratégica
+    
+    ### Forças (Internas)
+    - (Pelo menos 2 itens detalhados com título em negrito. Exemplo: **Inovação Tecnológica**: Descrição...)
+    
+    ### Fraquezas (Internas)
+    - (Pelo menos 2 itens detalhados com título em negrito.)
+    
+    ### Oportunidades (Mercado)
+    - (Pelo menos 2 itens detalhados com título em negrito.)
+    
+    ### Ameaças (Competição/Regulação)
+    - (Pelo menos 2 itens detalhados com título em negrito.)
+
+    ## Roadmap de Parceria
+    (Descreva 3 fases sugeridas para escala em formato de lista. Exemplo:
+    - **Fase 1: Validação & Integração** - Detalhes...
+    - **Fase 2: Piloto em Escala** - Detalhes...
+    - **Fase 3: Expansão de Mercado** - Detalhes...)
+
+    ## Conclusão Consultiva
+    (Recomendação final e parecer da Orizon Match sobre o investimento/parceria.)
+
+    Importante: Não use saudações de boas-vindas, introduções ou conclusão da IA. Comece o texto diretamente com o título "## Sumário Executivo". Use formatação Markdown profissional rigorosamente.
   `;
     const completion = await openai.chat.completions.create({
         model: "meta/llama-3.1-70b-instruct",

@@ -34,6 +34,7 @@ export default function OrganizationDashboard() {
     fundingCalls,
     researchersSearch,
     setResearchersSearch,
+    researchers,
     filteredResearchers,
     royaltyRate,
     setRoyaltyRate,
@@ -324,7 +325,7 @@ export default function OrganizationDashboard() {
             ['validate_trl', 'prepare_proposal', 'embrapit_report', 'consult_inventor', 'add_lab'].includes(activeModal) 
               ? 'max-w-3xl' 
               : 'max-w-lg'
-          } bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-6 overflow-hidden max-h-[90vh] overflow-y-auto transition-all`}>
+          } bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-6 overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar transition-all`}>
             {/* Background decorative lights */}
             <div className="absolute top-0 right-0 w-36 h-36 bg-indigo-500/10 blur-[40px] rounded-full -mr-16 -mt-16 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-36 h-36 bg-fuchsia-500/10 blur-[40px] rounded-full -ml-16 -mb-16 pointer-events-none" />
@@ -1098,58 +1099,56 @@ export default function OrganizationDashboard() {
                         />
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[460px] overflow-y-auto pr-1 custom-scrollbar">
-                        {[
-                          { id: 1, name: "Prof. Dr. Rafael Silva", title: "Coordenador no CRR / Inatel", hIndex: 34, patents: 8, expertise: "Antenas inteligentes, Redes 5G/6G, Hardware RF", email: "rafael.silva@inatel.br", image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" },
-                          { id: 2, name: "Dr. André Lourenço", title: "Pesquisador Sênior no WAI Lab", hIndex: 28, patents: 4, expertise: "Redes Neurais, IoT Industrial, Algoritmos de Borda", email: "andre.lourenco@inatel.br", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" },
-                          { id: 3, name: "Dra. Camila Santos", title: "Pesquisadora de Segurança Cibernética", hIndex: 22, patents: 12, expertise: "Segurança de Redes, Criptografia Pós-Quântica, IoT", email: "camila.santos@inatel.br", image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80" }
-                        ]
-                        .filter(i => i.name.toLowerCase().includes(inventorQuery.toLowerCase()) || i.expertise.toLowerCase().includes(inventorQuery.toLowerCase()))
-                        .map((inv, idx) => (
-                          <div key={idx} className="p-5 bg-slate-950/60 border border-slate-850 rounded-2xl flex flex-col justify-between hover:border-indigo-500/30 hover:bg-slate-900/15 transition-all group shadow-md">
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-3.5">
-                                <img src={inv.image} alt={inv.name} className="w-12 h-12 rounded-2xl object-cover border border-slate-800 shadow-lg group-hover:scale-105 transition-transform" />
-                                <div className="min-w-0">
-                                  <h4 className="font-extrabold text-white text-xs truncate group-hover:text-indigo-400 transition-colors">{inv.name}</h4>
-                                  <p className="text-[9px] text-slate-500 font-semibold truncate mt-0.5">{inv.title}</p>
+                      <div className="max-h-[380px] overflow-y-auto pr-2 pb-6 custom-scrollbar">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {researchers
+                            .filter(i => i.name.toLowerCase().includes(inventorQuery.toLowerCase()) || i.expertise.toLowerCase().includes(inventorQuery.toLowerCase()))
+                            .map((inv, idx) => (
+                              <div key={idx} className="p-5 bg-slate-950/60 border border-slate-850 rounded-2xl flex flex-col justify-between hover:border-indigo-500/30 hover:bg-slate-900/15 transition-all group shadow-md">
+                                <div className="space-y-4">
+                                  <div className="flex items-center gap-3.5">
+                                    <img src={inv.image} alt={inv.name} className="w-12 h-12 rounded-2xl object-cover border border-slate-800 shadow-lg group-hover:scale-105 transition-transform" />
+                                    <div className="min-w-0">
+                                      <h4 className="font-extrabold text-white text-xs truncate group-hover:text-indigo-400 transition-colors">{inv.name}</h4>
+                                      <p className="text-[9px] text-slate-500 font-semibold truncate mt-0.5">{inv.title}</p>
+                                    </div>
+                                  </div>
+
+                                  {/* Matrix Visual */}
+                                  <div className="grid grid-cols-2 gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-900/80 shadow-inner">
+                                    <div className="text-center">
+                                      <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider block">H-Index</span>
+                                      <span className="text-xs font-black text-indigo-400">{inv.hIndex}</span>
+                                    </div>
+                                    <div className="text-center border-l border-slate-900">
+                                      <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider block">Patentes</span>
+                                      <span className="text-xs font-black text-emerald-400">{inv.patents}</span>
+                                    </div>
+                                  </div>
+
+                                  <p className="text-[10px] text-slate-400 leading-relaxed">
+                                    <strong className="text-slate-300">Áreas:</strong> {inv.expertise}
+                                  </p>
+                                </div>
+
+                                <div className="flex gap-2 mt-4 pt-3 border-t border-slate-900">
+                                  <button
+                                    type="button"
+                                    onClick={() => openModal('allocate_researcher', inv)}
+                                    className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[9px] font-extrabold transition-all uppercase tracking-wider text-center shadow-[0_0_12px_rgba(79,70,229,0.15)]"
+                                  >
+                                    Alocar
+                                  </button>
+                                  <a 
+                                    href={`mailto:${inv.email}`} 
+                                    className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 hover:border-slate-700 rounded-xl text-[9px] font-extrabold transition-all uppercase tracking-wider text-center"
+                                  >
+                                    Contato
+                                  </a>
                                 </div>
                               </div>
-
-                              {/* Matrix Visual */}
-                              <div className="grid grid-cols-2 gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-900/80 shadow-inner">
-                                <div className="text-center">
-                                  <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider block">H-Index</span>
-                                  <span className="text-xs font-black text-indigo-400">{inv.hIndex}</span>
-                                </div>
-                                <div className="text-center border-l border-slate-900">
-                                  <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider block">Patentes</span>
-                                  <span className="text-xs font-black text-emerald-400">{inv.patents}</span>
-                                </div>
-                              </div>
-
-                              <p className="text-[10px] text-slate-400 leading-relaxed">
-                                <strong className="text-slate-300">Áreas:</strong> {inv.expertise}
-                              </p>
-                            </div>
-
-                            <div className="flex gap-2 mt-4 pt-3 border-t border-slate-900">
-                              <button
-                                type="button"
-                                onClick={() => openModal('allocate_researcher', inv)}
-                                className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[9px] font-extrabold transition-all uppercase tracking-wider text-center shadow-[0_0_12px_rgba(79,70,229,0.15)]"
-                              >
-                                Alocar
-                              </button>
-                              <a 
-                                href={`mailto:${inv.email}`} 
-                                className="flex-1 py-2.5 bg-slate-900 hover:bg-slate-850 text-slate-200 border border-slate-800 hover:border-slate-700 rounded-xl text-[9px] font-extrabold transition-all uppercase tracking-wider text-center"
-                              >
-                                Contato
-                              </a>
-                            </div>
-                          </div>
-                        ))}
+                            ))}
+                        </div>
                       </div>
                     </div>
                   )}

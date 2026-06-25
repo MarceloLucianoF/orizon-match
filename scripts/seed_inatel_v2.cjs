@@ -14,7 +14,7 @@ const DEVELOPER_UID = "BfIgQtnAZxRFuHCoiMw4bMkfgWW2";
 
 const KEEPUIDS = new Set([
   'ict_inatel',
-  'ict_fai',
+  'ict_fai_mg',
   'comp_ericsson',
   'comp_siemens',
   'comp_weg',
@@ -131,7 +131,7 @@ async function seedV2() {
   // Create Users in Firebase Auth
   console.log("🔑 Criando/atualizando contas no Firebase Auth...");
   await getOrCreateUser('ict_inatel', 'ict@inatel.br', 'orizon123');
-  await getOrCreateUser('ict_fai', 'ict_fai@orizon.com', 'orizon123');
+  await getOrCreateUser('ict_fai_mg', 'ict_fai_mg@orizon.com', 'orizon123');
   await getOrCreateUser('comp_ericsson', 'empresa@ericsson.com', 'orizon123');
   await getOrCreateUser('comp_siemens', 'siemens@orizon.com', 'orizon123');
   await getOrCreateUser('comp_weg', 'weg@orizon.com', 'orizon123');
@@ -155,22 +155,21 @@ async function seedV2() {
 
   // 1. Users Firestore Profiles
   const users = {
-    'ict_fai': { 
-      id: 'ict_fai', 
+    'ict_fai_mg': { 
+      id: 'ict_fai_mg', 
       role: 'ict', 
-      orgId: 'ict_fai_org',
-      name: 'FAI - Centro de Ensino Superior em Gestão, Tecnologia e Educação', 
-      email: 'ict_fai@orizon.com',
-      segment: 'Gestão, Tecnologia, Sistemas de Informação e Educação',
+      orgId: 'ict_fai_mg_org',
+      name: 'FAI-MG (NPDI / INTEF)', 
+      email: 'ict_fai_mg@orizon.com',
+      segment: 'Cloud / EdTech / TI',
       verified: true,
       subscriptionStatus: 'premium',
       location: 'Santa Rita do Sapucaí, MG',
       capabilities: [
-        'Núcleo de Prática em Gestão (NPG)',
-        'Fábrica de Software e Sistemas de Informação',
-        'Núcleo de Empreendedorismo e Inovação (NEI)',
-        'Projetos Tecnológicos e Inovação da FAITEC',
-        'Consultoria Organizacional e Governança Corporativa'
+        'Núcleo de Pesquisa, Desenvolvimento e Inovação (NPDI)',
+        'Incubadora de Empresas (INTEF)',
+        'AWS Academy Program',
+        'Projetos FAITEC (Engenharia de Produção, Sistemas de Informação, Administração)'
       ],
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     },
@@ -405,11 +404,100 @@ async function seedV2() {
 
   // Seeding organizations collection
   const organizations = {
-    'ict_fai_org': {
-      id: 'ict_fai_org',
-      name: 'FAI - Centro de Ensino Superior em Gestão, Tecnologia e Educação',
+    'ict_fai_mg_org': {
+      id: 'ict_fai_mg_org',
+      name: 'FAI-MG (NPDI / INTEF)',
       type: 'ICT',
-      managers: ['ict_fai'],
+      managers: ['ict_fai_mg'],
+      researchers: [
+        {
+          id: 'res_fai_01',
+          name: 'Prof. Dr. Fábio Gavião',
+          title: 'Doutor - Sistemas de Informação',
+          department: 'Sistemas de Informação',
+          expertise: 'Computação de Alta Performance (HPC) e Cloud Computing (AWS)',
+          lattesUrl: 'http://lattes.cnpq.br/simulado_fai_01',
+          hIndex: 18,
+          patents: 3,
+          email: 'fabio.gaviao@fai-mg.br',
+          image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80',
+          compatibility: 96
+        },
+        {
+          id: 'res_fai_02',
+          name: 'Profa. Dra. Sandra Carvalho',
+          title: 'Doutora - Engenharia de Produção',
+          department: 'Engenharia de Produção',
+          expertise: 'Manufatura Enxuta (Green Belt), Integração Industrial e Logística',
+          lattesUrl: 'http://lattes.cnpq.br/simulado_fai_02',
+          hIndex: 15,
+          patents: 5,
+          email: 'sandra.carvalho@fai-mg.br',
+          image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80',
+          compatibility: 89
+        },
+        {
+          id: 'res_fai_03',
+          name: 'Prof. Me. Carlos Alberto Mont\' Alvão',
+          title: 'Mestre - Gestão da Qualidade',
+          department: 'Gestão da Qualidade',
+          expertise: 'ISO 9001, Pesquisa Operacional e Gestão de Riscos Industriais',
+          lattesUrl: 'http://lattes.cnpq.br/simulado_fai_03',
+          hIndex: 12,
+          patents: 2,
+          email: 'carlos.alvao@fai-mg.br',
+          image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80',
+          compatibility: 82
+        },
+        {
+          id: 'res_fai_04',
+          name: 'Profa. Me. Margarete Siqueira',
+          title: 'Mestra - Núcleo de Empreendedorismo',
+          department: 'Núcleo de Empreendedorismo (NEI/INTEF)',
+          expertise: 'EdTech, Adaptive Learning e Modelagem de Novos Negócios',
+          lattesUrl: 'http://lattes.cnpq.br/simulado_fai_04',
+          hIndex: 10,
+          patents: 1,
+          email: 'margarete.siqueira@fai-mg.br',
+          image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
+          compatibility: 85
+        }
+      ],
+      fundingCalls: [
+        {
+          id: 'edital_fai_01',
+          title: 'Programa Centelha MG (FAPEMIG)',
+          agency: 'FAPEMIG',
+          type: 'Subvenção Econômica',
+          amount: 'R$ 130.000',
+          deadline: '2026-08-30',
+          focus: 'Apoio a startups em fase inicial incubadas (INTEF)',
+          status: 'open',
+          matchScore: 88
+        },
+        {
+          id: 'edital_fai_02',
+          title: 'Chamada FINEP - Soluções em EdTech & GovTech',
+          agency: 'FINEP',
+          type: 'Fomento à Pesquisa',
+          amount: 'R$ 500.000',
+          deadline: '2026-10-15',
+          focus: 'Plataformas SaaS para Educação e Cidades Inteligentes',
+          status: 'open',
+          matchScore: 92
+        },
+        {
+          id: 'edital_fai_03',
+          title: 'AWS Academy Cloud Research Grant',
+          agency: 'AWS Partner Network',
+          type: 'Créditos Cloud / Grant',
+          amount: 'US$ 10.000',
+          deadline: 'Fluxo Contínuo',
+          focus: 'Projetos nativos em nuvem e arquiteturas de Machine Learning',
+          status: 'open',
+          matchScore: 95
+        }
+      ],
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     },
     'ict_outra_org': {
@@ -665,13 +753,13 @@ async function seedV2() {
       segment: 'Tecnologia e Inovação',
       trl: 5,
       verified: true,
-      userId: 'ict_fai',
-      orgId: 'ict_fai_org',
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
       summary: 'Plataforma inteligente de análise de dados e BI baseada em inteligência artificial para otimização de processos de gestão e tomada de decisão estratégica em micro e pequenas empresas do Vale da Eletrônica.',
       ticket: '100k',
       researcher: 'Prof. Msc. FAI de Santa Rita',
       patentStatus: 'Registro de Software Depositado',
-      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      ictName: 'FAI-MG (NPDI / INTEF)',
       fundingTags: ['FAPEMIG', 'Editais FAI']
     },
     {
@@ -680,13 +768,13 @@ async function seedV2() {
       segment: 'Software & Agro',
       trl: 6,
       verified: true,
-      userId: 'ict_fai',
-      orgId: 'ict_fai_org',
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
       summary: 'Plataforma descentralizada baseada em blockchain para rastreamento da cadeia de custódia de cafés especiais no Sul de Minas, conectando produtores a compradores globais com verificação de sustentabilidade.',
       ticket: '150k',
       researcher: 'Prof. Dr. Inovação FAI (FAITEC)',
       patentStatus: 'Registro de Software Solicitado',
-      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      ictName: 'FAI-MG (NPDI / INTEF)',
       fundingTags: ['Lei do Bem', 'FAITEC']
     },
     {
@@ -695,14 +783,149 @@ async function seedV2() {
       segment: 'Hardware & Agro',
       trl: 7,
       verified: true,
-      userId: 'ict_fai',
-      orgId: 'ict_fai_org',
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
       summary: 'Sensores de umidade do solo conectados via LoRaWAN com algoritmo de otimização de irrigação por IA, desenvolvidos especificamente para agricultura familiar e pequenas fazendas da microrregião de Santa Rita.',
       ticket: '80k',
       researcher: 'Coord. Engenharia FAI (FAITEC)',
       patentStatus: 'Patente Depositada (BR 10 2026)',
-      ictName: 'FAI (Centro de Ensino Superior em Gestão, Tecnologia e Educação) de Santa Rita do Sapucaí',
+      ictName: 'FAI-MG (NPDI / INTEF)',
       fundingTags: ['FAPEMIG', 'FAITEC']
+    },
+    { 
+      id: 'p_fai_01', 
+      title: 'Cloud-Native Adaptive Learning Engine', 
+      summary: 'Motor educacional preditivo hospedado em AWS. Analisa o engajamento de alunos em tempo real para personalizar trilhas de ensino.', 
+      segment: 'EdTech / IA', 
+      trl: 6, 
+      verified: true, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '250k', 
+      ictName: 'FAI-MG (INTEF)', 
+      researcher: 'Profa. Me. Margarete Siqueira', 
+      patentStatus: 'Registro de Software (INPI)',
+      fundingTags: ['AWS Academy', 'FINEP']
+    },
+    { 
+      id: 'p_fai_02', 
+      title: 'ITIL V3 Automated Workflow Orchestrator', 
+      summary: 'Plataforma SaaS para governança automatizada de TI baseada nas normativas ITIL. Reduz o MTTR (Mean Time to Repair) de service desks corporativos em 40%.', 
+      segment: 'IT Management', 
+      trl: 8, 
+      verified: true, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '1M', 
+      ictName: 'FAI-MG (NPDI)', 
+      researcher: 'Prof. Rodrigo R. Magalhães', 
+      patentStatus: 'Segredo Industrial',
+      fundingTags: ['NPDI', 'Lei do Bem']
+    },
+    { 
+      id: 'p_fai_03', 
+      title: 'Edge-to-Cloud Backup Automation para IoT', 
+      summary: 'Solução arquitetada na nuvem (AWS/Azure) para crescimento automático de infraestrutura e backups descentralizados para sensores Smart City.', 
+      segment: 'Cloud Computing / IoT', 
+      trl: 5, 
+      verified: false, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '50k', 
+      ictName: 'FAI-MG (NPDI)', 
+      researcher: 'Núcleo de Computação FAI', 
+      patentStatus: 'Depositada',
+      fundingTags: ['AWS Academy', 'FAITEC']
+    },
+    { 
+      id: 'p_fai_04', 
+      title: 'Dashboard Analítico para Cadeias Produtivas', 
+      summary: 'Sistema de gestão da informação acoplado a ERPs para otimização em tempo real de chão de fábrica e fomento de Lei da Informática.', 
+      segment: 'Sistemas de Informação', 
+      trl: 7, 
+      verified: true, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '250k', 
+      ictName: 'FAI-MG (INTEF)', 
+      researcher: 'Prof. Dr. José Cláudio Pereira', 
+      patentStatus: 'Registro de Software (INPI)',
+      fundingTags: ['Lei da Informática', 'INTEF']
+    },
+    { 
+      id: 'p_fai_05', 
+      title: 'Smart Factory Twin (Digital Twin)', 
+      summary: 'Gêmeo digital integrável a sistemas ERP legado para simulação de gargalos em linhas de montagem de eletrônicos do polo industrial.', 
+      segment: 'Industry 4.0 / Gestão', 
+      trl: 7, 
+      verified: true, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '250k', 
+      ictName: 'FAI-MG (Eng. de Produção)', 
+      researcher: 'Núcleo de Engenharia de Produção', 
+      patentStatus: 'Registro de Software (INPI)',
+      fundingTags: ['FAPEMIG', 'Sebrae']
+    },
+    { 
+      id: 'p_fai_06', 
+      title: 'RiskScore AI Supply Chain', 
+      summary: 'Motor de inteligência artificial para análise preditiva de crédito e risco de ruptura na cadeia de suprimentos de hardware B2B.', 
+      segment: 'FinTech / Gestão', 
+      trl: 5, 
+      verified: false, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '50k', 
+      ictName: 'FAI-MG (INTEF)', 
+      researcher: 'Prof. Carlos Eduardo', 
+      patentStatus: 'Segredo Industrial',
+      fundingTags: ['INTEF', 'Sebrae']
+    },
+    { 
+      id: 'p_fai_07', 
+      title: 'Immersive Tech Training VR', 
+      summary: 'Plataforma de realidade virtual (VR) para treinamento de operadores de maquinário SMT, reduzindo o tempo de onboarding industrial em 60%.', 
+      segment: 'EdTech / HR Tech', 
+      trl: 6, 
+      verified: true, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '250k', 
+      ictName: 'FAI-MG (FAITEC Lab)', 
+      researcher: 'Grupo de Pesquisa em Educação Tecnológica', 
+      patentStatus: 'Depositada',
+      fundingTags: ['FAITEC', 'FAPEMIG']
+    },
+    { 
+      id: 'p_fai_08', 
+      title: 'Urban Logistics Data Mesh', 
+      summary: 'Algoritmo de roteirização dinâmica baseado em análise de dados em nuvem para otimização logística em polos de inovação descentralizados.', 
+      segment: 'Logistics / Smart City', 
+      trl: 8, 
+      verified: true, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '1M', 
+      ictName: 'FAI-MG (Sistemas de Informação)', 
+      researcher: 'Profa. Dra. Silvana', 
+      patentStatus: 'Registro de Software (INPI)',
+      fundingTags: ['CNPq', 'FINEP']
+    },
+    { 
+      id: 'p_fai_09', 
+      title: 'Automação RPA para Compliance Fiscal', 
+      summary: 'Robôs de automação de processos (RPA) desenhados para auditoria fiscal contínua de indústrias que utilizam benefícios da Lei da Informática e Rota 2030.', 
+      segment: 'RegTech / Gestão', 
+      trl: 9, 
+      verified: true, 
+      userId: 'ict_fai_mg',
+      orgId: 'ict_fai_mg_org',
+      ticket: '250k', 
+      ictName: 'FAI-MG (INTEF)', 
+      researcher: 'Núcleo de Administração e Negócios', 
+      patentStatus: 'Registro de Software (INPI)',
+      fundingTags: ['Lei da Informática', 'INTEF']
     }
   ];
 

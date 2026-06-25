@@ -78,19 +78,19 @@ export function useOrganizationDashboard() {
   };
 
   // Mock Funding Calls (Radar de Fomento)
-  const fundingCalls = [
+  const [fundingCalls, setFundingCalls] = useState<any[]>([
     { id: 1, agency: "FINEP", title: "Mais Inovação Brasil - Telecom & Semicondutores", amount: "Até R$ 5M", matchScore: 94, deadline: "15/07/2026", segment: "Telecom/Hardware" },
     { id: 2, agency: "Embrapii", title: "Chamada Unidades EMBRAPII - Hard Tech & IoT", amount: "Subsídio de 50%", matchScore: 92, deadline: "30/08/2026", segment: "Indústria 4.0/IoT" },
     { id: 3, agency: "FAPEMIG", title: "Programa Centelha III - Minas Gerais", amount: "Até R$ 100K", matchScore: 85, deadline: "10/06/2026", segment: "Hardware/Telecom" }
-  ];
+  ]);
 
   // Mock Researchers (Lattes Integration)
   const [researchersSearch, setResearchersSearch] = useState("");
-  const researchers = [
+  const [researchers, setResearchers] = useState<any[]>([
     { id: 1, name: "Prof. Dr. Rafael Silva", title: "Coordenador no CRR / Inatel", expertise: "Antenas inteligentes, Redes 5G/6G, Hardware RF", hIndex: 34, patents: 8, compatibility: 96, image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" },
     { id: 2, name: "Dr. André Lourenço", title: "Pesquisador Sênior no WAI Lab", expertise: "Redes Neurais, IoT Industrial, Algoritmos de Borda", hIndex: 28, patents: 4, compatibility: 89, image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" },
     { id: 3, name: "Dra. Camila Santos", title: "Pesquisadora de Segurança Cibernética", expertise: "Segurança de Redes, Criptografia Pós-Quântica, IoT", hIndex: 22, patents: 12, compatibility: 85, image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80" }
-  ];
+  ]);
 
   const filteredResearchers = researchers.filter(r => 
     r.name.toLowerCase().includes(researchersSearch.toLowerCase()) || 
@@ -187,32 +187,40 @@ export function useOrganizationDashboard() {
         
         const userData = userDoc.data();
         const isIct = userData.role === 'ict';
-        let orgId = "";
+        let orgId = userData.orgId || user.uid;
         
+        let loadedOrg: any = null;
         if (isIct) {
-          orgId = user.uid;
-          setOrg({
-            id: orgId,
-            name: userData.name || "Inatel - NGTI & Unidade EMBRAPII ICC",
-            type: "ICT",
-            managers: [user.uid]
-          });
+          const orgDoc = await getDoc(doc(db, "organizations", orgId));
+          if (orgDoc.exists()) {
+            loadedOrg = { id: orgDoc.id, ...orgDoc.data() };
+            setOrg(loadedOrg);
+          } else {
+            loadedOrg = {
+              id: orgId,
+              name: userData.name || "Inatel - NGTI & Unidade EMBRAPII ICC",
+              type: "ICT",
+              managers: [user.uid]
+            };
+            setOrg(loadedOrg);
+          }
         } else {
-          orgId = userData.orgId;
           if (!orgId) {
             setLoading(false);
             return;
           }
           const orgDoc = await getDoc(doc(db, "organizations", orgId));
           if (orgDoc.exists()) {
-            setOrg({ id: orgDoc.id, ...orgDoc.data() } as any);
+            loadedOrg = { id: orgDoc.id, ...orgDoc.data() };
+            setOrg(loadedOrg);
           } else {
-            setOrg({
+            loadedOrg = {
               id: orgId,
               name: "Inatel - NGTI & Unidade EMBRAPII ICC",
               type: "ICT",
               managers: [user.uid]
-            });
+            };
+            setOrg(loadedOrg);
           }
         }
         
@@ -228,6 +236,45 @@ export function useOrganizationDashboard() {
             { id: 2, name: "Wireless & AI Lab (WAI Lab)", area: "Inteligência Artificial / Computação Móvel", equipment: "Cluster GPU Nvidia DGX, Módulos SDR (Software Defined Radio)", capacity: "Otimização de canais de RF com aprendizado de máquina, redes neurais aplicadas a telecom", occupancy: 80, projectsCount: 4 },
             { id: 3, name: "Laboratório WOCA (Wireless and Optical Convergent Access)", area: "Fotônica / Redes de Acesso", equipment: "Fusora de Fibra Óptica de Precisão, Medidor de Potência Óptica de Alta Resolução", capacity: "Integração entre redes sem fio e fibra óptica (backhaul/fronthaul)", occupancy: 60, projectsCount: 3 }
           ]);
+        }
+
+        // Load Researchers dynamically or fallback
+        if (loadedOrg?.researchers && Array.isArray(loadedOrg.researchers) && loadedOrg.researchers.length > 0) {
+          setResearchers(loadedOrg.researchers);
+        } else {
+          if (orgId && orgId.toLowerCase().includes("fai")) {
+            setResearchers([
+              { id: 'res_fai_01', name: 'Prof. Dr. Fábio Gavião', title: 'Doutor - Sistemas de Informação', department: 'Sistemas de Informação', expertise: 'Computação de Alta Performance (HPC) e Cloud Computing (AWS)', lattesUrl: 'http://lattes.cnpq.br/simulado_fai_01', hIndex: 18, patents: 3, email: 'fabio.gaviao@fai-mg.br', image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80', compatibility: 96 },
+              { id: 'res_fai_02', name: 'Profa. Dra. Sandra Carvalho', title: 'Doutora - Engenharia de Produção', department: 'Engenharia de Produção', expertise: 'Manufatura Enxuta (Green Belt), Integração Industrial e Logística', lattesUrl: 'http://lattes.cnpq.br/simulado_fai_02', hIndex: 15, patents: 5, email: 'sandra.carvalho@fai-mg.br', image: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=150&auto=format&fit=crop&q=80', compatibility: 89 },
+              { id: 'res_fai_03', name: 'Prof. Me. Carlos Alberto Mont\' Alvão', title: 'Mestre - Gestão da Qualidade', department: 'Gestão da Qualidade', expertise: 'ISO 9001, Pesquisa Operacional e Gestão de Riscos Industriais', lattesUrl: 'http://lattes.cnpq.br/simulado_fai_03', hIndex: 12, patents: 2, email: 'carlos.alvao@fai-mg.br', image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80', compatibility: 82 },
+              { id: 'res_fai_04', name: 'Profa. Me. Margarete Siqueira', title: 'Mestra - Núcleo de Empreendedorismo', department: 'Núcleo de Empreendedorismo (NEI/INTEF)', expertise: 'EdTech, Adaptive Learning e Modelagem de Novos Negócios', lattesUrl: 'http://lattes.cnpq.br/simulado_fai_04', hIndex: 10, patents: 1, email: 'margarete.siqueira@fai-mg.br', image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80', compatibility: 85 }
+            ]);
+          } else {
+            setResearchers([
+              { id: 1, name: "Prof. Dr. Rafael Silva", title: "Coordenador no CRR / Inatel", expertise: "Antenas inteligentes, Redes 5G/6G, Hardware RF", hIndex: 34, patents: 8, compatibility: 96, image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80" },
+              { id: 2, name: "Dr. André Lourenço", title: "Pesquisador Sênior no WAI Lab", expertise: "Redes Neurais, IoT Industrial, Algoritmos de Borda", hIndex: 28, patents: 4, compatibility: 89, image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80" },
+              { id: 3, name: "Dra. Camila Santos", title: "Pesquisadora de Segurança Cibernética", expertise: "Segurança de Redes, Criptografia Pós-Quântica, IoT", hIndex: 22, patents: 12, compatibility: 85, image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80" }
+            ]);
+          }
+        }
+
+        // Load Funding Calls dynamically or fallback
+        if (loadedOrg?.fundingCalls && Array.isArray(loadedOrg.fundingCalls) && loadedOrg.fundingCalls.length > 0) {
+          setFundingCalls(loadedOrg.fundingCalls);
+        } else {
+          if (orgId && orgId.toLowerCase().includes("fai")) {
+            setFundingCalls([
+              { id: 'edital_fai_01', agency: 'FAPEMIG', title: 'Programa Centelha MG (FAPEMIG)', amount: 'R$ 130.000', deadline: '2026-08-30', type: 'Subvenção Econômica', focus: 'Apoio a startups em fase inicial incubadas (INTEF)', status: 'open', matchScore: 88 },
+              { id: 'edital_fai_02', agency: 'FINEP', title: 'Chamada FINEP - Soluções em EdTech & GovTech', amount: 'R$ 500.000', deadline: '2026-10-15', type: 'Fomento à Pesquisa', focus: 'Plataformas SaaS para Educação e Cidades Inteligentes', status: 'open', matchScore: 92 },
+              { id: 'edital_fai_03', agency: 'AWS Partner Network', title: 'AWS Academy Cloud Research Grant', amount: 'US$ 10.000', deadline: 'Fluxo Contínuo', type: 'Créditos Cloud / Grant', focus: 'Projetos nativos em nuvem e arquiteturas de Machine Learning', status: 'open', matchScore: 95 }
+            ]);
+          } else {
+            setFundingCalls([
+              { id: 1, agency: "FINEP", title: "Mais Inovação Brasil - Telecom & Semicondutores", amount: "Até R$ 5M", matchScore: 94, deadline: "15/07/2026", segment: "Telecom/Hardware" },
+              { id: 2, agency: "Embrapii", title: "Chamada Unidades EMBRAPII - Hard Tech & IoT", amount: "Subsídio de 50%", matchScore: 92, deadline: "30/08/2026", segment: "Indústria 4.0/IoT" },
+              { id: 3, agency: "FAPEMIG", title: "Programa Centelha III - Minas Gerais", amount: "Até R$ 100K", matchScore: 85, deadline: "10/06/2026", segment: "Hardware/Telecom" }
+            ]);
+          }
         }
 
         // Get Stats
