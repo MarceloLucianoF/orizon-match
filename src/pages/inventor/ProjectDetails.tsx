@@ -1,19 +1,112 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { doc, getDoc, collection, query, where, getDocs, updateDoc, increment } from "firebase/firestore";
 import { db } from "../../firebase/config";
 import { 
   ArrowLeft, Eye, Star, Zap, 
   Shield, FileText, Gavel, Briefcase, 
-  ShieldCheck, Code, Lock, ArrowRight
+  ShieldCheck, Code, Lock, ArrowRight,
+  TrendingUp, Map, Target, CheckCircle, AlertTriangle, AlertOctagon, Printer, Loader2
 } from "lucide-react";
 import { VDRRoom } from "../../components/VDRRoom";
 import { SmartNDAModal } from "../../components/legal/SmartNDAModal";
 import { checkExistingNDA } from "../../services/ndaService";
 import { useAuth } from "../../hooks/useAuth";
 import ReactMarkdown from 'react-markdown';
-import { Loader2, Printer } from "lucide-react";
 import { generateProjectAiBriefing } from "../../services/reportService";
+
+// Helper recursively extracting plain text from Markdown React components to identify blockquote tags.
+const extractText = (node: any): string => {
+  if (!node) return "";
+  if (typeof node === "string") return node;
+  if (Array.isArray(node)) return node.map(extractText).join("");
+  if (node.props && node.props.children) return extractText(node.props.children);
+  return "";
+};
+
+const CustomH2 = ({ children }: any) => {
+  const text = React.Children.toArray(children).join('').toLowerCase();
+  let icon = <FileText className="text-indigo-400" size={18} />;
+  let id = "summary";
+  
+  if (text.includes("swot")) {
+    icon = <TrendingUp className="text-indigo-400" size={18} />;
+    id = "swot";
+  } else if (text.includes("roadmap")) {
+    icon = <Map className="text-indigo-400" size={18} />;
+    id = "roadmap";
+  } else if (text.includes("conclus") || text.includes("recomend")) {
+    icon = <Target className="text-indigo-400" size={18} />;
+    id = "conclusion";
+  }
+  
+  return (
+    <div id={id} className="pt-8 pb-4 border-b border-slate-800/80 mb-6 scroll-mt-28">
+      <div className="flex items-center gap-2.5">
+        <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400 border border-indigo-500/20">
+          {icon}
+        </div>
+        <h2 className="text-lg font-bold tracking-tight text-white m-0 !border-b-0 !pb-0 !mt-0 !bg-none !webkit-text-fill-color-initial">
+          {children}
+        </h2>
+      </div>
+    </div>
+  );
+};
+
+const CustomH3 = ({ children }: any) => {
+  const text = React.Children.toArray(children).join('').toLowerCase();
+  let icon = null;
+  
+  if (text.includes("força")) {
+    icon = <CheckCircle className="text-emerald-400 mr-2" size={16} />;
+  } else if (text.includes("fraqueza")) {
+    icon = <AlertTriangle className="text-amber-500 mr-2" size={16} />;
+  } else if (text.includes("oportunidade")) {
+    icon = <TrendingUp className="text-indigo-400 mr-2" size={16} />;
+  } else if (text.includes("ameaça")) {
+    icon = <AlertOctagon className="text-rose-500 mr-2" size={16} />;
+  }
+  
+  return (
+    <h3 className="text-sm font-bold text-slate-200 mt-6 mb-3 flex items-center">
+      {icon}
+      {children}
+    </h3>
+  );
+};
+
+const CustomBlockquote = ({ children }: any) => {
+  const text = extractText(children);
+  const isOpportunity = /oportunidade|opportunity/i.test(text);
+  const isRisk = /risco|risk/i.test(text);
+
+  let containerClass = "border-l-4 border-indigo-500 bg-indigo-950/20 text-slate-300";
+  let title = "Key Insight";
+  let icon = <ShieldCheck className="text-indigo-400" size={16} />;
+
+  if (isOpportunity) {
+    containerClass = "border-l-4 border-amber-500 bg-amber-950/20 text-slate-300";
+    title = "Oportunidade";
+    icon = <Zap className="text-amber-400" size={16} />;
+  } else if (isRisk) {
+    containerClass = "border-l-4 border-rose-500 bg-rose-950/20 text-slate-300";
+    title = "Risco Crítico";
+    icon = <AlertOctagon className="text-rose-400" size={16} />;
+  }
+
+  return (
+    <div className={`my-6 p-5 rounded-r-2xl ${containerClass} backdrop-blur-sm`}>
+      <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider mb-2 select-none">
+        {icon}
+        <span>{title}</span>
+      </div>
+      <div className="text-sm leading-relaxed">
+        {children}
+      </div>
+    </div>
+  );
+};
 
 interface ProjectData {
   id: string;
@@ -33,6 +126,73 @@ interface ProjectData {
   [key: string]: any;
 }
 
+const getKpis = (project: ProjectData, linkedAssets: any[]) => {
+  const summaryLength = project.summary?.length || 0;
+  const hasProtected = project.isProtected || false;
+  const hasAssets = linkedAssets.length > 0;
+  const hasMaturity = !!project.maturity;
+  
+  // 1. AI Confidence and qualitative labels
+  let confidence = 85;
+  if (summaryLength > 200) confidence += 5;
+  else if (summaryLength > 50) confidence += 2;
+  if (hasProtected || hasAssets) confidence += 4;
+  if (hasMaturity) confidence += 4;
+  confidence = Math.min(98, confidence);
+  
+  let confidenceLabel = "Média Confiança";
+  let confidenceColor = "text-amber-400";
+  if (confidence >= 95) {
+    confidenceLabel = "Muito Alta (Very High)";
+    confidenceColor = "text-indigo-400";
+  } else if (confidence >= 90) {
+    confidenceLabel = "Alta (High Confidence)";
+    confidenceColor = "text-indigo-400";
+  }
+
+  // 2. TRL Maturity
+  const trlVal = project.validatedMaturity || project.maturity || 1;
+  const isTrlValidated = !!project.validatedMaturity;
+
+  // 3. IP Strength
+  let ipStrength = "Pendente";
+  let ipDetail = "Sem proteção ativa";
+  if (project.isProtected || hasAssets) {
+    ipStrength = "Forte";
+    ipDetail = project.patentNumber ? `Patente: ${project.patentNumber}` : "Ativos vinculados";
+  }
+
+  // 4. Enterprise Readiness & AI Executive Score
+  let readiness = "Média (Medium)";
+  let readinessColor = "text-indigo-400";
+  if (trlVal >= 7 && (project.isProtected || hasAssets)) {
+    readiness = "Altíssima (Very High)";
+    readinessColor = "text-emerald-400";
+  } else if (trlVal >= 4 && (project.isProtected || hasAssets)) {
+    readiness = "Alta (High)";
+    readinessColor = "text-emerald-400";
+  } else if (trlVal >= 4) {
+    readiness = "Média (Medium)";
+  } else {
+    readiness = "Baixa (Low)";
+    readinessColor = "text-amber-400";
+  }
+
+  let execScore = 80;
+  if (trlVal >= 7) execScore += 8;
+  else if (trlVal >= 4) execScore += 5;
+  if (project.isProtected || hasAssets) execScore += 6;
+  if (summaryLength > 150) execScore += 4;
+  execScore = Math.min(98, execScore);
+
+  return [
+    { title: "AI Executive Score", value: `${execScore}/100`, detail: `Readiness: ${readiness}`, icon: <Target size={14} className="text-indigo-400" />, valColor: readinessColor },
+    { title: "Confidence", value: `${confidence}%`, detail: confidenceLabel, icon: <Zap size={14} className="text-amber-400" />, valColor: confidenceColor },
+    { title: "Maturidade TRL", value: `TRL ${trlVal}`, detail: isTrlValidated ? "Validada (INPI)" : "Declarada", icon: <ShieldCheck size={14} className="text-emerald-400" /> },
+    { title: "Força de IP", value: ipStrength, detail: ipDetail, icon: <Briefcase size={14} className="text-amber-400" /> }
+  ];
+};
+
 export function ProjectDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -43,7 +203,30 @@ export function ProjectDetails() {
   const [aiReport, setAiReport] = useState<string | null>(null);
   const [showNDAModal, setShowNDAModal] = useState(false);
   const [hasSignedNDA, setHasSignedNDA] = useState(false);
+  const [activeSection, setActiveSection] = useState("summary");
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (!aiReport) return;
+    const sections = ["summary", "swot", "roadmap", "conclusion"];
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { rootMargin: "-20% 0px -60% 0px" }
+    );
+    
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    
+    return () => observer.disconnect();
+  }, [aiReport]);
 
   useEffect(() => {
     async function load() {
@@ -294,8 +477,82 @@ export function ProjectDetails() {
                 </div>
               </div>
 
-              <div className="p-10 md:p-12 prose prose-invert max-w-none">
-                <ReactMarkdown>{aiReport}</ReactMarkdown>
+              {/* KPIs Row */}
+              <div className="p-6 md:p-8 border-b border-slate-800/60 grid grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/40 no-print">
+                {getKpis(project, linkedAssets).map((kpi, idx) => (
+                  <div key={idx} className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/30 transition">
+                    <div className="flex items-center justify-between text-slate-500 mb-2">
+                      <span className="text-[10px] font-black uppercase tracking-wider">{kpi.title}</span>
+                      <div className="p-1 bg-slate-800/50 rounded-lg">
+                        {kpi.icon}
+                      </div>
+                    </div>
+                    <div>
+                      <div className={`text-xl font-bold text-white tracking-tight ${kpi.valColor || ''}`}>{kpi.value}</div>
+                      <div className="text-[10px] text-slate-500 mt-1 font-mono">{kpi.detail}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Main Content Split: Sidebar + Text */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 no-print">
+                {/* Sidebar Navigation */}
+                <div className="lg:col-span-1 border-r border-slate-800/60 p-6 lg:p-8 bg-slate-950/20 lg:sticky lg:top-24 h-fit max-h-[80vh] overflow-y-auto">
+                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Seções do Briefing</h4>
+                  <nav className="space-y-1">
+                    {[
+                      { id: "summary", label: "Overview", icon: <FileText size={14} /> },
+                      { id: "swot", label: "SWOT Analysis", icon: <TrendingUp size={14} /> },
+                      { id: "roadmap", label: "Roadmap", icon: <Map size={14} /> },
+                      { id: "conclusion", label: "Recommendations", icon: <Target size={14} /> }
+                    ].map((item) => (
+                      <a
+                        key={item.id}
+                        href={`#${item.id}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
+                          setActiveSection(item.id);
+                        }}
+                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          activeSection === item.id 
+                            ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.05)]" 
+                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
+                        }`}
+                      >
+                        {item.icon}
+                        <span>{item.label}</span>
+                      </a>
+                    ))}
+                  </nav>
+                </div>
+
+                {/* Right content column */}
+                <div className="lg:col-span-3 p-8 md:p-10 lg:p-12 prose prose-invert max-w-none">
+                  <ReactMarkdown
+                    components={{
+                      h2: CustomH2,
+                      h3: CustomH3,
+                      blockquote: CustomBlockquote
+                    }}
+                  >
+                    {aiReport}
+                  </ReactMarkdown>
+                </div>
+              </div>
+
+              {/* Print layout fallback (renders text without grid/sidebar in print) */}
+              <div className="print-only p-10 prose prose-invert max-w-none">
+                <ReactMarkdown
+                  components={{
+                    h2: CustomH2,
+                    h3: CustomH3,
+                    blockquote: CustomBlockquote
+                  }}
+                >
+                  {aiReport}
+                </ReactMarkdown>
               </div>
 
               <div className="print-only print-footer">

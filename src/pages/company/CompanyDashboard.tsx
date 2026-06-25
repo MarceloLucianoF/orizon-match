@@ -41,16 +41,16 @@ interface Deal {
   correlationId?: string;
 }
 
-const COLUMNS: { id: DealStatus; title: string; color: string }[] = [
-  { id: 'descoberta', title: 'Descoberta', color: 'border-slate-700 bg-slate-800/30' },
-  { id: 'interesse', title: 'Interesse', color: 'border-blue-500/30 bg-blue-500/10' },
-  { id: 'nda', title: 'NDA', color: 'border-cyan-500/30 bg-cyan-500/10' },
-  { id: 'avaliacao', title: 'Análise Técnica', color: 'border-indigo-500/30 bg-indigo-500/10' },
-  { id: 'due_diligence', title: 'Due Diligence', color: 'border-amber-500/30 bg-amber-500/10' },
-  { id: 'comite', title: 'Comitê', color: 'border-fuchsia-500/30 bg-fuchsia-500/10' },
-  { id: 'negociacao', title: 'Negociação', color: 'border-purple-500/30 bg-purple-500/10' },
-  { id: 'contrato', title: 'Contrato', color: 'border-emerald-500/30 bg-emerald-500/10' },
-  { id: 'encerrado', title: 'Encerrado', color: 'border-rose-500/30 bg-rose-500/10' },
+const COLUMNS: { id: DealStatus; title: string; indicatorColor: string }[] = [
+  { id: 'descoberta', title: 'Descoberta', indicatorColor: 'bg-slate-500' },
+  { id: 'interesse', title: 'Interesse', indicatorColor: 'bg-blue-500' },
+  { id: 'nda', title: 'NDA', indicatorColor: 'bg-cyan-500' },
+  { id: 'avaliacao', title: 'Análise Técnica', indicatorColor: 'bg-indigo-500' },
+  { id: 'due_diligence', title: 'Due Diligence', indicatorColor: 'bg-amber-500' },
+  { id: 'comite', title: 'Comitê', indicatorColor: 'bg-fuchsia-500' },
+  { id: 'negociacao', title: 'Negociação', indicatorColor: 'bg-purple-500' },
+  { id: 'contrato', title: 'Contrato', indicatorColor: 'bg-emerald-500' },
+  { id: 'encerrado', title: 'Encerrado', indicatorColor: 'bg-rose-500' },
 ];
 
 export function CompanyDashboard() {
@@ -342,13 +342,13 @@ export function CompanyDashboard() {
           <p className="text-slate-400 mt-1 text-sm">{t("dashboard.investor.subtitle")}</p>
         </div>
 
-        <div className="flex bg-slate-900/50 p-1 rounded-2xl border border-slate-800 shadow-inner">
+        <div className="flex bg-slate-950/60 p-1 rounded-xl border border-slate-800/80 shadow-inner backdrop-blur-md">
           <button
             onClick={() => setActiveTab('overview')}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
               activeTab === 'overview' 
-                ? 'bg-slate-800 text-white shadow-xl border border-slate-700' 
-                : 'text-slate-500 hover:text-slate-300'
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.35)]' 
+                : 'text-slate-500 hover:text-slate-350'
             }`}
           >
             <LayoutDashboard size={14} />
@@ -357,9 +357,9 @@ export function CompanyDashboard() {
           
           <button
             onClick={() => setActiveTab('radar')}
-            className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${
+            className={`flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
               activeTab === 'radar' 
-                ? 'bg-indigo-600/20 text-indigo-400 shadow-xl border border-indigo-500/30' 
+                ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.35)]' 
                 : 'text-slate-500 hover:text-indigo-400'
             }`}
           >
@@ -492,8 +492,8 @@ export function CompanyDashboard() {
                     onClick={() => setActiveMobileColumn(col.id)}
                     className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap border transition-all cursor-pointer ${
                       isActive
-                        ? "bg-indigo-600/20 border-indigo-500/35 text-indigo-400 shadow-lg"
-                        : "bg-slate-900/50 border-slate-800 text-slate-500 hover:text-slate-350"
+                        ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-400 shadow-lg"
+                        : "bg-slate-900/40 border-slate-850 text-slate-400 hover:text-slate-200"
                     }`}
                   >
                     {title} ({count})
@@ -518,13 +518,16 @@ export function CompanyDashboard() {
                   return (
                     <div 
                       key={column.id} 
-                      className={`w-full sm:w-80 flex flex-col rounded-2xl border ${column.color} p-4 ${
+                      className={`w-full sm:w-80 flex flex-col rounded-2xl border border-slate-850/80 bg-slate-900/20 p-4 ${
                         isVisibleOnMobile ? "flex" : "hidden sm:flex"
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-slate-200 text-sm">{columnTitle}</h3>
-                        <span className="bg-slate-900/50 text-slate-400 text-xs font-bold px-2 py-0.5 rounded-md border border-slate-700/50">{columnDeals.length}</span>
+                      <div className="flex items-center justify-between mb-4 border-b border-slate-800/40 pb-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-2.5 h-2.5 rounded-full ${column.indicatorColor}`} />
+                          <h3 className="font-bold text-slate-350 text-xs uppercase tracking-wider">{columnTitle}</h3>
+                        </div>
+                        <span className="bg-slate-950 text-slate-500 text-[10px] font-black px-2 py-0.5 rounded border border-slate-800/80">{columnDeals.length}</span>
                       </div>
                       <div className="space-y-3">
                         {columnDeals.map(deal => {
@@ -532,66 +535,66 @@ export function CompanyDashboard() {
 
                           if (isEditing) {
                             return (
-                              <div key={deal.id} className="bg-slate-900 border border-indigo-500/50 rounded-xl p-4 transition-all shadow-xl space-y-3">
+                              <div key={deal.id} className="bg-slate-950 border border-indigo-500/45 rounded-xl p-4 transition-all shadow-xl shadow-indigo-550/5 space-y-3">
                                 <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Editar CRM</div>
                                 
                                 <div className="space-y-1">
-                                  <label className="text-[10px] text-slate-400 font-bold block uppercase">Responsável</label>
+                                  <label className="text-[9px] text-slate-500 font-bold block uppercase tracking-wider">Responsável</label>
                                   <input 
                                     type="text" 
                                     value={editOwnerName} 
                                     onChange={e => setEditOwnerName(e.target.value)}
-                                    className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                    className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
                                   />
                                 </div>
 
                                 <div className="space-y-1">
-                                  <label className="text-[10px] text-slate-400 font-bold block uppercase">Valor Estimado (R$)</label>
+                                  <label className="text-[9px] text-slate-500 font-bold block uppercase tracking-wider">Valor Estimado (R$)</label>
                                   <input 
                                     type="number" 
                                     value={editEstimatedValue} 
                                     onChange={e => setEditEstimatedValue(Number(e.target.value))}
-                                    className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                    className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
                                   />
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-2">
                                   <div className="space-y-1">
-                                    <label className="text-[10px] text-slate-400 font-bold block uppercase">Probabilidade (%)</label>
+                                    <label className="text-[9px] text-slate-500 font-bold block uppercase tracking-wider">Probabilidade (%)</label>
                                     <input 
                                       type="number" 
                                       min="0" 
                                       max="100" 
                                       value={editProbability} 
                                       onChange={e => setEditProbability(Number(e.target.value))}
-                                      className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                      className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
                                     />
                                   </div>
                                   <div className="space-y-1">
-                                    <label className="text-[10px] text-slate-400 font-bold block uppercase">Data Prevista</label>
+                                    <label className="text-[9px] text-slate-500 font-bold block uppercase tracking-wider">Data Prevista</label>
                                     <input 
                                       type="date" 
                                       value={editExpectedCloseDate} 
                                       onChange={e => setEditExpectedCloseDate(e.target.value)}
-                                      className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                      className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
                                     />
                                   </div>
                                 </div>
 
                                 <div className="space-y-1">
-                                  <label className="text-[10px] text-slate-400 font-bold block uppercase">Próxima Ação</label>
+                                  <label className="text-[9px] text-slate-500 font-bold block uppercase tracking-wider">Próxima Ação</label>
                                   <input 
                                     type="text" 
                                     value={editNextAction} 
                                     onChange={e => setEditNextAction(e.target.value)}
-                                    className="bg-slate-950 border border-slate-700 text-xs text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500"
+                                    className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
                                   />
                                 </div>
 
                                 <div className="flex gap-2 justify-end pt-2 border-t border-slate-800">
                                   <button 
                                     onClick={() => setEditingDealId(null)} 
-                                    className="px-2.5 py-1.5 rounded text-[10px] font-bold text-slate-400 hover:text-slate-200 transition-colors flex items-center gap-1 cursor-pointer"
+                                    className="px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-450 hover:text-slate-200 hover:bg-slate-900 border border-transparent hover:border-slate-800 transition-all flex items-center gap-1 cursor-pointer"
                                   >
                                     <XIcon size={12} /> Cancelar
                                   </button>
@@ -603,7 +606,7 @@ export function CompanyDashboard() {
                                       probability: editProbability,
                                       nextAction: editNextAction
                                     })}
-                                    className="bg-indigo-650 hover:bg-indigo-600 px-3 py-1.5 rounded text-[10px] font-bold text-white transition-colors flex items-center gap-1 shadow-md shadow-indigo-600/20 cursor-pointer"
+                                    className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-3.5 py-1.5 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 shadow-md shadow-indigo-650/20 active:scale-95 cursor-pointer"
                                   >
                                     <Save size={12} /> Salvar
                                   </button>
@@ -613,7 +616,7 @@ export function CompanyDashboard() {
                           }
 
                           return (
-                            <div key={deal.id} className="bg-slate-900 border border-slate-700/80 rounded-xl p-4 hover:border-indigo-500/50 transition-all shadow-lg flex flex-col gap-3 group relative">
+                            <div key={deal.id} className="bg-slate-950/40 border border-slate-850 hover:border-indigo-500/30 hover:shadow-[0_4px_20px_rgba(99,102,241,0.05)] hover:scale-[1.01] transition-all duration-300 rounded-xl p-4 flex flex-col gap-3 group relative backdrop-blur-sm">
                               {/* Edit Button overlay on hover */}
                               <button 
                                 onClick={() => {
@@ -624,7 +627,7 @@ export function CompanyDashboard() {
                                   setEditProbability(deal.probability !== undefined ? deal.probability : 10);
                                   setEditNextAction(deal.nextAction || "Agendar reunião de triagem");
                                 }}
-                                className="absolute top-3 right-3 p-1.5 rounded bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 opacity-0 group-hover:opacity-100 transition-all cursor-pointer"
+                                className="absolute top-3 right-3 p-1.5 rounded bg-slate-800 border border-slate-705 text-slate-400 hover:text-slate-200 opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer shadow-sm"
                                 title="Editar CRM"
                               >
                                 <Edit size={12} />
@@ -638,11 +641,11 @@ export function CompanyDashboard() {
                               </div>
 
                               <div>
-                                <h4 className="font-bold text-slate-200 text-sm leading-tight">{deal.projectName}</h4>
+                                <h4 className="font-bold text-slate-200 text-sm leading-tight tracking-tight">{deal.projectName}</h4>
                               </div>
 
                               {/* CRM Metric grid */}
-                              <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 pt-2.5 border-t border-slate-800/60 text-[10px]">
+                              <div className="grid grid-cols-2 gap-x-2 gap-y-1.5 pt-2.5 border-t border-slate-805 text-[10px]">
                                 <div className="flex items-center gap-1 text-slate-400">
                                   <DollarSign size={11} className="text-emerald-500" />
                                   <span className="font-semibold text-slate-200">
@@ -668,7 +671,7 @@ export function CompanyDashboard() {
                               </div>
 
                               {/* Next action callout */}
-                              <div className="bg-slate-950/60 border border-slate-800/80 rounded-lg p-2 flex items-start gap-1.5">
+                              <div className="bg-slate-950/80 border border-slate-850 rounded-lg p-2 flex items-start gap-1.5">
                                 <CheckSquare size={11} className="text-amber-500 mt-0.5 flex-shrink-0" />
                                 <div className="flex flex-col text-[10px]">
                                   <span className="text-[8px] font-black text-slate-500 uppercase tracking-widest leading-none mb-0.5">Próxima Ação</span>
@@ -679,7 +682,7 @@ export function CompanyDashboard() {
                               </div>
 
                               <select 
-                                className="bg-slate-950 border border-slate-700 text-[11px] text-slate-300 rounded p-1.5 w-full outline-none focus:border-indigo-500 mt-1 cursor-pointer transition-all hover:bg-slate-800 hover:text-slate-200"
+                                className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-[11px] text-slate-355 rounded-lg p-2 w-full outline-none focus:border-indigo-500 mt-1 cursor-pointer transition-all hover:bg-slate-900"
                                 value={deal.status}
                                 onChange={(e) => moveDeal(deal.id, e.target.value as DealStatus)}
                               >

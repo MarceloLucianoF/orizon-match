@@ -23,18 +23,18 @@ export default function Home() {
     <div className="bg-[#030712] text-slate-100 min-h-screen overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
 
       {/* HEADER */}
-      <header className="fixed top-0 w-full z-50 bg-[#030712]/80 backdrop-blur-xl border-b border-slate-800/40">
+      <header className="fixed top-0 w-full z-50 bg-slate-950/70 backdrop-blur-md border-b border-slate-800/60 transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-3.5 flex justify-between items-center">
-          <Link to="/" className="font-black text-xl text-white tracking-tight flex items-center gap-2">
-            <span className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]">O</span>
+          <Link to="/" className="font-black text-xl text-white tracking-tight flex items-center gap-2 group">
+            <span className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white shadow-[0_0_15px_rgba(79,70,229,0.5)] group-hover:scale-105 group-hover:rotate-3 transition-all duration-300">O</span>
             Orizon <span className="text-indigo-400 text-xs font-semibold px-2 py-0.5 rounded bg-slate-900 border border-slate-800 tracking-wider">PLATFORM</span>
           </Link>
           <div className="flex gap-4 items-center">
-            <Link to="/sobre" className="text-slate-400 hover:text-white transition text-sm hidden sm:block">Como funciona</Link>
-            <Link to="/login" className="px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 transition font-semibold text-slate-300 text-sm">
+            <Link to="/sobre" className="text-slate-400 hover:text-white transition-colors duration-200 text-sm hidden sm:block">Como funciona</Link>
+            <Link to="/login" className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 hover:bg-slate-850 hover:text-white transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 font-semibold text-slate-350 text-sm">
               Entrar
             </Link>
-            <Link to="/onboarding" className="px-4 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 transition font-semibold text-white text-sm shadow-[0_0_15px_rgba(79,70,229,0.3)]">
+            <Link to="/onboarding" className="px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 transition-all duration-300 font-semibold text-white text-sm shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] hover:-translate-y-0.5 active:translate-y-0">
               Cadastrar
             </Link>
           </div>
@@ -68,14 +68,14 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-10">
             <Link
               to="/onboarding"
-              className="group px-8 py-4 rounded-2xl bg-indigo-500 hover:bg-indigo-600 transition font-bold text-white shadow-[0_0_30px_rgba(79,70,229,0.4)] text-sm md:text-base flex items-center justify-center gap-2"
+              className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:via-indigo-400 hover:to-indigo-500 transition-all duration-300 font-bold text-white shadow-[0_0_25px_rgba(79,70,229,0.3)] hover:shadow-[0_0_35px_rgba(79,70,229,0.5)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm md:text-base flex items-center justify-center gap-2"
             >
               Iniciar transferência tecnológica
-              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+              <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
             </Link>
             <Link
               to="/sobre"
-              className="px-8 py-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 hover:bg-slate-900 transition text-slate-300 font-semibold text-sm md:text-base text-center"
+              className="px-8 py-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700/80 hover:bg-slate-900 hover:text-white transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-slate-350 font-semibold text-sm md:text-base text-center"
             >
               Verificar segurança do VDR
             </Link>
@@ -120,11 +120,14 @@ export default function Home() {
                 body: "Inventores e corporações hesitam em iniciar conversas por falta de um ambiente seguro e de NDAs robustos que protejam segredos comerciais.",
               },
             ].map(({ icon, title, body }) => (
-              <div key={title} className="p-6 md:p-8 rounded-2xl bg-slate-900/20 border border-slate-800 hover:border-slate-700/60 hover:bg-slate-900/40 transition duration-300">
-                <div className="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center mb-6">
+              <div 
+                key={title} 
+                className="p-6 md:p-8 rounded-2xl bg-gradient-to-b from-slate-900/50 to-slate-950/30 border border-slate-850 hover:border-indigo-500/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.5),0_0_15px_rgba(99,102,241,0.05)] hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 backdrop-blur-sm"
+              >
+                <div className="w-12 h-12 rounded-xl bg-slate-850 border border-slate-800 flex items-center justify-center mb-6 shadow-inner">
                   {icon}
                 </div>
-                <h3 className="font-bold text-white text-lg mb-3">{title}</h3>
+                <h3 className="font-bold text-white text-lg mb-3 tracking-tight">{title}</h3>
                 <p className="text-slate-400 leading-relaxed text-sm">{body}</p>
               </div>
             ))}
@@ -147,33 +150,40 @@ export default function Home() {
         </div>
 
         {/* Ecosystem CSS Diagram */}
-        <div className="max-w-4xl mx-auto p-8 rounded-3xl bg-slate-950/30 border border-slate-900 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-4 relative overflow-hidden">
+        <div className="max-w-4xl mx-auto p-8 rounded-3xl bg-slate-950/40 border border-slate-800/60 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-4 relative overflow-hidden backdrop-blur-sm">
+          <div className="absolute inset-0 bg-indigo-500/[0.01] pointer-events-none" />
           
           {/* Node 1: ICTs */}
-          <div className="flex flex-col items-center p-5 rounded-2xl border border-slate-800 bg-slate-900/60 w-52 relative z-10">
-            <GraduationCap className="text-blue-400 w-8 h-8 mb-2" />
+          <div className="flex flex-col items-center p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 hover:border-slate-700 hover:shadow-[0_0_15px_rgba(59,130,246,0.1)] transition-all duration-300 w-52 relative z-10">
+            <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-3">
+              <GraduationCap className="text-blue-400 w-6 h-6" />
+            </div>
             <h4 className="font-bold text-white text-sm">ICTs & NITs</h4>
-            <p className="text-slate-500 text-[10px] mt-1 text-center">Portfólios de Patentes e Linhas de Pesquisa</p>
+            <p className="text-slate-400 text-[10px] mt-1 text-center leading-relaxed">Portfólios de Patentes e Linhas de Pesquisa</p>
           </div>
 
           {/* Connection vector 1 */}
-          <div className="hidden md:block flex-1 h-[2px] bg-gradient-to-r from-blue-500/20 to-indigo-500 z-0" />
+          <div className="hidden md:block flex-1 h-[2px] bg-gradient-to-r from-blue-500/30 via-indigo-500/50 to-indigo-500 z-0" />
 
           {/* Central Hub: Orizon */}
-          <div className="flex flex-col items-center p-6 rounded-2xl border border-indigo-500/30 bg-indigo-500/10 w-60 relative z-10 shadow-[0_0_20px_rgba(79,70,229,0.2)]">
-            <Network className="text-indigo-400 w-10 h-10 mb-2 animate-pulse" />
-            <h3 className="font-black text-white text-base">ORIZON MATCH</h3>
-            <p className="text-indigo-300 text-[10px] mt-1 text-center font-semibold">Motor de IA e VDR Blindado</p>
+          <div className="flex flex-col items-center p-6 rounded-2xl border border-indigo-500/30 bg-indigo-950/20 w-60 relative z-10 shadow-[0_0_30px_rgba(99,102,241,0.15)] hover:border-indigo-500/50 transition-all duration-300">
+            <div className="w-14 h-14 rounded-full bg-indigo-500/10 flex items-center justify-center mb-3 animate-pulse shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+              <Network className="text-indigo-400 w-8 h-8" />
+            </div>
+            <h3 className="font-black text-white text-base tracking-tight">ORIZON MATCH</h3>
+            <p className="text-indigo-300 text-[10px] mt-1 text-center font-semibold uppercase tracking-wider">Motor de IA e VDR Blindado</p>
           </div>
 
           {/* Connection vector 2 */}
-          <div className="hidden md:block flex-1 h-[2px] bg-gradient-to-r from-indigo-500 to-emerald-500/20 z-0" />
+          <div className="hidden md:block flex-1 h-[2px] bg-gradient-to-r from-indigo-500 via-emerald-500/50 to-emerald-500/30 z-0" />
 
           {/* Node 2: Empresas */}
-          <div className="flex flex-col items-center p-5 rounded-2xl border border-slate-800 bg-slate-900/60 w-52 relative z-10">
-            <Building2 className="text-emerald-400 w-8 h-8 mb-2" />
+          <div className="flex flex-col items-center p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 hover:border-slate-700 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all duration-300 w-52 relative z-10">
+            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-3">
+              <Building2 className="text-emerald-400 w-6 h-6" />
+            </div>
             <h4 className="font-bold text-white text-sm">Indústrias & Investidores</h4>
-            <p className="text-slate-500 text-[10px] mt-1 text-center">Teses de Inovação e Demandas de Mercado</p>
+            <p className="text-slate-400 text-[10px] mt-1 text-center leading-relaxed">Teses de Inovação e Demandas de Mercado</p>
           </div>
         </div>
       </section>
@@ -208,7 +218,8 @@ export default function Home() {
             </div>
 
             {/* Simulated Match Interface Dashboard */}
-            <div className="lg:col-span-7 bg-slate-900/60 border border-slate-800 rounded-3xl p-6 shadow-2xl relative overflow-hidden backdrop-blur-md">
+            <div className="lg:col-span-7 bg-slate-900/60 border border-slate-800/80 rounded-3xl p-6 shadow-2xl relative overflow-hidden backdrop-blur-md hover:border-indigo-500/10 transition-all duration-500 group/sim">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/[0.02] blur-[80px] pointer-events-none" />
               <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
                 <span className="text-xs font-bold text-slate-400 tracking-wider">Mecanismo de IA Orizon</span>
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -216,7 +227,7 @@ export default function Home() {
 
               <div className="space-y-5">
                 {/* Demand Input */}
-                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-850">
                   <div className="flex items-center gap-2 mb-2">
                     <Building2 className="text-emerald-400 w-4 h-4" />
                     <span className="text-[10px] font-bold text-slate-400 uppercase">Tese de Demanda (Indústria de Energia)</span>
@@ -227,7 +238,7 @@ export default function Home() {
                 {/* IA Calculating animation visual */}
                 <div className="flex items-center gap-3 py-1">
                   <div className="flex-1 h-[1px] bg-dashed bg-slate-800" />
-                  <div className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-mono font-bold flex items-center gap-1.5">
+                  <div className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[10px] font-mono font-bold flex items-center gap-1.5 shadow-sm">
                     <Cpu size={12} className="animate-spin" />
                     Matcher IA processando afinidade semântica...
                   </div>
@@ -235,23 +246,23 @@ export default function Home() {
                 </div>
 
                 {/* Match Result Card */}
-                <div className="bg-indigo-500/5 p-4 rounded-xl border border-indigo-500/30 flex justify-between items-start gap-4">
+                <div className="bg-indigo-950/20 p-4 rounded-xl border border-indigo-500/30 flex justify-between items-start gap-4 hover:border-indigo-500/50 hover:shadow-[0_0_20px_rgba(99,102,241,0.1)] transition-all duration-300">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <GraduationCap className="text-blue-400 w-4 h-4" />
                       <span className="text-[10px] font-bold text-blue-300 uppercase">Universidade Federal de Minas Gerais (UFMG)</span>
                     </div>
                     <h4 className="font-bold text-white text-xs md:text-sm">BR10202500010: Reator Catalítico Integrado com Nanopartículas Estruturadas</h4>
-                    <p className="text-[11px] text-slate-400">Patente depositada de catalisador de transição capaz de elevar em 28% a taxa de hidrogênio gerado.</p>
+                    <p className="text-[11px] text-slate-450 leading-relaxed">Patente depositada de catalisador de transição capaz de elevar em 28% a taxa de hidrogênio gerado.</p>
                     <div className="flex gap-3 text-[10px] pt-1">
-                      <span className="bg-slate-800 px-2 py-0.5 rounded text-indigo-300 font-semibold">TRL 6 (Modelo Funcional)</span>
-                      <span className="bg-slate-800 px-2 py-0.5 rounded text-emerald-300 font-semibold">NDA Disponível</span>
+                      <span className="bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-indigo-300 font-semibold">TRL 6 (Modelo Funcional)</span>
+                      <span className="bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-emerald-300 font-semibold">NDA Disponível</span>
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <span className="text-[10px] font-bold text-slate-400 block uppercase">AFINIDADE</span>
-                    <span className="text-2xl md:text-3xl font-black text-indigo-400">92%</span>
+                    <span className="text-2xl md:text-3xl font-black text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]">92%</span>
                     <span className="block mt-2 px-2 py-1 bg-indigo-500/20 text-indigo-300 text-[9px] font-bold rounded uppercase tracking-wider text-center">
                       Recomendado
                     </span>
@@ -434,8 +445,11 @@ export default function Home() {
               desc: "Acesso multi-tenant para administradores simularem papéis e gerenciarem dezenas de membros."
             }
           ].map(({ icon, title, desc }) => (
-            <div key={title} className="bg-slate-900/30 border border-slate-800 hover:border-slate-700/60 rounded-2xl p-6 transition duration-300">
-              <div className="w-10 h-10 rounded-xl bg-slate-800/80 flex items-center justify-center mb-4">
+            <div 
+              key={title} 
+              className="bg-slate-900/40 border border-slate-850 hover:border-slate-700/60 hover:bg-slate-900/60 hover:shadow-[0_4px_25px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 rounded-2xl p-6 transition-all duration-300 backdrop-blur-sm"
+            >
+              <div className="w-10 h-10 rounded-xl bg-slate-850 border border-slate-800 flex items-center justify-center mb-4 shadow-sm">
                 {icon}
               </div>
               <h3 className="font-bold text-white text-sm md:text-base mb-2">{title}</h3>
@@ -458,9 +472,9 @@ export default function Home() {
           </p>
           <Link
             to="/onboarding"
-            className="inline-flex items-center gap-3 px-8 md:px-10 py-4 md:py-5 rounded-2xl bg-indigo-500 hover:bg-indigo-600 transition font-bold text-base md:text-lg text-white shadow-[0_0_40px_rgba(79,70,229,0.4)]"
+            className="group inline-flex items-center gap-3 px-8 md:px-10 py-4 md:py-5 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-450 transition-all duration-300 font-bold text-base md:text-lg text-white shadow-[0_0_30px_rgba(79,70,229,0.4)] hover:shadow-[0_0_40px_rgba(79,70,229,0.6)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95"
           >
-            Cadastrar minha inovação <ArrowRight size={20} />
+            Cadastrar minha inovação <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform duration-200" />
           </Link>
         </div>
       </section>

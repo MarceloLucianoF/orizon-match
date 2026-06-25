@@ -66,6 +66,56 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
           </button>
         </div>
 
+        {/* Visual Progress Flowchart */}
+        <div className="bg-slate-950/40 border-b border-slate-850 px-6 py-5 no-print">
+          <div className="max-w-xl mx-auto flex items-center justify-between relative">
+            {/* Connector Line behind nodes */}
+            <div className="absolute top-4 left-4 right-4 h-0.5 bg-slate-800 -z-10" />
+            
+            {[
+              { id: "created", label: "Criado", desc: "Documento gerado", status: "complete" },
+              { id: "sent", label: "Enviado", desc: "Disponível para assinatura", status: "complete" },
+              { id: "viewed", label: "Visualizado", desc: "Sessão segura ativa", status: "active" },
+              { id: "signed", label: "Assinado", desc: "Assinatura pendente", status: "pending" },
+              { id: "archived", label: "Arquivado", desc: "Imutabilidade garantida", status: "pending" }
+            ].map((step, idx, arr) => {
+              let circleStyle = "bg-slate-900 border-slate-800 text-slate-500";
+              let lineStyle = idx < 2 ? "bg-indigo-500" : "bg-slate-800";
+              
+              if (step.status === "complete") {
+                circleStyle = "bg-indigo-600 border-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]";
+              } else if (step.status === "active") {
+                circleStyle = "bg-slate-900 border-indigo-500 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)] animate-pulse";
+              }
+
+              return (
+                <div key={step.id} className="flex flex-col items-center relative flex-1 text-center">
+                  {/* Connector line segment */}
+                  {idx > 0 && (
+                    <div className={`absolute top-4 right-1/2 left-0 h-0.5 ${lineStyle} -z-10`} />
+                  )}
+                  {idx < arr.length - 1 && (
+                    <div className={`absolute top-4 left-1/2 right-0 h-0.5 ${step.status === "complete" ? "bg-indigo-500" : "bg-slate-800"} -z-10`} />
+                  )}
+
+                  {/* Node Circle */}
+                  <div className={`w-8 h-8 rounded-full border flex items-center justify-center font-bold text-xs transition ${circleStyle}`}>
+                    {step.status === "complete" ? "✓" : idx + 1}
+                  </div>
+                  
+                  {/* Labels */}
+                  <span className={`text-[10px] font-bold mt-2 tracking-wide uppercase ${step.status === "active" ? "text-indigo-400" : step.status === "complete" ? "text-slate-300" : "text-slate-500"}`}>
+                    {step.label}
+                  </span>
+                  <span className="text-[8px] text-slate-600 hidden sm:block mt-0.5 max-w-[80px] leading-tight font-sans">
+                    {step.desc}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
           <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 md:p-10 text-slate-300 text-sm leading-relaxed font-serif space-y-6">

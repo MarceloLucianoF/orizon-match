@@ -468,30 +468,30 @@ export function VDRRoom({
   }, [viewerFile, viewerStartTime]);
 
   return (
-    <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col min-h-[600px] relative">
+    <div className="bg-[#020617] bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.02),transparent_60%)] border border-slate-850 rounded-[2rem] overflow-hidden shadow-2xl flex flex-col min-h-[600px] relative">
       
       {/* VDR Header */}
-      <div className="p-6 border-b border-slate-800 bg-slate-900/80 flex flex-wrap justify-between items-center gap-3">
+      <div className="p-6 border-b border-slate-850 bg-slate-950/60 backdrop-blur-md flex flex-wrap justify-between items-center gap-3">
         <div>
-          <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+          <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
             <FolderOpen className="text-indigo-400" size={20} /> Virtual Data Room (VDR)
             {inpiBadge && (
-              <span className={`text-[10px] px-2 py-0.5 rounded-full border font-bold ml-2 flex items-center gap-1 ${inpiBadge.color}`}>
+              <span className={`text-[10px] px-2.5 py-0.5 rounded-full border font-bold ml-2 flex items-center gap-1 ${inpiBadge.color}`}>
                 <ShieldCheck size={10} /> {inpiBadge.label}
               </span>
             )}
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">Ambiente seguro para compartilhamento de documentação estratégica.</p>
+          <p className="text-xs text-slate-400 mt-0.5">Ambiente seguro para compartilhamento de documentação estratégica.</p>
         </div>
         
         <div className="flex gap-2">
           {!isPublic && (
             <button 
               onClick={() => setShowAuditLogs(!showAuditLogs)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 border ${
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border active:scale-95 duration-200 ${
                 showAuditLogs 
                   ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' 
-                  : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'
+                  : 'bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white'
               }`}
             >
               <ClipboardList size={14} /> {showAuditLogs ? "Ver Arquivos" : "Logs de Auditoria"}
@@ -501,7 +501,7 @@ export function VDRRoom({
           {!isPublic && (
             <button 
               onClick={() => setShowUploadModal(true)}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.2)]"
+              className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.25)] hover:shadow-[0_0_20px_rgba(79,70,229,0.45)] active:scale-95 duration-200"
             >
               <Upload size={14} /> Subir Documento
             </button>
@@ -509,38 +509,38 @@ export function VDRRoom({
         </div>
       </div>
 
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 flex-col md:flex-row">
         
         {/* Sidebar Folders */}
         {!showAuditLogs && (
-          <div className="w-64 border-r border-slate-800 p-4 space-y-2 overflow-y-auto">
+          <div className="w-full md:w-64 border-b md:border-b-0 md:border-r border-slate-850 p-4 space-y-1.5 overflow-y-auto">
             {folders.map(folder => (
               <button
                 key={folder.id}
                 onClick={() => setActiveFolder(folder.id)}
-                className={`w-full flex items-center justify-between px-3 py-3 rounded-xl transition-all ${
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 border ${
                   activeFolder === folder.id 
-                  ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_15px_rgba(79,70,229,0.1)]' 
-                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
+                  ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-[0_4px_15px_rgba(99,102,241,0.05)] font-bold' 
+                  : 'text-slate-450 hover:bg-slate-900/40 hover:text-slate-200 border-transparent'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <folder.icon size={18} className={activeFolder === folder.id ? 'text-indigo-400' : 'text-slate-500'} />
                   <span className="text-sm font-medium">{folder.name}</span>
                 </div>
-                {folder.isLocked ? <Lock size={14} className="text-slate-600" /> : <ChevronRight size={14} className="text-slate-700" />}
+                {folder.isLocked ? <Lock size={14} className="text-slate-650" /> : <ChevronRight size={14} className="text-slate-700" />}
               </button>
             ))}
           </div>
         )}
 
         {/* Dynamic Display Area */}
-        <div className="flex-1 p-6 overflow-y-auto bg-slate-950/30">
+        <div className="flex-1 p-6 overflow-y-auto bg-slate-950/20 backdrop-blur-sm">
           {showAuditLogs ? (
             // Audit Log View
             <div className="space-y-4 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-bold text-slate-300 uppercase tracking-widest flex items-center gap-2">
+                <h4 className="text-xs font-bold text-slate-350 uppercase tracking-widest flex items-center gap-2">
                   <Clock size={16} className="text-indigo-400" /> Histórico de Auditoria do VDR
                 </h4>
                 <span className="text-[10px] text-slate-500 font-bold uppercase">{auditLogs.length} Ações</span>
@@ -551,32 +551,32 @@ export function VDRRoom({
                   <Loader2 className="animate-spin text-indigo-400" size={32} />
                 </div>
               ) : auditLogs.length === 0 ? (
-                <div className="text-center py-12 text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+                <div className="text-center py-12 text-slate-550 border border-dashed border-slate-800 rounded-2xl">
                   Nenhuma atividade registrada neste Virtual Data Room.
                 </div>
               ) : (
-                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
+                <div className="bg-slate-950 border border-slate-850 rounded-2xl overflow-hidden shadow-xl">
                   <table className="w-full text-left border-collapse">
                     <thead>
-                      <tr className="border-b border-slate-800 text-[10px] uppercase font-bold text-slate-500 bg-slate-900/40">
+                      <tr className="border-b border-slate-850 text-[9px] uppercase font-bold text-slate-450 bg-slate-900/10 tracking-widest">
                         <th className="p-4">Usuário</th>
                         <th className="p-4">Documento</th>
                         <th className="p-4">Ação</th>
                         <th className="p-4">Data e Hora</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-800/50 text-xs">
+                    <tbody className="divide-y divide-slate-850/50 text-xs font-sans text-slate-300">
                       {auditLogs.map(log => (
-                        <tr key={log.id} className="hover:bg-slate-800/20 text-slate-300">
+                        <tr key={log.id} className="hover:bg-slate-900/40 text-slate-300 transition-colors">
                           <td className="p-4 font-bold">{log.userName}</td>
                           <td className="p-4 text-slate-400">{log.fileName}</td>
                           <td className="p-4">
-                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                              log.action === 'upload' ? 'bg-emerald-500/10 text-emerald-400' :
-                              log.action === 'download' ? 'bg-indigo-500/10 text-indigo-400' :
-                              'bg-amber-500/10 text-amber-400'
+                            <span className={`px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-wider ${
+                              log.action === 'upload' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                              log.action === 'download' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' :
+                              'bg-amber-500/10 border-amber-500/20 text-amber-400'
                             }`}>
-                              {log.action.toUpperCase()}
+                              {log.action}
                             </span>
                           </td>
                           <td className="p-4 text-slate-500">
@@ -591,14 +591,14 @@ export function VDRRoom({
             </div>
           ) : !activeFolder ? (
             // Empty Folder State
-            <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-4 animate-in fade-in duration-500">
-              <FolderOpen size={48} className="opacity-20" />
-              <p className="text-sm">Selecione uma pasta para visualizar os arquivos.</p>
+            <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-4 animate-in fade-in duration-500 py-20">
+              <FolderOpen size={48} className="opacity-20 text-indigo-400" />
+              <p className="text-xs">Selecione uma pasta para visualizar os arquivos confidenciais.</p>
             </div>
           ) : currentFolder?.isLocked ? (
             // Folder Locked State
-            <div className="h-full flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in-95 duration-300 py-12">
-              <div className="w-20 h-20 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center">
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in-95 duration-300 py-16">
+              <div className="w-20 h-20 rounded-full bg-slate-950 border border-slate-850 flex items-center justify-center shadow-lg">
                 <Lock size={32} className="text-indigo-500 animate-pulse" />
               </div>
               <div className="max-w-xs">
@@ -609,16 +609,16 @@ export function VDRRoom({
               </div>
               <button 
                 onClick={() => setShowNDAModal(true)}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all"
+                className="bg-indigo-650 hover:bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_25px_rgba(79,70,229,0.5)] active:scale-95 transition-all duration-200"
               >
                 Solicitar Acesso / Assinar NDA
               </button>
             </div>
           ) : (
             // Folder Active View
-            <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
+            <div className="space-y-4 animate-in slide-in-from-right-4 duration-305">
               <div className="flex items-center justify-between mb-2">
-                <h4 className="text-sm font-bold text-slate-300 uppercase tracking-widest">{currentFolder?.name}</h4>
+                <h4 className="text-xs font-bold text-slate-350 uppercase tracking-widest">{currentFolder?.name}</h4>
                 <span className="text-[10px] text-slate-500 font-bold uppercase">{activeFolderFiles.length} Arquivos</span>
               </div>
               
@@ -627,30 +627,30 @@ export function VDRRoom({
                   <Loader2 className="animate-spin text-indigo-400" size={24} />
                 </div>
               ) : activeFolderFiles.length === 0 ? (
-                <div className="text-center py-12 text-slate-500 border border-dashed border-slate-800 rounded-2xl">
+                <div className="text-center py-12 text-slate-500 border border-dashed border-slate-850 rounded-2xl">
                   Nenhum arquivo nesta pasta.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {activeFolderFiles.map(file => (
-                    <div key={file.id} className="group bg-slate-900/80 border border-slate-800 hover:border-indigo-500/40 rounded-2xl p-4 flex items-center justify-between transition-all hover:shadow-lg">
+                    <div key={file.id} className="group bg-slate-950/40 border border-slate-850 hover:border-indigo-500/30 hover:shadow-[0_4px_20px_rgba(99,102,241,0.05)] hover:scale-[1.005] rounded-xl p-4 flex items-center justify-between transition-all duration-300 backdrop-blur-sm">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-500 group-hover:text-indigo-400 transition-colors">
+                        <div className="w-11 h-11 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-center text-slate-450 group-hover:text-indigo-400 transition-colors shadow-sm">
                           <FileText size={20} />
                         </div>
                         <div>
                           <h5 className="text-sm font-bold text-slate-200">{file.name}</h5>
-                          <div className="flex items-center gap-3 mt-1 flex-wrap">
-                            <span className="text-[10px] text-slate-600 uppercase font-mono">{file.type} • {file.size}</span>
+                          <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                            <span className="text-[10px] text-slate-500 uppercase font-mono">{file.type} • {file.size}</span>
                             <span className="text-[10px] text-slate-500">v{file.version}</span>
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1 ${
-                              file.status === 'verified' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-amber-500/10 text-amber-400'
+                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border flex items-center gap-1 ${
+                              file.status === 'verified' ? 'bg-emerald-500/10 border-emerald-500/25 text-emerald-400' : 'bg-amber-500/10 border-amber-500/25 text-amber-400'
                             }`}>
                               {file.status === 'verified' ? <ShieldCheck size={10} /> : <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />}
                               {file.status === 'verified' ? 'Auditado' : 'Em Análise'}
                             </span>
-                            <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                              file.accessLevel === 'public' ? 'bg-indigo-500/10 text-indigo-400' : 'bg-red-500/10 text-red-400'
+                            <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                              file.accessLevel === 'public' ? 'bg-indigo-500/10 border-indigo-500/25 text-indigo-400' : 'bg-red-500/10 border-red-500/25 text-red-400'
                             }`}>
                               {file.accessLevel === 'public' ? 'Público' : 'Restrito (NDA)'}
                             </span>
@@ -658,17 +658,17 @@ export function VDRRoom({
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <button 
                           onClick={() => handleViewFile(file)}
-                          className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition" 
+                          className="p-2 text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-xl transition-all duration-205 active:scale-90 border border-transparent hover:border-slate-700/50" 
                           title="Visualizar"
                         >
                           <Eye size={18} />
                         </button>
                         <button 
                           onClick={() => handleDownloadFile(file)}
-                          className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-400/10 rounded-lg transition" 
+                          className="p-2 text-slate-405 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all duration-205 active:scale-90 border border-transparent hover:border-indigo-500/20" 
                           title="Baixar"
                         >
                           <Download size={18} />
@@ -717,7 +717,7 @@ export function VDRRoom({
                   onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
                   required
                 />
-                <FileText size={32} className="mx-auto text-slate-600 mb-2" />
+                <FileText size={32} className="mx-auto text-slate-605 mb-2" />
                 <span className="text-xs font-bold text-slate-400">
                   {uploadFile ? uploadFile.name : "Clique para selecionar um arquivo"}
                 </span>
@@ -730,7 +730,7 @@ export function VDRRoom({
 
               {/* Category */}
               <div>
-                <label className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block mb-1">Categoria</label>
+                <label className="text-slate-450 text-[9px] uppercase font-bold tracking-wider block mb-1.5">Categoria</label>
                 <select 
                   value={uploadCategory} 
                   onChange={(e) => setUploadCategory(e.target.value as any)}
@@ -746,7 +746,7 @@ export function VDRRoom({
 
               {/* Access Level */}
               <div>
-                <label className="text-slate-400 text-[10px] uppercase font-bold tracking-wider block mb-1">Nível de Acesso</label>
+                <label className="text-slate-450 text-[9px] uppercase font-bold tracking-wider block mb-1.5">Nível de Acesso</label>
                 <select 
                   value={uploadAccessLevel} 
                   onChange={(e) => setUploadAccessLevel(e.target.value as any)}
@@ -771,14 +771,14 @@ export function VDRRoom({
                     setUploadFile(null);
                     setShowUploadModal(false);
                   }}
-                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-3 rounded-xl text-xs font-bold transition"
+                  className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 py-3 rounded-xl text-xs font-bold transition active:scale-95"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={uploading || !uploadFile}
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-600/40 text-white py-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2"
+                  className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-650/40 text-white py-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95"
                 >
                   {uploading ? (
                     <>
@@ -801,12 +801,12 @@ export function VDRRoom({
           <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden relative shadow-2xl animate-in zoom-in-95 duration-200">
             
             {/* Watermark Diagonal overlay */}
-            <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-[0.05] z-40 flex flex-col justify-around rotate-[-25deg] scale-125">
+            <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-[0.07] z-40 flex flex-col justify-around rotate-[-25deg] scale-125">
               {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="whitespace-nowrap text-xs font-mono font-bold tracking-widest text-slate-100 flex justify-between gap-8 py-2">
+                <div key={i} className="whitespace-nowrap text-[10px] font-mono font-black tracking-widest text-white flex justify-between gap-8 py-2">
                   {Array.from({ length: 4 }).map((_, j) => (
                     <span key={j}>
-                      CONFIDENTIAL VDR - {user?.email || "stakeholder@orizon"} - IP: {viewerIp} - Session: {getSessionId()} - {new Date().toLocaleDateString('pt-BR')}
+                      SECURE DATA ROOM • {user?.email || "anonymous"} • IP: {viewerIp} • SESSION: {getSessionId().slice(0, 15)} • {new Date().toLocaleDateString('pt-BR')}
                     </span>
                   ))}
                 </div>
@@ -814,32 +814,32 @@ export function VDRRoom({
             </div>
 
             {/* Header */}
-            <div className="p-5 border-b border-slate-800 bg-slate-900/90 flex justify-between items-center z-50">
+            <div className="p-5 border-b border-slate-850 bg-slate-950/90 backdrop-blur-md flex justify-between items-center z-50">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
                   <ShieldCheck size={20} />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                  <h4 className="text-sm font-black text-white tracking-tight flex items-center gap-2">
                     Visualizador Seguro VDR
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 font-bold uppercase tracking-wider">
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 font-black uppercase tracking-wider">
                       CONFIDENCIAL
                     </span>
                   </h4>
-                  <p className="text-xs text-slate-500">{viewerFile.name} (v{viewerFile.version})</p>
+                  <p className="text-xs text-slate-550 mt-0.5">{viewerFile.name} (v{viewerFile.version})</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <button
                   onClick={handlePrintAttempt}
-                  className="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-900 text-slate-400 hover:text-white transition text-xs font-bold"
+                  className="px-4 py-2 rounded-xl border border-slate-805 hover:border-slate-700 bg-slate-950 hover:bg-slate-900 text-slate-400 hover:text-white transition-all text-xs font-bold active:scale-95 duration-200"
                 >
                   Imprimir
                 </button>
                 <button
                   onClick={handleCloseViewer}
-                  className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                  className="bg-slate-800 hover:bg-slate-700 text-slate-205 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 active:scale-95 duration-200"
                 >
                   Fechar Visualizador
                 </button>

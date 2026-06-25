@@ -54,6 +54,112 @@ type Step =
   | 'PROVIDER_THESIS'
   | 'PROVIDER_MODEL';
 
+const getStepCoaching = (step: Step) => {
+  switch (step) {
+    case 'SEGMENT':
+      return {
+        title: "Segmento de Atuação",
+        subtitle: "Categorização Estratégica",
+        desc: "Classificar seu projeto em uma das Câmaras Setoriais da FIESC garante que a IA faça a conexão direta com os comitês industriais e tomadores de decisão corretos.",
+        tips: [
+          "Escolha o setor mais próximo da aplicação final",
+          "Permite a filtragem por teses industriais específicas",
+          "Garante alinhamento regulatório setorial"
+        ]
+      };
+    case 'PROTECTION':
+    case 'LINK_ASSETS':
+      return {
+        title: "Propriedade Intelectual",
+        subtitle: "Garantia Jurídica & Confiança",
+        desc: "Executivos buscam segurança. Vincular patentes válidas ou em depósito estabelece a base jurídica necessária para que grandes indústrias acessem os detalhes do seu projeto.",
+        tips: [
+          "Conecta com buscas automáticas do INPI",
+          "Ativos aparecem no IP Check da plataforma",
+          "Indústrias filtram por tecnologias já patenteadas"
+        ]
+      };
+    case 'RESEARCH':
+      return {
+        title: "Necessidades de P&D",
+        subtitle: "Infraestrutura & Fomento",
+        desc: "Muitas indústrias buscam cooperar com universidades e startups para projetos de pesquisa aplicada. Declarar suas necessidades de pesquisa direciona parcerias de codesenvolvimento.",
+        tips: [
+          "Conecta com linhas de fomento estadual/nacional",
+          "Indica abertura para parceria em laboratórios",
+          "Ajuda na captação de recursos governamentais"
+        ]
+      };
+    case 'INNOVATION_TYPE':
+      return {
+        title: "Tipo de Inovação",
+        subtitle: "Proposta de Valor ao Mercado",
+        desc: "Diferenciar entre melhoria incremental e inovação radical ajuda indústrias a entenderem o apetite ao risco e o tempo de retorno (Time-to-Market) do projeto.",
+        tips: [
+          "Melhorias focam em otimização e processos rápidos",
+          "Inovação radical atrai investimentos estruturais",
+          "Direciona a tese corporativa correspondente"
+        ]
+      };
+    case 'LOCATION':
+      return {
+        title: "Polo Regional",
+        subtitle: "Apoio de Logística & Ecossistema",
+        desc: "A proximidade física facilita auditorias, reuniões de conselho e integração logística. Mapeamos os polos regionais industriais do ecossistema.",
+        tips: [
+          "Facilita conexões com polos industriais próximos",
+          "Alinhamento com editais de fomento regionais",
+          "Melhora a pontuação de afinidade geográfica"
+        ]
+      };
+    case 'MATURITY':
+      return {
+        title: "Maturidade Tecnológica",
+        subtitle: "Classificação TRL/IRL",
+        desc: "O Technology Readiness Level (TRL) é o padrão internacional para medir a maturidade de tecnologias. Quanto maior, mais próxima a tecnologia está da produção industrial em escala.",
+        tips: [
+          "TRL 1-3: Conceito e validação em laboratório",
+          "TRL 4-6: Protótipo e validação em ambiente relevante",
+          "TRL 7-9: Validação industrial e comercialização"
+        ]
+      };
+    case 'SUMMARY_METHOD':
+    case 'SUMMARY_CONTENT':
+      return {
+        title: "Lapidação de Pitch",
+        subtitle: "Comunicação Executiva & IA",
+        desc: "Nossa IA integrada traduz descrições acadêmicas e técnicas em propostas de valor corporativas robustas, adequadas para a tomada de decisão executiva.",
+        tips: [
+          "Descreva claramente a dor do mercado (Problema)",
+          "Apresente os diferenciais sem jargões complexos",
+          "Evite revelar segredos comerciais confidenciais"
+        ]
+      };
+    case 'REVIEW':
+      return {
+        title: "Validação Estratégica",
+        subtitle: "Revisão e Geração de Matches",
+        desc: "Revise a consistência dos dados do seu ativo de inovação. Após finalizar, nossa IA iniciará o processamento semântico instantâneo com a tese das corporações.",
+        tips: [
+          "Todos os dados serão processados sob criptografia",
+          "Seu projeto será listado como CONFIDENCIAL",
+          "Identidade protegida até a assinatura do NDA"
+        ]
+      };
+    default:
+      return {
+        title: "Estruturação Tecnológica",
+        subtitle: "Orizon Matchmaker",
+        desc: "Estamos estruturando a ficha técnica do seu projeto para mitigar riscos regulatórios, técnicos e de mercado, aumentando drasticamente a percepção de valor.",
+        tips: [
+          "Dados confidenciais sob NDA digital",
+          "Processamento semântico por IA",
+          "Interface alinhada à Lei de Inovação"
+        ]
+      };
+  }
+};
+
 export function CreateProjectInventor() {
   const { user, userProfile, impersonatingAdminId } = useAuth();
   const navigate = useNavigate();
@@ -253,16 +359,21 @@ export function CreateProjectInventor() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto pb-20">
-      <div className="mb-10 text-center">
-        <h1 className="text-3xl font-black text-white tracking-tight mb-2">Novo Projeto</h1>
-        <p className="text-slate-400">Preencha os detalhes para encontrar o match ideal.</p>
+    <div className="max-w-6xl mx-auto pb-20 px-4 md:px-6">
+      <div className="mb-8 text-left border-b border-slate-800/60 pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-black text-white tracking-tight">Estruturar Nova Tecnologia</h1>
+          <p className="text-slate-400 text-sm mt-1">Siga o roteiro executivo para qualificar e patentear seu ativo de inovação.</p>
+        </div>
+        <div className="w-full md:w-80">
+          {renderProgressBar()}
+        </div>
       </div>
 
-      {renderProgressBar()}
-
-      <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-1000" />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+        {/* LEFT COLUMN: WIZARD FORM */}
+        <div className="lg:col-span-2 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-1000" />
         
         {error && (
           <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-in fade-in zoom-in-95">
@@ -918,6 +1029,42 @@ export function CreateProjectInventor() {
           </div>
         )}
 
+        </div>
+
+        {/* RIGHT COLUMN: COACHING SIDEBAR */}
+        <div className="lg:col-span-1 lg:sticky lg:top-24 space-y-6">
+          <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[80px] pointer-events-none" />
+            
+            <div className="space-y-1 mb-6">
+              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{getStepCoaching(step).subtitle}</span>
+              <h3 className="text-lg font-bold text-white tracking-tight">{getStepCoaching(step).title}</h3>
+            </div>
+            
+            <p className="text-xs text-slate-400 leading-relaxed mb-6">
+              {getStepCoaching(step).desc}
+            </p>
+            
+            <div className="h-px bg-slate-800/80 my-4" />
+            
+            <div className="space-y-3">
+              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Diretriz de Estruturação</h4>
+              {getStepCoaching(step).tips.map((tip, idx) => (
+                <div key={idx} className="flex gap-2.5 items-start text-xs text-slate-350">
+                  <CheckCircle2 className="text-indigo-400 shrink-0 mt-0.5" size={14} />
+                  <span>{tip}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="bg-indigo-950/10 border border-indigo-550/20 rounded-2xl p-5 flex items-center gap-3 text-slate-500 text-xs backdrop-blur-sm">
+            <ShieldCheck size={18} className="text-indigo-400/80 shrink-0" />
+            <p className="leading-relaxed">
+              Ficha de qualificação em conformidade com a Lei nº 10.973/04 (Lei de Inovação). Dados e patentes protegidos no VDR.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* IA Processing Overlay */}
