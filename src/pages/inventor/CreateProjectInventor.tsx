@@ -458,7 +458,7 @@ export function CreateProjectInventor() {
                       value={formData.registration.idNumber}
                       onChange={(e) => updateRegistration('idNumber', e.target.value)}
                       disabled={!!userProfile?.idNumber}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:border-indigo-500 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                       placeholder="00.000.000/0001-00"
                     />
                   </div>
@@ -501,7 +501,7 @@ export function CreateProjectInventor() {
                     type="text"
                     value={formData.patentNumber}
                     onChange={(e) => updateField('patentNumber', e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:border-indigo-500 outline-none"
+                    className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none transition-all"
                     placeholder="BR 10 202X XXXXXX-X"
                   />
                 </div>
@@ -798,7 +798,7 @@ export function CreateProjectInventor() {
                   <textarea
                     value={formData.summaryQuestions.problem}
                     onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none h-24 transition-all"
                     placeholder="Descreva a dor do mercado..."
                   />
                 </div>
@@ -807,7 +807,7 @@ export function CreateProjectInventor() {
                   <textarea
                     value={formData.summaryQuestions.solution}
                     onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none h-24 transition-all"
                     placeholder="Como sua ideia funciona..."
                   />
                 </div>
@@ -816,7 +816,7 @@ export function CreateProjectInventor() {
                   <textarea
                     value={formData.summaryQuestions.difference}
                     onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none h-24 transition-all"
                     placeholder="Por que você é melhor que a concorrência..."
                   />
                 </div>
@@ -939,7 +939,7 @@ export function CreateProjectInventor() {
                 <textarea
                   value={formData.summary}
                   onChange={(e) => updateField('summary', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-64"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none h-64 transition-all"
                   placeholder="Escreva aqui o resumo da sua patente ou ideia de negócio..."
                 />
               </div>

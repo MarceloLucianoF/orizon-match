@@ -544,7 +544,7 @@ export function CompanyDashboard() {
                                     type="text" 
                                     value={editOwnerName} 
                                     onChange={e => setEditOwnerName(e.target.value)}
-                                    className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
+                                    className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                   />
                                 </div>
 
@@ -554,7 +554,7 @@ export function CompanyDashboard() {
                                     type="number" 
                                     value={editEstimatedValue} 
                                     onChange={e => setEditEstimatedValue(Number(e.target.value))}
-                                    className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
+                                    className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                   />
                                 </div>
 
@@ -567,7 +567,7 @@ export function CompanyDashboard() {
                                       max="100" 
                                       value={editProbability} 
                                       onChange={e => setEditProbability(Number(e.target.value))}
-                                      className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
+                                      className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                     />
                                   </div>
                                   <div className="space-y-1">
@@ -576,7 +576,7 @@ export function CompanyDashboard() {
                                       type="date" 
                                       value={editExpectedCloseDate} 
                                       onChange={e => setEditExpectedCloseDate(e.target.value)}
-                                      className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
+                                      className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                     />
                                   </div>
                                 </div>
@@ -587,7 +587,7 @@ export function CompanyDashboard() {
                                     type="text" 
                                     value={editNextAction} 
                                     onChange={e => setEditNextAction(e.target.value)}
-                                    className="bg-slate-900/80 border border-slate-800 focus:border-indigo-500 text-xs text-slate-200 rounded-lg p-2 w-full outline-none transition-all"
+                                    className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                   />
                                 </div>
 

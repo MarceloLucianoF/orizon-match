@@ -69,7 +69,7 @@ export function CapacitiesTab({
                 value={newLabName}
                 onChange={e => setNewLabName(e.target.value)}
                 placeholder="Ex: Laboratório de Biofotônica"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
               />
             </div>
             <div className="space-y-1.5">
@@ -80,7 +80,7 @@ export function CapacitiesTab({
                 value={newLabArea}
                 onChange={e => setNewLabArea(e.target.value)}
                 placeholder="Ex: Biotecnologia / Saúde"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
               />
             </div>
             <div className="space-y-1.5">
@@ -90,7 +90,7 @@ export function CapacitiesTab({
                 onChange={e => setNewLabEquip(e.target.value)}
                 placeholder="Ex: Microscópio Confocal, Centrífuga refrigerada"
                 rows={3}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all resize-none"
+                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all resize-none"
               />
             </div>
             <button 
