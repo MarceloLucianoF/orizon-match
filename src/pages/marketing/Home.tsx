@@ -388,11 +388,11 @@ export default function Home() {
                 desc: "Monitoramos e salvamos em um log de auditoria imutável o tempo exato de leitura (`view.start` / `view.end`) de cada página por cada ator."
               }
             ].map(({ icon, title, desc }) => (
-              <div key={title} className="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 hover:border-emerald-500/30 transition duration-300">
+              <div key={title} className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 hover:border-emerald-500/25 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 backdrop-blur-sm shadow-sm">
                 <div className="w-12 h-12 rounded-xl bg-slate-800/80 flex items-center justify-center mb-5">
                   {icon}
                 </div>
-                <h3 className="font-bold text-white text-base md:text-lg mb-3">{title}</h3>
+                <h3 className="font-bold text-white text-base md:text-lg mb-3 tracking-tight">{title}</h3>
                 <p className="text-slate-400 text-xs md:text-sm leading-relaxed">{desc}</p>
               </div>
             ))}
@@ -447,12 +447,12 @@ export default function Home() {
           ].map(({ icon, title, desc }) => (
             <div 
               key={title} 
-              className="bg-slate-900/40 border border-slate-850 hover:border-slate-700/60 hover:bg-slate-900/60 hover:shadow-[0_4px_25px_rgba(0,0,0,0.4)] hover:-translate-y-0.5 rounded-2xl p-6 transition-all duration-300 backdrop-blur-sm"
+              className="bg-slate-900/40 border border-slate-800/80 hover:border-indigo-500/20 hover:shadow-[0_12px_24px_-8px_rgba(99,102,241,0.06)] hover:-translate-y-0.5 rounded-2xl p-6 transition-all duration-300 backdrop-blur-sm shadow-sm"
             >
-              <div className="w-10 h-10 rounded-xl bg-slate-850 border border-slate-800 flex items-center justify-center mb-4 shadow-sm">
+              <div className="w-10 h-10 rounded-xl bg-slate-850 border border-slate-800/80 flex items-center justify-center mb-4 shadow-sm">
                 {icon}
               </div>
-              <h3 className="font-bold text-white text-sm md:text-base mb-2">{title}</h3>
+              <h3 className="font-bold text-white text-sm md:text-base mb-2 tracking-tight">{title}</h3>
               <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
             </div>
           ))}

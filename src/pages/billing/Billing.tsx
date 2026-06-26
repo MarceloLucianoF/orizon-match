@@ -43,7 +43,7 @@ export function Billing() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card do Plano Atual */}
-        <div className="md:col-span-2 bg-slate-900/50 border border-slate-800 rounded-3xl p-6 md:p-8 relative overflow-hidden group">
+        <div className="md:col-span-2 bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 relative overflow-hidden group shadow-card backdrop-blur-sm">
           <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full blur-3xl opacity-20 transition-all duration-500 ${isPremium ? 'bg-indigo-500 group-hover:scale-150' : 'bg-slate-500'}`} />
           
           <div className="relative z-10 flex flex-col h-full">
@@ -99,26 +99,26 @@ export function Billing() {
         </div>
 
         {/* Detalhes de Próximo Pagamento */}
-        <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 flex flex-col">
-          <h3 className="text-xs font-black uppercase tracking-widest text-slate-500 mb-6">Próximo Vencimento</h3>
+        <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 flex flex-col shadow-card backdrop-blur-sm">
+          <h3 className="text-xs font-black uppercase tracking-widest text-slate-400 mb-6">Próximo Vencimento</h3>
           
           <div className="flex-1 flex flex-col justify-center items-center text-center space-y-2">
-            <div className="bg-slate-950 p-4 rounded-2xl border border-slate-800 mb-2">
-              <Calendar size={32} className="text-slate-400" />
+            <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-850 mb-2 shadow-inner">
+              <Calendar size={32} className="text-slate-405" />
             </div>
             <p className="text-2xl font-black text-white">{isPremium ? '10 Jun 2026' : '--'}</p>
             <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">{isPremium ? 'Cobrança Mensal' : 'Sem cobranças ativas'}</p>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-800 text-[10px] text-slate-500">
+          <div className="mt-6 pt-6 border-t border-slate-800/80 text-[10px] text-slate-500">
             Cartão final ** 4242
           </div>
         </div>
       </div>
 
       {/* Histórico de Faturas */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
-        <div className="p-6 border-b border-slate-800 bg-slate-900/30 flex justify-between items-center">
+      <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl overflow-hidden shadow-card backdrop-blur-sm">
+        <div className="p-6 border-b border-slate-800 bg-slate-900/10 flex justify-between items-center">
           <h2 className="text-sm font-black uppercase tracking-widest text-slate-200 flex items-center gap-2">
             <Receipt className="text-indigo-400" size={18} /> Histórico de Faturas
           </h2>

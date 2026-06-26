@@ -46,20 +46,20 @@ export default function About() {
 
         {/* TESE + SEGURANÇA */}
         <div className="grid md:grid-cols-2 gap-6 md:gap-8 border-t border-slate-800 pt-12 md:pt-16">
-          <div className="bg-slate-900/40 p-6 md:p-8 rounded-2xl border border-slate-800">
+          <div className="bg-slate-900/40 p-6 md:p-8 rounded-2xl border border-slate-800/80 hover:border-indigo-500/20 hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-sm shadow-card">
             <div className="flex items-center gap-3 mb-4">
               <Target className="text-indigo-400" size={24} />
-              <h3 className="text-white font-semibold text-lg md:text-xl">Nossa Tese</h3>
+              <h3 className="text-white font-bold text-lg md:text-xl tracking-tight">Nossa Tese</h3>
             </div>
             <p className="text-slate-400 leading-relaxed text-sm md:text-base">
-              Conexões de inovação não devem depender de networking aleatório. Devem ser orientadas por dados reais: maturidade tecnológica, fit de segmento e capacidade produtiva. Isso é o que chamamos de <strong className="text-slate-200">matchmaking de precisão</strong>.
+              Conexões de inovação não devem depender de networking aleatório. Devem ser orientadas por dados reais: maturidade tecnológica, fit de segmento e capacidade produtiva. Isso é o que chamamos de <strong className="text-slate-200 font-semibold">matchmaking de precisão</strong>.
             </p>
           </div>
 
-          <div className="bg-slate-900/40 p-6 md:p-8 rounded-2xl border border-slate-800">
+          <div className="bg-slate-900/40 p-6 md:p-8 rounded-2xl border border-slate-800/80 hover:border-indigo-500/20 hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-sm shadow-card">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="text-emerald-400" size={24} />
-              <h3 className="text-white font-semibold text-lg md:text-xl">Segurança e Confiança</h3>
+              <h3 className="text-white font-bold text-lg md:text-xl tracking-tight">Segurança e Confiança</h3>
             </div>
             <p className="text-slate-400 leading-relaxed text-sm md:text-base">
               Protegemos propriedade intelectual com NDA digital e Data Room Virtual auditado. O primeiro contato é estruturado de forma profissional, blindando inventor e investidor.
@@ -78,9 +78,9 @@ export default function About() {
               { icon: <Handshake className="text-amber-400" size={24} />, title: "Parceiro Curadoria", desc: "Escritórios jurídicos convidados validam documentação, gerando selo de aptidão para investidores." },
               { icon: <Target className="text-indigo-400" size={24} />, title: "Alinhamento FIESC", desc: "Segmentos mapeados pelas Câmaras da FIESC garantem classificação industrial precisa e relevante." },
             ].map(item => (
-              <div key={item.title} className="bg-slate-900/30 border border-slate-800 rounded-2xl p-5 md:p-6 hover:border-slate-700 transition">
-                <div className="mb-3">{item.icon}</div>
-                <h4 className="text-white font-bold text-sm md:text-base mb-2">{item.title}</h4>
+              <div key={item.title} className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 hover:border-indigo-500/20 hover:-translate-y-0.5 transition-all duration-300 backdrop-blur-sm shadow-card">
+                <div className="mb-3.5">{item.icon}</div>
+                <h4 className="text-white font-bold text-sm md:text-base mb-2.5 tracking-tight">{item.title}</h4>
                 <p className="text-slate-400 text-xs md:text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}

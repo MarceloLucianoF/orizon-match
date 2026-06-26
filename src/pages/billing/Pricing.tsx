@@ -219,8 +219,8 @@ export default function Pricing() {
                 key={plan.id}
                 className={`relative p-8 rounded-3xl border transition-all duration-500 flex flex-col justify-between ${
                   plan.highlight 
-                  ? 'bg-slate-900/80 border-indigo-500/50 shadow-[0_0_40px_rgba(79,70,229,0.15)] scale-105 z-20' 
-                  : 'bg-slate-900/40 border-slate-800 scale-100 z-10 hover:border-slate-700'
+                  ? 'bg-gradient-to-b from-slate-900/90 to-slate-950/90 border-indigo-500/50 shadow-[0_20px_50px_rgba(99,102,241,0.15)] scale-105 z-20 hover:border-indigo-500 hover:shadow-[0_20px_60px_rgba(99,102,241,0.22)] hover:-translate-y-1' 
+                  : 'bg-slate-900/40 border-slate-800/80 scale-100 z-10 hover:border-slate-700/80 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)]'
                 }`}
               >
                 {plan.highlight && (

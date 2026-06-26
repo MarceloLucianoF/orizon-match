@@ -345,7 +345,7 @@ export function ProjectDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 space-y-6">
+          <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 space-y-6 shadow-sm backdrop-blur-sm">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <FileText className="text-indigo-400" size={20} />
               Resumo do Projeto
@@ -356,7 +356,7 @@ export function ProjectDetails() {
           </div>
 
           {/* Garantia Jurídica / IP Section */}
-          <div className="bg-gradient-to-br from-indigo-900/20 to-slate-900 border border-indigo-500/30 rounded-3xl p-8 space-y-6 relative overflow-hidden group">
+          <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900/40 border border-indigo-500/20 hover:border-indigo-500/30 rounded-3xl p-8 space-y-6 relative overflow-hidden group shadow-lg transition-all duration-300 backdrop-blur-sm">
             <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-1000" />
             
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
@@ -377,8 +377,8 @@ export function ProjectDetails() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
               {linkedAssets.length > 0 ? (
                 linkedAssets.map(asset => (
-                  <div key={asset.id} className="bg-slate-950/80 border border-slate-800 rounded-2xl p-4 flex items-center gap-4 hover:border-indigo-500/40 transition-all">
-                    <div className="p-3 bg-slate-900 rounded-xl border border-slate-800">
+                  <div key={asset.id} className="bg-slate-950/50 border border-slate-850 rounded-2xl p-5 flex items-center gap-4 hover:border-indigo-500/25 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] transition-all duration-300 backdrop-blur-sm">
+                    <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-850">
                       {asset.type === 'patent' ? <Briefcase className="text-amber-400" size={18} /> :
                        asset.type === 'software' ? <Code className="text-emerald-400" size={18} /> :
                        <ShieldCheck className="text-indigo-400" size={18} />}
@@ -431,7 +431,7 @@ export function ProjectDetails() {
             linkedAssets={linkedAssets}
           />
 
-          <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8">
+          <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 shadow-sm backdrop-blur-sm">
             <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
               <Shield className="text-emerald-400" size={20} />
               Virtual Data Room (VDR)
@@ -480,16 +480,16 @@ export function ProjectDetails() {
               {/* KPIs Row */}
               <div className="p-6 md:p-8 border-b border-slate-800/60 grid grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/40 no-print">
                 {getKpis(project, linkedAssets).map((kpi, idx) => (
-                  <div key={idx} className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between hover:border-indigo-500/30 transition">
-                    <div className="flex items-center justify-between text-slate-500 mb-2">
-                      <span className="text-[10px] font-black uppercase tracking-wider">{kpi.title}</span>
-                      <div className="p-1 bg-slate-800/50 rounded-lg">
+                  <div key={idx} className="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-indigo-500/25 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-8px_rgba(99,102,241,0.06)] transition-all duration-300 backdrop-blur-sm shadow-sm">
+                    <div className="flex items-center justify-between text-slate-500 mb-3">
+                      <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">{kpi.title}</span>
+                      <div className="p-1.5 bg-slate-950/80 border border-slate-800/50 rounded-lg shadow-inner">
                         {kpi.icon}
                       </div>
                     </div>
-                    <div>
-                      <div className={`text-xl font-bold text-white tracking-tight ${kpi.valColor || ''}`}>{kpi.value}</div>
-                      <div className="text-[10px] text-slate-500 mt-1 font-mono">{kpi.detail}</div>
+                    <div className="space-y-1.5">
+                      <div className={`text-xl font-extrabold text-white tracking-tight ${kpi.valColor || ''}`}>{kpi.value}</div>
+                      <div className="text-[10px] text-slate-400 font-medium font-mono">{kpi.detail}</div>
                     </div>
                   </div>
                 ))}

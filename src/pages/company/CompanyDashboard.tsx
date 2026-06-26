@@ -518,24 +518,24 @@ export function CompanyDashboard() {
                   return (
                     <div 
                       key={column.id} 
-                      className={`w-full sm:w-80 flex flex-col rounded-2xl border border-slate-850/80 bg-slate-900/20 p-4 ${
+                      className={`w-full sm:w-80 flex flex-col rounded-2xl border border-slate-850/60 bg-slate-900/15 p-4.5 ${
                         isVisibleOnMobile ? "flex" : "hidden sm:flex"
                       }`}
                     >
-                      <div className="flex items-center justify-between mb-4 border-b border-slate-800/40 pb-2">
+                      <div className="flex items-center justify-between mb-4.5 border-b border-slate-800/40 pb-2.5">
                         <div className="flex items-center gap-2">
                           <span className={`w-2.5 h-2.5 rounded-full ${column.indicatorColor}`} />
                           <h3 className="font-bold text-slate-350 text-xs uppercase tracking-wider">{columnTitle}</h3>
                         </div>
                         <span className="bg-slate-950 text-slate-500 text-[10px] font-black px-2 py-0.5 rounded border border-slate-800/80">{columnDeals.length}</span>
                       </div>
-                      <div className="space-y-3">
+                      <div className="space-y-3.5">
                         {columnDeals.map(deal => {
                           const isEditing = editingDealId === deal.id;
 
                           if (isEditing) {
                             return (
-                              <div key={deal.id} className="bg-slate-950 border border-indigo-500/45 rounded-xl p-4 transition-all shadow-xl shadow-indigo-550/5 space-y-3">
+                              <div key={deal.id} className="bg-slate-950 border border-indigo-500/35 rounded-xl p-4.5 transition-all shadow-2xl shadow-indigo-500/5 space-y-3.5">
                                 <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Editar CRM</div>
                                 
                                 <div className="space-y-1">
@@ -616,7 +616,7 @@ export function CompanyDashboard() {
                           }
 
                           return (
-                            <div key={deal.id} className="bg-slate-950/40 border border-slate-850 hover:border-indigo-500/30 hover:shadow-[0_4px_20px_rgba(99,102,241,0.05)] hover:scale-[1.01] transition-all duration-300 rounded-xl p-4 flex flex-col gap-3 group relative backdrop-blur-sm">
+                            <div key={deal.id} className="bg-slate-950/50 border border-slate-850/80 hover:border-indigo-500/25 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 transition-all duration-300 rounded-xl p-4.5 flex flex-col gap-3 group relative backdrop-blur-sm shadow-sm">
                               {/* Edit Button overlay on hover */}
                               <button 
                                 onClick={() => {

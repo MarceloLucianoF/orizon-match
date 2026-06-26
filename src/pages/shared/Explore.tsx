@@ -469,84 +469,83 @@ export function Explore() {
           {results.map((project, idx) => {
             const tier = getMatchTier(project.score);
             const scoreColor = getScoreColor(project.score);
-            
             return (
-              <div key={project.id} className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 md:p-5 hover:border-indigo-500/30 transition-all flex flex-col md:flex-row md:items-center gap-4 md:gap-6 relative overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.12)]">
+              <div key={project.id} className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 md:p-7 hover:border-indigo-500/25 shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_-15px_rgba(99,102,241,0.06)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col md:flex-row md:items-center gap-6 relative overflow-hidden backdrop-blur-sm">
                 {/* Score circle */}
-                <div className="flex-shrink-0 flex flex-col items-center justify-center w-16 h-16 md:w-20 md:h-20 rounded-full border-4 border-slate-800 relative bg-slate-900 mx-auto md:mx-0">
-                  <span className={`text-lg md:text-xl font-bold ${scoreColor}`}>{project.score}%</span>
+                <div className="flex-shrink-0 flex flex-col items-center justify-center w-18 h-18 md:w-22 md:h-22 rounded-full border-4 border-slate-800/60 relative bg-slate-950/80 mx-auto md:mx-0 shadow-inner">
+                  <span className={`text-xl md:text-2xl font-extrabold ${scoreColor} tracking-tight`}>{project.score}%</span>
                   {idx === 0 && (
-                    <div className="absolute -top-3 bg-amber-500 text-amber-950 text-[9px] font-bold px-2 py-0.5 rounded-full shadow-[0_0_10px_rgba(245,158,11,0.5)]">
+                    <div className="absolute -top-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-amber-950 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.4)] tracking-wider">
                       TOP 1
                     </div>
                   )}
                 </div>
 
                 {/* Info */}
-                <div className="flex-1 min-w-0 space-y-3 text-center md:text-left">
-                  <div className="flex flex-wrap items-center gap-2 justify-center md:justify-start">
-                    <h3 className="text-base font-bold text-slate-100 truncate max-w-full">
+                <div className="flex-1 min-w-0 space-y-4 text-center md:text-left">
+                  <div className="flex flex-wrap items-center gap-2.5 justify-center md:justify-start">
+                    <h3 className="text-lg font-bold text-white tracking-tight leading-snug">
                       {project.title || t("explore.confidentialProject")}
                     </h3>
                     
                     {tier.label && (
-                      <span className={`${tier.bgColor} ${tier.color} text-[10px] px-2 py-0.5 rounded border ${tier.borderColor} font-bold`}>
+                      <span className={`${tier.bgColor} ${tier.color} text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-md border ${tier.borderColor} font-extrabold`}>
                         {tier.label}
                       </span>
                     )}
 
                     {project.isVdrReady && (
-                      <span className="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded border border-emerald-500/20 font-medium flex items-center gap-1">
-                        <ShieldCheck size={10} /> {t("explore.vdrAudited")}
+                      <span className="bg-emerald-500/5 text-emerald-400 text-[10px] px-2 py-0.5 rounded-md border border-emerald-500/15 font-semibold flex items-center gap-1">
+                        <ShieldCheck size={11} /> {t("explore.vdrAudited")}
                       </span>
                     )}
 
                     {(project.isIctVerified || project.validatedMaturity) && (
-                      <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2 py-0.5 rounded border border-indigo-500/20 font-bold flex items-center gap-1">
-                        <ShieldCheck size={10} className="text-indigo-400" /> {t("explore.ictVerified")}
+                      <span className="bg-indigo-500/5 text-indigo-400 text-[10px] px-2 py-0.5 rounded-md border border-indigo-500/15 font-bold flex items-center gap-1">
+                        <ShieldCheck size={11} className="text-indigo-400" /> {t("explore.ictVerified")}
                       </span>
                     )}
                   </div>
                   
                   {/* The Hook/Summary */}
-                  <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
+                  <p className="text-sm text-slate-350 leading-relaxed font-medium line-clamp-2">
                     {project.summary || "Sem descrição detalhada disponível."}
                   </p>
 
                   {/* Highlights (Invstor-style badges) */}
-                  <div className="flex flex-wrap gap-2 text-[10px] font-bold justify-center md:justify-start">
-                    <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-1 rounded flex items-center gap-1">
+                  <div className="flex flex-wrap gap-2 text-[11px] font-semibold justify-center md:justify-start">
+                    <span className="bg-emerald-500/5 text-emerald-400 border border-emerald-500/15 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm">
                       💰 Busca: {project.ticketRange === '50k' ? '< R$ 250k' : project.ticketRange === '250k' ? 'R$ 250k - R$ 1M' : project.ticketRange === '1m' ? '> R$ 1M' : 'Sob Consulta'}
                     </span>
-                    <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-1 rounded flex items-center gap-1">
+                    <span className="bg-indigo-500/5 text-indigo-400 border border-indigo-500/15 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm">
                       ⚙️ TRL {project.declaredTRL || project.maturity || 1}
                     </span>
                     {project.isIctVerified && (
-                      <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-1 rounded flex items-center gap-1">
+                      <span className="bg-slate-900/60 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm">
                         🛡️ ICT: {project.ictName || "Inatel"}
                       </span>
                     )}
                     {project.location?.region && (
-                      <span className="bg-slate-800 text-slate-300 border border-slate-700 px-2 py-1 rounded flex items-center gap-1">
+                      <span className="bg-slate-900/60 text-slate-300 border border-slate-800 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm">
                         📍 {project.location.region}
                       </span>
                     )}
                   </div>
 
-                  <p className="text-xs text-slate-500">{explainMatch(project.breakdown)}</p>
+                  <p className="text-xs text-slate-400 font-medium">{explainMatch(project.breakdown)}</p>
 
                   {/* GATILHO DE ESCASSEZ (PAYWALL / NDA) */}
-                  <div className="border-t border-slate-800/80 pt-3 mt-1 text-left">
+                  <div className="border-t border-slate-800/60 pt-3.5 mt-1 text-left">
                     {userProfile?.subscriptionStatus !== 'premium' ? (
                       <div className="relative group cursor-pointer" onClick={() => navigate('/pricing')}>
                         {/* Camada borrada */}
-                        <div className="blur-[4px] opacity-40 select-none text-[11px] text-slate-500 space-y-1">
+                        <div className="blur-[4px] opacity-30 select-none text-[11px] text-slate-500 space-y-1">
                           <p>Pesquisador Principal: Dr. Alberto Ferreira</p>
                           <p>Patente/Registro: Concedida (BR 10 2024 001234 5)</p>
                         </div>
                         {/* Cadeado sobreposto */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="bg-indigo-650 hover:bg-indigo-650 text-white text-[10px] font-black uppercase tracking-wider px-3 py-1.5 rounded-xl shadow-lg flex items-center gap-1.5 transition-all border border-indigo-500/30">
+                          <span className="bg-indigo-650 hover:bg-indigo-650 text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 transition-all border border-indigo-500/30">
                             🔒 Assine o Plano Corporate para ver a Patente
                           </span>
                         </div>
@@ -554,9 +553,9 @@ export function Explore() {
                     ) : (
                       // Visão liberada para quem pagou
                       <div className="text-[11px] space-y-1 text-slate-400">
-                        <p><strong className="text-slate-300">Pesquisador Principal:</strong> {project.researcher || "Prof. Rafael Silva"}</p>
+                        <p><strong className="text-slate-355">Pesquisador Principal:</strong> {project.researcher || "Prof. Rafael Silva"}</p>
                         <p>
-                          <strong className="text-slate-300">Patente/Registro:</strong>{" "}
+                          <strong className="text-slate-355">Patente/Registro:</strong>{" "}
                           <span className="text-indigo-400 font-bold hover:underline cursor-pointer">
                             {project.patentStatus || "Concedida (BR 10 2024)"}
                           </span>
@@ -567,11 +566,11 @@ export function Explore() {
                 </div>
 
                 {/* Action */}
-                <div className="flex-shrink-0 flex flex-col gap-2 w-full md:w-auto">
+                <div className="flex-shrink-0 flex flex-col gap-2.5 w-full md:w-auto">
                   <button 
                     onClick={() => handleConnect(project)}
                     disabled={connecting === project.id || userProjects.length === 0}
-                    className="bg-indigo-650 hover:bg-indigo-600 disabled:bg-slate-900 disabled:text-slate-600 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.2)] w-full md:w-auto justify-center"
+                    className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900/60 disabled:text-slate-500 disabled:border-slate-800/80 text-white px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/35 border border-indigo-500/20 flex items-center gap-2 w-full md:w-auto justify-center"
                   >
                     {connecting === project.id ? (
                       <Loader2 className="animate-spin" size={16} />
@@ -582,14 +581,14 @@ export function Explore() {
 
                   {isCorporate && (
                     dealIdsInPipeline.has(project.id) ? (
-                      <div className="flex items-center justify-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/25 px-4 py-2 rounded-xl text-xs font-bold w-full md:w-auto">
+                      <div className="flex items-center justify-center gap-1.5 bg-emerald-500/5 text-emerald-400 border border-emerald-500/20 px-5 py-2.5 rounded-xl text-xs font-bold w-full md:w-auto shadow-sm">
                         <CheckCircle size={14} />
                         <span>No Pipeline</span>
                       </div>
                     ) : (
                       <button
                         onClick={() => handleAddToDealFlow(project)}
-                        className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 w-full md:w-auto"
+                        className="bg-slate-800/85 hover:bg-slate-700 text-slate-200 border border-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-1.5 w-full md:w-auto shadow-sm"
                       >
                         <span>➕ Pipeline</span>
                       </button>
@@ -604,7 +603,7 @@ export function Explore() {
                     userProfile?.role === 'industry') && (
                     <button
                       onClick={() => handleOpenBriefing(project)}
-                      className="bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-[0_0_15px_rgba(217,70,239,0.15)] w-full md:w-auto"
+                      className="bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-fuchsia-500/10 hover:shadow-fuchsia-500/20 flex items-center justify-center gap-1.5 w-full md:w-auto border border-fuchsia-500/20"
                     >
                       <span>✨ Analista IA</span>
                     </button>

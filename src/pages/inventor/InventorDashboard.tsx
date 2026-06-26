@@ -247,9 +247,9 @@ export function InventorDashboard() {
                 <ProjectPerformanceChart title={t("dashboard.inventor.chartTitle")} />
               </div>
 
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-850 rounded-2xl p-6 shadow-xl">
+            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-card">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-base md:text-lg font-bold text-slate-100 flex items-center gap-2">
+                <h2 className="text-base md:text-lg font-bold text-white flex items-center gap-2 tracking-tight">
                   <Star className="text-amber-400 fill-amber-400/20" size={18} /> {t("dashboard.inventor.featuredMatches")}
                 </h2>
                 {stats.projects > 0 && (
@@ -286,7 +286,7 @@ export function InventorDashboard() {
                     const explanation = isFomoLocked ? "••••••••••••••••••••••••••••••••••••••••••••" : explainMatch(match.breakdown);
                     
                     return (
-                      <div key={match.id} className="bg-slate-950/40 border border-slate-850 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-4 hover:border-indigo-500/30 hover:shadow-[0_4px_20px_rgba(99,102,241,0.05)] hover:scale-[1.01] transition-all duration-300 relative overflow-hidden backdrop-blur-sm">
+                      <div key={match.id} className="bg-slate-950/50 border border-slate-850/80 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-5 hover:border-indigo-500/25 hover:shadow-[0_12px_24px_-8px_rgba(99,102,241,0.06)] hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden backdrop-blur-sm">
                         <div className={`w-12 h-12 rounded-full border border-slate-800/80 bg-slate-950 flex items-center justify-center flex-shrink-0 shadow-sm ${isFomoLocked ? 'text-slate-600' : scoreColor}`} style={{ boxShadow: !isFomoLocked ? '0 0 10px rgba(99,102,241,0.1)' : 'none' }}>
                           {isFomoLocked ? <Lock size={16} className="text-slate-600" /> : <span className="font-black text-sm drop-shadow-[0_0_6px_currentColor]">{match.score}%</span>}
                         </div>
@@ -329,14 +329,14 @@ export function InventorDashboard() {
               <MarketTrendsChart title={t("dashboard.inventor.marketTrends")} />
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-950/30 to-cyan-950/20 border border-indigo-500/20 hover:border-indigo-500/35 rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:scale-[1.01] shadow-xl">
+            <div className="bg-gradient-to-br from-indigo-950/30 to-cyan-950/20 border border-indigo-500/20 hover:border-indigo-500/35 rounded-2xl p-6 md:p-8 relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 shadow-xl">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl" />
-              <div className="absolute right-5 top-5 flex items-center justify-center h-6 w-6">
+              <div className="absolute right-6 top-6 flex items-center justify-center h-6 w-6">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-20"></span>
                 <span className="animate-pulse absolute inline-flex h-3 w-3 rounded-full bg-emerald-400 opacity-40"></span>
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
               </div>
-              <h3 className="text-sm font-semibold text-indigo-300 uppercase tracking-wider mb-2 flex items-center gap-2">
+              <h3 className="text-xs font-black text-indigo-300 uppercase tracking-widest mb-3.5 flex items-center gap-2">
                 <Activity size={16} className="text-emerald-400 animate-pulse" /> {t("dashboard.inventor.radarOrizon")}
               </h3>
               {radarCount === null ? (
@@ -355,8 +355,8 @@ export function InventorDashboard() {
               )}
             </div>
 
-            <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-850 rounded-2xl p-6 shadow-xl transition-all duration-300 hover:border-indigo-500/10">
-              <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">{t("dashboard.inventor.marketReadiness")}</h3>
+            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-card transition-all duration-300 hover:border-indigo-500/20 hover:-translate-y-0.5">
+              <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest mb-5">{t("dashboard.inventor.marketReadiness")}</h3>
               <div className="flex flex-col items-center mb-5">
                 <div className="relative w-28 h-28 md:w-32 md:h-32 flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
@@ -399,55 +399,55 @@ export function InventorDashboard() {
 
             {/* Checklist de Readiness */}
             {primaryProject && (
-              <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-850 rounded-2xl p-6 space-y-4 shadow-xl transition-all duration-300 hover:border-indigo-500/10">
-                <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">
+              <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 md:p-8 space-y-5 shadow-card transition-all duration-300 hover:border-indigo-500/20 hover:-translate-y-0.5">
+                <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest">
                   {t("dashboard.inventor.readinessChecklist.title")}
                 </h3>
-                <div className="space-y-2.5">
-                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
                       {primaryProject.title ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-650" size={16} />}
-                      <span className={primaryProject.title ? "text-slate-300 font-medium" : "text-slate-500"}>
+                      <span className={primaryProject.title ? "text-slate-355 font-semibold" : "text-slate-500"}>
                         {t("dashboard.inventor.readinessChecklist.titleCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-bold">+20%</span>
+                    <span className="text-[10px] text-indigo-400 font-extrabold">+20%</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                  <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
                       {primaryProject.segment ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-650" size={16} />}
-                      <span className={primaryProject.segment ? "text-slate-300 font-medium" : "text-slate-500"}>
+                      <span className={primaryProject.segment ? "text-slate-355 font-semibold" : "text-slate-500"}>
                         {t("dashboard.inventor.readinessChecklist.segmentCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-bold">+20%</span>
+                    <span className="text-[10px] text-indigo-400 font-extrabold">+20%</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                  <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
                       {(primaryProject.maturity || primaryProject.trlScore) ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-650" size={16} />}
-                      <span className={(primaryProject.maturity || primaryProject.trlScore) ? "text-slate-300 font-medium" : "text-slate-500"}>
+                      <span className={(primaryProject.maturity || primaryProject.trlScore) ? "text-slate-355 font-semibold" : "text-slate-500"}>
                         {t("dashboard.inventor.readinessChecklist.trlCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-bold">+10%</span>
+                    <span className="text-[10px] text-indigo-400 font-extrabold">+10%</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                  <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
                       {(primaryProject.needs && Object.values(primaryProject.needs).some(v => v)) ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-650" size={16} />}
-                      <span className={(primaryProject.needs && Object.values(primaryProject.needs).some(v => v)) ? "text-slate-300 font-medium" : "text-slate-500"}>
+                      <span className={(primaryProject.needs && Object.values(primaryProject.needs).some(v => v)) ? "text-slate-355 font-semibold" : "text-slate-500"}>
                         {t("dashboard.inventor.readinessChecklist.needsCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-bold">+20%</span>
+                    <span className="text-[10px] text-indigo-400 font-extrabold">+20%</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs p-2.5 bg-slate-950/40 rounded-xl border border-slate-850">
+                  <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
                       {(primaryProject.vdrStatus === 'verified' || primaryProject.isVdrReady || primaryProject.inpiStatus) ? <CheckCircle2 className="text-emerald-400 font-bold" size={16} /> : <Circle className="text-slate-650" size={16} />}
-                      <span className={(primaryProject.vdrStatus === 'verified' || primaryProject.isVdrReady || primaryProject.inpiStatus) ? "text-slate-300 font-medium" : "text-slate-500"}>
+                      <span className={(primaryProject.vdrStatus === 'verified' || primaryProject.isVdrReady || primaryProject.inpiStatus) ? "text-slate-355 font-semibold" : "text-slate-500"}>
                         {t("dashboard.inventor.readinessChecklist.vdrCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-bold">+20%</span>
+                    <span className="text-[10px] text-indigo-400 font-extrabold">+20%</span>
                   </div>
                 </div>
               </div>
