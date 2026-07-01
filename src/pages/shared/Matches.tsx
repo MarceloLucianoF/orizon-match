@@ -231,6 +231,11 @@ export function Matches() {
                     <span className="bg-slate-900/80 border border-slate-800 px-3 py-1 rounded-full text-slate-400">
                       {t("matches.needs")}: <span className="text-indigo-400 ml-1">{match.breakdown.needs || 0} {t("matches.pts")}</span>
                     </span>
+                    {match.breakdown.semanticScore !== undefined && (
+                      <span className="bg-slate-900/80 border border-slate-800 px-3 py-1 rounded-full text-slate-400">
+                        {t("matches.semantic")}: <span className="text-indigo-400 ml-1">{match.breakdown.semanticScore || 0} {t("matches.pts")}</span>
+                      </span>
+                    )}
                   </div>
                 )}
                 

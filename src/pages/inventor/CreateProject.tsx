@@ -6,7 +6,8 @@ import { createProject } from "../../services/projectService";
 import { 
   Loader2, ArrowRight, ArrowLeft, CheckCircle2, 
   Lightbulb, GraduationCap, Factory, ShieldCheck, 
-  HelpCircle, MessageSquare, Info, Video, MapPin, Zap, Rocket, Search
+  HelpCircle, MessageSquare, Info, Video, MapPin, Zap, Rocket, Search,
+  UploadCloud, FileText
 } from "lucide-react";
 import { TRLCalculator } from "../../components/TRLCalculator";
 import { AssetSelector } from "../../components/legal/AssetSelector";

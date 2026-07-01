@@ -532,7 +532,29 @@ export function Explore() {
                     )}
                   </div>
 
-                  <p className="text-xs text-slate-400 font-medium">{explainMatch(project.breakdown)}</p>
+                  {project.breakdown && (
+                    <div className="flex flex-wrap gap-2 text-[9px] uppercase font-bold tracking-wider justify-center md:justify-start">
+                      <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
+                        {t("matches.segment")}: <span className="text-indigo-400 ml-1">{project.breakdown.segment || 0} {t("matches.pts")}</span>
+                      </span>
+                      <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
+                        {t("matches.maturity")}: <span className="text-indigo-400 ml-1">{project.breakdown.maturity || 0} {t("matches.pts")}</span>
+                      </span>
+                      <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
+                        {t("matches.readiness")}: <span className="text-indigo-400 ml-1">{project.breakdown.readiness || 0} {t("matches.pts")}</span>
+                      </span>
+                      <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
+                        {t("matches.needs")}: <span className="text-indigo-400 ml-1">{project.breakdown.needs || 0} {t("matches.pts")}</span>
+                      </span>
+                      {project.breakdown.semanticScore !== undefined && (
+                        <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
+                          {t("matches.semantic")}: <span className="text-indigo-400 ml-1">{project.breakdown.semanticScore || 0} {t("matches.pts")}</span>
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  <p className="text-xs text-slate-450 font-semibold">{explainMatch(project.breakdown)}</p>
 
                   {/* GATILHO DE ESCASSEZ (PAYWALL / NDA) */}
                   <div className="border-t border-slate-800/60 pt-3.5 mt-1 text-left">

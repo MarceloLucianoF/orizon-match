@@ -7,50 +7,180 @@ export function calculateMatch(project: any, target: any) {
     readiness: 0,
     needs: 0,
     location: 0,
+    semanticMatches: 0,
+    semanticScore: 0
   };
 
-  // SEGMENTO (30 pts)
-  if (project.segment === target.segment) {
-    breakdown.segment = 30;
-  } else if (target.segments?.includes(project.segment)) {
-    breakdown.segment = 30;
+  // 1. Afinidade de Segmento (Chamber / Industry) [Máx: 20]
+  const projectSegment = project.segment || project.segmento;
+  const targetSegments = target.segments || target.segmentosInteresse || (target.segment ? [target.segment] : []);
+  const projectDNAIndustries = project.technologyDNA?.industry || [];
+
+  if (projectSegment && targetSegments.includes(projectSegment)) {
+    breakdown.segment = 20;
+  } else if (targetSegments.some((seg: string) => projectDNAIndustries.includes(seg))) {
+    breakdown.segment = 15;
   } else {
     breakdown.segment = 5;
   }
 
-  // MATURIDADE / TRL (20 pts)
-  const trl = project.trlScore || project.maturity || 1;
-  const targetTrl = target.preferredTrl || 6;
-  const trlDiff = Math.abs(trl - targetTrl);
-  breakdown.maturity = Math.max(0, 20 - trlDiff * 3);
+  // 2. Alinhamento de Maturidade (TRL Target) [Máx: 15]
+  const trl = project.technologyDNA?.trl || project.maturity || project.trlScore || 1;
+  const trlMin = target.trlMin !== undefined ? target.trlMin : (target.preferredTrl ? Math.max(1, target.preferredTrl - 1) : undefined);
+  const trlMax = target.trlMax !== undefined ? target.trlMax : (target.preferredTrl ? Math.min(9, target.preferredTrl + 1) : undefined);
 
-  // READINESS / VDR (20 pts)
-  const irl = project.irlScore || 0;
-  const hasAuditedVdr = project.vdrStatus === 'verified' || project.isVdrReady;
-  
-  breakdown.readiness = (irl * 2); // 0-12 pts based on IRL
-  if (hasAuditedVdr) breakdown.readiness += 8; // +8 pts for audited documents
-
-  // NEEDS (20 pts)
-  if (project.needs?.investment && (target.role === "industry" || target.role === "investor")) breakdown.needs += 20;
-  if (project.needs?.research && target.role === "ict") breakdown.needs += 20;
-
-  // LOCATION (10 pts)
-  if (project.location?.region === target.location?.region) {
-    breakdown.location = 10;
+  let isTrlMatched = true;
+  if (trlMin !== undefined && trlMax !== undefined) {
+    if (trl >= trlMin && trl <= trlMax) {
+      breakdown.maturity = 15;
+    } else if (Math.abs(trl - trlMin) === 1 || Math.abs(trl - trlMax) === 1) {
+      breakdown.maturity = 10;
+    } else {
+      breakdown.maturity = 0;
+      isTrlMatched = false;
+    }
   } else {
+    breakdown.maturity = 15; // default
+  }
+
+  // 3. Ajuste Fino de Readiness por Papel (Role-based Fit) [Máx: 25]
+  const scores = project.readinessScores;
+  const targetRole = target.role || target.tipo;
+  if (scores) {
+    if (targetRole === "investor") {
+      const commWeight = (scores.commercial || 0) * 0.3;
+      const mktWeight = (scores.market || 0) * 0.3;
+      const legalWeight = (scores.legal || 0) * 0.2;
+      const overallWeight = (scores.overall || 0) * 0.2;
+      breakdown.readiness = Math.round((commWeight + mktWeight + legalWeight + overallWeight) * 0.25);
+    } else if (targetRole === "industry" || targetRole === "company") {
+      const techWeight = (scores.technology || 0) * 0.3;
+      const mfgWeight = (scores.manufacturing || 0) * 0.3;
+      const regWeight = (scores.regulatory || 0) * 0.2;
+      const overallWeight = (scores.overall || 0) * 0.2;
+      breakdown.readiness = Math.round((techWeight + mfgWeight + regWeight + overallWeight) * 0.25);
+    } else {
+      breakdown.readiness = Math.round((scores.overall || 0) * 0.25);
+    }
+  } else {
+    // Suporte a projetos legados
+    const hasAuditedVdr = project.vdrStatus === "verified" || project.isVdrReady || (project.dueDiligenceProgress === 100);
+    const irl = project.irlScore || project.irl || 0;
+    let baseReadiness = irl * 1.5; // IRL na escala de 0-9
+    if (hasAuditedVdr) baseReadiness += 6;
+    breakdown.readiness = Math.round(baseReadiness);
+  }
+
+  // 4. Interseção Semântica (Technology DNA Keywords) [Máx: 25]
+  const projectKeywords = project.technologyDNA?.keywords || [];
+  const targetKeywords = target.keywords || target.segmentosInteresse || (target.segment ? [target.segment] : []);
+  const thesisText = (target.innovationThesis || "").toLowerCase();
+
+  let matchesCount = 0;
+  let semanticScore = 0;
+
+  if (projectKeywords.length > 0) {
+    projectKeywords.forEach((kw: string) => {
+      const kwLower = kw.toLowerCase();
+      if (targetKeywords.some((tkw: string) => tkw.toLowerCase() === kwLower)) {
+        matchesCount++;
+      } else if (thesisText.includes(kwLower)) {
+        matchesCount++;
+      }
+    });
+
+    if (matchesCount >= 3) {
+      semanticScore = 25;
+    } else if (matchesCount === 2) {
+      semanticScore = 17;
+    } else if (matchesCount === 1) {
+      semanticScore = 10;
+    } else {
+      const hasSegmentMatch = projectKeywords.some(
+        (kw: string) => projectSegment && projectSegment.toLowerCase().includes(kw.toLowerCase())
+      );
+      semanticScore = hasSegmentMatch ? 10 : 5;
+    }
+  } else {
+    // Cruzamento textual para legados
+    const textToMatch = (
+      (project.title || "") + " " + (project.summary || "") + " " + (project.description || "")
+    ).toLowerCase();
+    targetKeywords.forEach((tkw: string) => {
+      if (textToMatch.includes(tkw.toLowerCase())) {
+        matchesCount++;
+      }
+    });
+    if (matchesCount >= 2) semanticScore = 20;
+    else if (matchesCount === 1) semanticScore = 12;
+    else semanticScore = 5;
+  }
+
+  breakdown.semanticMatches = matchesCount;
+  breakdown.semanticScore = semanticScore;
+
+  // 5. Complementaridade de Demandas & Região [Máx: 15]
+  // Demandas (10 pts)
+  const projNeeds = project.needs || {};
+  const projPrecisa = project.precisa || [];
+  const hasInvestmentNeed = projNeeds.investment || projPrecisa.includes("investor");
+  const hasResearchNeed = projNeeds.research || projPrecisa.includes("ict");
+  const hasIndustryNeed = projNeeds.industry || projPrecisa.includes("industry") || projPrecisa.includes("company");
+
+  if (hasInvestmentNeed && targetRole === "investor") {
+    breakdown.needs = 10;
+  } else if (hasResearchNeed && targetRole === "ict") {
+    breakdown.needs = 10;
+  } else if (hasIndustryNeed && (targetRole === "industry" || targetRole === "company")) {
+    breakdown.needs = 10;
+  } else {
+    breakdown.needs = 2;
+  }
+
+  // Localização (5 pts)
+  const projRegion = project.location?.region || project.localizacao?.estado;
+  const targetRegion = target.location?.region || target.localizacao?.estado;
+  if (projRegion && targetRegion && projRegion.toLowerCase() === targetRegion.toLowerCase()) {
     breakdown.location = 5;
+  } else {
+    breakdown.location = 2;
   }
 
   score =
     breakdown.segment +
     breakdown.maturity +
     breakdown.readiness +
+    semanticScore +
     breakdown.needs +
     breakdown.location;
 
+  // 🚫 PUNIÇÕES NÃO-LINEARES (Red Flags & Gatilhos)
+  // 1. TRL Desalinhado (Guilhotina TRL)
+  if (!isTrlMatched) {
+    score = score * 0.5;
+  }
+
+  // 2. Red Flag Regulatório
+  const regulatoryScore = scores?.regulatory;
+  const isHighRegSegment = [
+    "Saúde",
+    "Biotecnologia",
+    "Alimentos e Bebidas",
+    "Segurança e Saúde no Trabalho"
+  ].includes(projectSegment || "");
+  if (regulatoryScore !== undefined && regulatoryScore < 40 && isHighRegSegment) {
+    score -= 30;
+  }
+
+  // 3. Restrição de Co-titularidade / Licenciamento
+  const hasCoOwnership = project.technologyProtection?.hasCoOwnership;
+  const hasLicensingRestrictions = !!project.technologyProtection?.licensingRestrictions;
+  if ((hasCoOwnership || hasLicensingRestrictions) && (targetRole === "investor" || targetRole === "industry")) {
+    score -= 15;
+  }
+
   return {
-    score: Math.min(score, 100),
+    score: Math.max(0, Math.min(Math.round(score), 100)),
     breakdown,
   };
 }
@@ -61,55 +191,65 @@ export function calculateMatch(project: any, target: any) {
  */
 export function explainMatch(breakdown: any): string {
   if (!breakdown) return "Compatibilidade identificada pelo algoritmo Orizon";
-  
+
   const reasons: string[] = [];
 
   // Segmento
-  if (breakdown.segment >= 25) {
-    reasons.push("atuação no mesmo segmento industrial");
-  } else if (breakdown.segment >= 10) {
-    reasons.push("segmento relacionado");
+  if (breakdown.segment === 20) {
+    reasons.push("atuação na mesma câmara FIESC");
+  } else if (breakdown.segment === 15) {
+    reasons.push("afinidade setorial no DNA do ativo");
   }
 
-  // Readiness (VDR + IRL)
-  if (breakdown.readiness >= 15) {
-    reasons.push("documentação auditada no Data Room");
-  } else if (breakdown.readiness >= 8) {
-    reasons.push("maturidade de negócio (IRL) consolidada");
-  } else if (breakdown.readiness >= 4) {
-    reasons.push("indicadores iniciais de prontidão");
+  // TRL / Maturity
+  if (breakdown.maturity === 15) {
+    reasons.push("TRL alinhado com a preferência corporativa");
+  } else if (breakdown.maturity === 10) {
+    reasons.push("estágio TRL com variação tolerável");
   }
 
-  // TRL
-  if (breakdown.maturity >= 17) {
-    reasons.push("estágio tecnológico (TRL) altamente compatível");
-  } else if (breakdown.maturity >= 12) {
-    reasons.push("estágio tecnológico (TRL) compatível");
-  } else if (breakdown.maturity >= 6) {
-    reasons.push("proximidade tecnológica parcial");
+  // Readiness / VDR
+  if (breakdown.readiness >= 18) {
+    reasons.push("excelentes scores de prontidão no Gêmeo Digital");
+  } else if (breakdown.readiness >= 10) {
+    reasons.push("maturidade de negócio (IRL) sólida");
+  }
+
+  // Semantic Keywords
+  if (breakdown.semanticMatches >= 3) {
+    reasons.push("forte afinidade no DNA tecnológico (3+ keywords coincidentes)");
+  } else if (breakdown.semanticMatches === 2) {
+    reasons.push("congruência em múltiplos termos da tese de inovação");
+  } else if (breakdown.semanticMatches === 1) {
+    reasons.push("coincidência em termo chave da tecnologia");
   }
 
   // Needs
-  if (breakdown.needs >= 15) {
-    reasons.push("necessidade estratégica correspondida");
+  if (breakdown.needs === 10) {
+    reasons.push("demandas de investimento/P&D correspondidas");
   }
 
   // Location
-  if (breakdown.location >= 8) {
-    reasons.push("localização na mesma região");
+  if (breakdown.location === 5) {
+    reasons.push("proximidade de ecossistema local");
   }
 
-  if (reasons.length === 0) return "Potencial de parceria validado por múltiplos fatores do algoritmo";
+  if (reasons.length === 0) return "Potencial de parceria validado por múltiplos fatores de sinergia";
 
-  // Monta frase final diferenciada por força do match
-  const total = (breakdown.segment || 0) + (breakdown.maturity || 0) + (breakdown.readiness || 0) + (breakdown.needs || 0) + (breakdown.location || 0);
-  
+  const total =
+    (breakdown.segment || 0) +
+    (breakdown.maturity || 0) +
+    (breakdown.readiness || 0) +
+    (breakdown.semanticScore || 0) +
+    (breakdown.needs || 0) +
+    (breakdown.location || 0);
+
   if (total >= 75) {
-    return `Compatibilidade alta: ${reasons.join(", ")}`;
+    return `Compatibilidade excelente: ${reasons.slice(0, 3).join(", ")}.`;
   } else if (total >= 55) {
-    return `Match sólido por ${reasons.join(" + ")}`;
+    return `Match sólido por ${reasons.slice(0, 3).join(" + ")}.`;
   } else {
-    return `Potencial identificado: ${reasons.join(", ")}`;
+    return `Sinergia identificada: ${reasons.slice(0, 2).join(" e ")}.`;
   }
 }
 

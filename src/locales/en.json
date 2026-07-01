@@ -73,6 +73,7 @@
     "maturity": "Maturity (TRL)",
     "readiness": "Readiness (VDR/IRL)",
     "needs": "Needs",
+    "semantic": "Technology DNA",
     "pts": "pts",
     "interested": "I'm interested",
     "save": "Save",

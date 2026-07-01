@@ -5,13 +5,16 @@ import { useAuth } from "../../hooks/useAuth";
 import { createProject } from "../../services/projectService";
 import { 
   Loader2, ArrowRight, ArrowLeft, CheckCircle2, 
-  ShieldCheck, HelpCircle, Info, Video, MapPin, Zap, Rocket, Search, MessageSquare
+  ShieldCheck, HelpCircle, Info, Video, MapPin, Zap, Rocket, Search, MessageSquare,
+  UploadCloud, FileText
 } from "lucide-react";
 import { TRLCalculator } from "../../components/TRLCalculator";
 import { AssetSelector } from "../../components/legal/AssetSelector";
 import { searchPatentsInpi } from "../../services/inpiService";
 import type { INPIPatent } from "../../services/inpiService";
 import { maskCpfCnpj, maskPhone } from "../../lib/validators";
+import { DropZone } from "../../components/project/DropZone";
+import { ProcessingLoader } from "../../components/project/ProcessingLoader";
 
 const FIESC_CHAMBERS = [
   "Agroindústria",
@@ -42,6 +45,8 @@ type Step =
   | 'MATURITY'
   | 'SUMMARY_METHOD' 
   | 'SUMMARY_CONTENT' 
+  | 'SUMMARY_UPLOAD' 
+  | 'SUMMARY_PROCESSING' 
   | 'CADASTRO' 
   | 'REVIEW'
   | 'LINK_ASSETS'
@@ -257,6 +262,108 @@ export function CreateProjectInventor() {
     }
   });
 
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isProcessingFile, setIsProcessingFile] = useState(false);
+  const [extractedTwinData, setExtractedTwinData] = useState<any | null>(null);
+  const [hasLoaderFinished, setHasLoaderFinished] = useState(false);
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const result = reader.result as string;
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const handleAnalyzeFile = async (fileToProcess: File) => {
+    setIsProcessingFile(true);
+    setError(null);
+    setExtractedTwinData(null);
+    setHasLoaderFinished(false);
+    try {
+      const base64 = await fileToBase64(fileToProcess);
+      
+      const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const functionUrl = isLocal
+        ? 'http://127.0.0.1:5001/orizon-match/southamerica-east1/analyzeTechnologyAsset'
+        : 'https://southamerica-east1-orizon-match.cloudfunctions.net/analyzeTechnologyAsset';
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: {
+            fileBase64: base64,
+            fileName: fileToProcess.name,
+            mimeType: fileToProcess.type,
+            segment: formData.segment
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errJson = await response.json().catch(() => ({}));
+        throw new Error(errJson.error?.message || "Erro na análise do arquivo pelo Gemini.");
+      }
+
+      const resJson = await response.json();
+      const extracted = resJson.data || resJson;
+      setExtractedTwinData(extracted);
+    } catch (err: any) {
+      console.error("Erro no processamento do ativo tecnológico:", err);
+      setError(err.message || "Erro ao analisar o arquivo. Tente novamente.");
+      setStep('SUMMARY_UPLOAD');
+      setIsProcessingFile(false);
+    }
+  };
+
+  useEffect(() => {
+    if (step === 'SUMMARY_PROCESSING' && selectedFile && !isProcessingFile && !extractedTwinData) {
+      handleAnalyzeFile(selectedFile);
+    }
+  }, [step, selectedFile]);
+
+  useEffect(() => {
+    if (hasLoaderFinished && extractedTwinData) {
+      setFormData(prev => ({
+        ...prev,
+        title: extractedTwinData.title || "Tecnologia Extraída por IA",
+        summary: extractedTwinData.summary || "",
+        trl: extractedTwinData.technologyDNA?.trl || prev.trl,
+        irl: extractedTwinData.readinessScores?.commercial ? Math.round(extractedTwinData.readinessScores.commercial / 10) : prev.irl,
+        ...{
+          role: 'idea',
+          technologyDNA: extractedTwinData.technologyDNA,
+          readinessScores: extractedTwinData.readinessScores,
+          technologyProtection: extractedTwinData.technologyProtection,
+          team: extractedTwinData.team,
+          commercializationStrategy: extractedTwinData.commercializationStrategy,
+          confidentiality: extractedTwinData.confidentiality,
+          vdrAssets: (extractedTwinData.vdrAssets || []).map((asset: any) => ({
+            ...asset,
+            url: "#",
+            uploadedAt: Date.now()
+          }))
+        }
+      }));
+      nextStep('REVIEW');
+      // Reset states
+      setExtractedTwinData(null);
+      setHasLoaderFinished(false);
+      setSelectedFile(null);
+      setIsProcessingFile(false);
+    }
+  }, [hasLoaderFinished, extractedTwinData]);
+
+  const handleLoaderComplete = () => {
+    setHasLoaderFinished(true);
+  };
+
   const nextStep = (next: Step) => setStep(next);
   const prevStep = (prev: Step) => setStep(prev);
 
@@ -329,6 +436,11 @@ export function CreateProjectInventor() {
           partnershipModel: formData.partnershipModel,
         }),
         linkedAssets: formData.linkedAssets,
+        technologyDNA: (formData as any).technologyDNA || null,
+        readinessScores: (formData as any).readinessScores || null,
+        technologyProtection: (formData as any).technologyProtection || null,
+        team: (formData as any).team || null,
+        vdrAssets: (formData as any).vdrAssets || null,
       } as any);
 
       navigate(`/matches?project=${projectId}`);
@@ -341,7 +453,10 @@ export function CreateProjectInventor() {
   };
 
   const renderProgressBar = () => {
-    let steps: Step[] = ['SEGMENT', 'PROTECTION', 'LINK_ASSETS', 'RESEARCH', 'INNOVATION_TYPE', 'LOCATION', 'MATURITY', 'SUMMARY_METHOD', 'SUMMARY_CONTENT', 'REVIEW'];
+    const summarySteps: Step[] = formData.summaryMethod === 'document'
+      ? ['SUMMARY_UPLOAD', 'SUMMARY_PROCESSING']
+      : ['SUMMARY_CONTENT'];
+    let steps: Step[] = ['SEGMENT', 'PROTECTION', 'LINK_ASSETS', 'RESEARCH', 'INNOVATION_TYPE', 'LOCATION', 'MATURITY', 'SUMMARY_METHOD', ...summarySteps, 'REVIEW'];
     
     const currentIndex = steps.indexOf(step);
     return (
@@ -752,17 +867,17 @@ export function CreateProjectInventor() {
               <p className="text-slate-400">Escolha a forma que mais te agrada para apresentar o projeto.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button
                 onClick={() => { updateField('summaryMethod', 'questions'); nextStep('SUMMARY_CONTENT'); }}
                 className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
               >
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover/card:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
                   <HelpCircle size={28} />
                 </div>
-                <div className="text-left">
+                <div className="text-center md:text-left">
                   <h3 className="font-bold text-white">Perguntas Guiadas</h3>
-                  <p className="text-sm text-slate-500 mt-2">Nós te ajudamos a construir o resumo através de pequenas perguntas.</p>
+                  <p className="text-xs text-slate-500 mt-2">Nós te ajudamos a construir o resumo através de perguntas.</p>
                 </div>
               </button>
 
@@ -770,12 +885,25 @@ export function CreateProjectInventor() {
                 onClick={() => { updateField('summaryMethod', 'text'); nextStep('SUMMARY_CONTENT'); }}
                 className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
               >
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover/card:scale-110 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
                   <MessageSquare size={28} />
                 </div>
-                <div className="text-left">
+                <div className="text-center md:text-left">
                   <h3 className="font-bold text-white">Texto Livre</h3>
-                  <p className="text-sm text-slate-500 mt-2">Você escreve o resumo da sua ideia em um único campo de texto.</p>
+                  <p className="text-xs text-slate-500 mt-2">Você escreve o resumo da sua ideia em um campo de texto único.</p>
+                </div>
+              </button>
+
+              <button
+                onClick={() => { updateField('summaryMethod', 'document'); nextStep('SUMMARY_UPLOAD'); }}
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+              >
+                <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
+                  <UploadCloud size={28} />
+                </div>
+                <div className="text-center md:text-left">
+                  <h3 className="font-bold text-white">Upload de Patente (IA)</h3>
+                  <p className="text-xs text-slate-500 mt-2">Envie um arquivo PDF/DOCX e deixe nossa IA ler e extrair tudo.</p>
                 </div>
               </button>
             </div>
@@ -784,6 +912,24 @@ export function CreateProjectInventor() {
               <button onClick={() => prevStep('INNOVATION_TYPE')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>
             </div>
           </div>
+        )}
+
+        {/* STEP: SUMMARY_UPLOAD */}
+        {step === 'SUMMARY_UPLOAD' && (
+          <DropZone 
+            onFileAccepted={(file) => {
+              setSelectedFile(file);
+              nextStep('SUMMARY_PROCESSING');
+            }}
+            onBack={() => prevStep('SUMMARY_METHOD')}
+          />
+        )}
+
+        {/* STEP: SUMMARY_PROCESSING */}
+        {step === 'SUMMARY_PROCESSING' && (
+          <ProcessingLoader 
+            onComplete={handleLoaderComplete}
+          />
         )}
 
         {/* STEP: SUMMARY_CONTENT */}
@@ -966,55 +1112,218 @@ export function CreateProjectInventor() {
         {/* STEP: REVIEW */}
         {step === 'REVIEW' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-right-4">
-            <div className="text-center">
-              <CheckCircle2 className="mx-auto text-emerald-400 mb-4" size={56} />
-              <h2 className="text-3xl font-bold text-white mb-2">Tudo Pronto!</h2>
-              <p className="text-slate-400 max-w-md mx-auto">
-                Seu projeto está pronto para ser processado pelo nosso algoritmo de matchmaking.
-              </p>
-            </div>
+            {formData.summaryMethod === 'document' && (formData as any).technologyDNA ? (
+              // Beautiful Digital Twin Preview
+              <div className="space-y-8 text-left">
+                <div className="text-center space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
+                    <Zap size={12} className="animate-pulse" /> Gêmeo Digital de Ativo
+                  </div>
+                  <h2 className="text-2xl font-black text-white">{(formData as any).title}</h2>
+                  <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider">Câmara FIESC: {formData.segment}</p>
+                </div>
 
-            <div className="grid gap-4 p-6 rounded-2xl bg-slate-950/50 border border-slate-800 text-sm">
-              <div className="flex justify-between border-b border-slate-800 pb-2">
-                <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Perfil</span>
-                <span className="text-slate-200 font-bold uppercase">{formData.role === 'idea' ? 'Inventor' : formData.role}</span>
+                {/* Overall Score Banner */}
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900/90 to-indigo-950/20 border border-indigo-500/10 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px]" />
+                  <div className="relative flex items-center justify-center w-20 h-20 shrink-0">
+                    <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur animate-pulse" />
+                    <div className="absolute w-18 h-18 border-2 border-indigo-500/20 rounded-full" />
+                    <span className="text-2xl font-black text-white">{(formData as any).readinessScores.overall}%</span>
+                  </div>
+                  <div className="text-center md:text-left space-y-1">
+                    <h4 className="text-white font-bold text-base">Transfer Readiness Score</h4>
+                    <p className="text-xs text-slate-400">
+                      Pontuação geral ponderada para a indústria de <strong className="text-indigo-300">{(formData as any).technologyDNA.industry.join(", ")}</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Executive Summary */}
+                <div className="space-y-2">
+                  <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Sumário Executivo (IA)</h4>
+                  <p className="p-5 rounded-2xl bg-slate-950/50 border border-slate-900 text-sm text-slate-300 leading-relaxed text-justify">
+                    {(formData as any).summary}
+                  </p>
+                </div>
+
+                {/* Scores Radar / Grid */}
+                <div className="space-y-3">
+                  <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Mapeamento de Readiness (Maturidade)</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { label: "Maturidade Técnica (TRL)", score: (formData as any).readinessScores.technology, desc: "Protótipo operacional validado (TRL 7)" },
+                      { label: "Maturidade Comercial (IRL)", score: (formData as any).readinessScores.commercial, desc: "Parceiro piloto pré-identificado" },
+                      { label: "Status de Proteção Legal", score: (formData as any).readinessScores.legal, desc: "Patente concedida no INPI" },
+                      { label: "Maturidade de Mercado", score: (formData as any).readinessScores.market, desc: "Endereçamento B2B de alta demanda" },
+                      { label: "Prontidão de Transferência (TTR)", score: (formData as any).readinessScores.transfer, desc: "NIT e inventores aptos a transferir" },
+                      { label: "Moats Regulatórios", score: (formData as any).readinessScores.regulatory, desc: "Dispositivo em conformidade regulatória (ANVISA)" }
+                    ].map((item) => (
+                      <div key={item.label} className="p-4 rounded-2xl bg-slate-950/30 border border-slate-900 space-y-2">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-slate-300 font-bold">{item.label}</span>
+                          <span className="text-indigo-400 font-extrabold">{item.score}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${item.score}%` }} />
+                        </div>
+                        <p className="text-[10px] text-slate-500">{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Technology DNA (Keywords, Competencies, Risks) */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                  <div className="space-y-3 text-left">
+                    <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Technology DNA</h4>
+                    <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-900 space-y-4">
+                      <div>
+                        <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Palavras-chave</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {(formData as any).technologyDNA.keywords.map((kw: string) => (
+                            <span key={kw} className="px-2.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-300 font-semibold">{kw}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Competências Críticas</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {(formData as any).technologyDNA.competencies.map((cp: string) => (
+                            <span key={cp} className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 font-semibold">{cp}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Riscos Monitorados</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {(formData as any).technologyDNA.risks.map((rk: string) => (
+                            <span key={rk} className="px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 font-semibold">{rk}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Technology Protection & Team */}
+                  <div className="space-y-4 text-left">
+                    <div className="space-y-2">
+                      <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Proteção Tecnológica</h4>
+                      <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-900 text-xs space-y-3">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500 font-medium">Situação da PI</span>
+                          <span className="text-white font-bold bg-indigo-600/30 px-2 py-0.5 rounded border border-indigo-500/30 uppercase tracking-wide">{(formData as any).technologyProtection.status === 'granted' ? 'Concedida' : (formData as any).technologyProtection.status}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500 font-medium">Patente (INPI)</span>
+                          <span className="text-slate-300 font-mono">{(formData as any).technologyProtection.registrations[0].number}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-500 font-medium">Registro ANVISA</span>
+                          <span className="text-slate-300 font-mono">{(formData as any).technologyProtection.registrations[1].number}</span>
+                        </div>
+                        <div className="h-px bg-slate-900 my-1" />
+                        <div className="space-y-1">
+                          <span className="text-slate-500 font-medium block">Titularidade</span>
+                          <p className="text-[11px] text-slate-300 font-bold leading-relaxed">
+                            {(formData as any).technologyProtection.owners.join(" / ")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Equipe & Disponibilidade</h4>
+                      <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-900 text-xs space-y-3">
+                        <div>
+                          <p className="text-white font-bold">{(formData as any).team.principalInvestigator}</p>
+                          <p className="text-[10px] text-slate-500">{(formData as any).team.laboratoryName}</p>
+                        </div>
+                        <div className="flex gap-2.5 pt-1">
+                          <a href={(formData as any).team.lattesUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">Lattes</a>
+                          <span className="text-slate-800">|</span>
+                          <a href={(formData as any).team.orcid} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">ORCID</a>
+                          <span className="text-slate-800">|</span>
+                          <a href={(formData as any).team.linkedinUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">LinkedIn</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* VDR Assets */}
+                <div className="space-y-3 text-left">
+                  <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Virtual Data Room (VDR) Organizadora</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {(formData as any).vdrAssets.map((asset: any) => (
+                      <div key={asset.id} className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex items-center gap-4 hover:border-slate-800 transition">
+                        <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+                          <FileText size={20} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-white truncate">{asset.name}</p>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Partição: {asset.category}</p>
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-bold shrink-0">{(asset.sizeBytes / (1024 * 1024)).toFixed(2)} MB</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
-              
-              {formData.role === 'idea' ? (
-                <>
+            ) : (
+              // Original basic review panel
+              <>
+                <div className="text-center">
+                  <CheckCircle2 className="mx-auto text-emerald-400 mb-4" size={56} />
+                  <h2 className="text-3xl font-bold text-white mb-2">Tudo Pronto!</h2>
+                  <p className="text-slate-400 max-w-md mx-auto">
+                    Seu projeto está pronto para ser processado pelo nosso algoritmo de matchmaking.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 p-6 rounded-2xl bg-slate-950/50 border border-slate-800 text-sm">
                   <div className="flex justify-between border-b border-slate-800 pb-2">
-                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Segmento</span>
-                    <span className="text-slate-200 font-bold">{formData.segment}</span>
+                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Perfil</span>
+                    <span className="text-slate-200 font-bold uppercase">{formData.role === 'idea' ? 'Inventor' : formData.role}</span>
                   </div>
-                  <div className="flex justify-between border-b border-slate-800 pb-2">
-                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Proteção</span>
-                    <span className="text-slate-200 font-bold">{formData.isProtected === 'sim' ? 'Protegida' : 'Não Protegida'}</span>
-                  </div>
-                </>
-              ) : formData.role === 'ict' ? (
-                <>
-                  <div className="flex justify-between border-b border-slate-800 pb-2">
-                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Expertise</span>
-                    <span className="text-slate-200 font-bold">{formData.researchLines.length} Linhas</span>
-                  </div>
-                  <div className="flex justify-between border-b border-slate-800 pb-2">
-                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Infraestrutura</span>
-                    <span className="text-slate-200 font-bold">{formData.infrastructure.length} Recursos</span>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex justify-between border-b border-slate-800 pb-2">
-                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Serviços</span>
-                    <span className="text-slate-200 font-bold">{formData.services.length} Categorias</span>
-                  </div>
-                  <div className="flex justify-between border-b border-slate-800 pb-2">
-                    <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Capacidade</span>
-                    <span className="text-slate-200 font-bold uppercase">{formData.productionCapacity}</span>
-                  </div>
-                </>
-              )}
-            </div>
+                  
+                  {formData.role === 'idea' ? (
+                    <>
+                      <div className="flex justify-between border-b border-slate-800 pb-2">
+                        <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Segmento</span>
+                        <span className="text-slate-200 font-bold">{formData.segment}</span>
+                      </div>
+                      <div className="flex justify-between border-b border-slate-800 pb-2">
+                        <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Proteção</span>
+                        <span className="text-slate-200 font-bold">{formData.isProtected === 'sim' ? 'Protegida' : 'Não Protegida'}</span>
+                      </div>
+                    </>
+                  ) : formData.role === 'ict' ? (
+                    <>
+                      <div className="flex justify-between border-b border-slate-800 pb-2">
+                        <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Expertise</span>
+                        <span className="text-slate-200 font-bold">{formData.researchLines.length} Linhas</span>
+                      </div>
+                      <div className="flex justify-between border-b border-slate-800 pb-2">
+                        <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Infraestrutura</span>
+                        <span className="text-slate-200 font-bold">{formData.infrastructure.length} Recursos</span>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between border-b border-slate-800 pb-2">
+                        <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Serviços</span>
+                        <span className="text-slate-200 font-bold">{formData.services.length} Categorias</span>
+                      </div>
+                      <div className="flex justify-between border-b border-slate-800 pb-2">
+                        <span className="text-slate-500 uppercase tracking-widest text-[10px] font-bold">Capacidade</span>
+                        <span className="text-slate-200 font-bold uppercase">{formData.productionCapacity}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
 
             <div className="pt-6 border-t border-slate-800 flex justify-between">
               <button onClick={() => prevStep('SUMMARY_CONTENT')} className="flex items-center gap-2 text-slate-400 hover:text-white transition"><ArrowLeft size={18} /> Voltar</button>

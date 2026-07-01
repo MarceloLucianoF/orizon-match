@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.onDomainEventCreated = exports.adminDeleteUser = exports.adminCreateUser = exports.generateProjectReport = exports.stripeWebhook = exports.createPortalSession = exports.createCheckoutSession = exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
+exports.analyzeTechnologyAsset = exports.onDomainEventCreated = exports.adminDeleteUser = exports.adminCreateUser = exports.generateProjectReport = exports.stripeWebhook = exports.createPortalSession = exports.createCheckoutSession = exports.onLegalInviteCreated = exports.enhancePitch = exports.recordView = exports.onMatchCreated = exports.onProjectCreated = exports.getMatchesPreview = void 0;
 const functions = __importStar(require("firebase-functions/v1"));
 const admin = __importStar(require("firebase-admin"));
 const match_service_1 = require("./services/match.service");
@@ -45,6 +45,8 @@ const analytics_service_1 = require("./services/analytics.service");
 const report_service_1 = require("./services/report.service");
 const openai_1 = __importDefault(require("openai"));
 const stripe_service_1 = require("./services/stripe.service");
+const gemini_service_1 = require("./services/gemini.service");
+const weights_service_1 = require("./services/weights.service");
 if (!admin.apps.length) {
     admin.initializeApp();
 }
@@ -561,6 +563,47 @@ exports.onDomainEventCreated = functions.region("southamerica-east1").firestore
             processedStatus: "error",
             error: err.message || "Unknown error",
             processedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
+    }
+});
+exports.analyzeTechnologyAsset = functions.region("southamerica-east1").https.onRequest(async (req, res) => {
+    // CORS configuration
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        res.status(204).send("");
+        return;
+    }
+    if (req.method !== "POST") {
+        res.status(405).send("Method Not Allowed");
+        return;
+    }
+    try {
+        const { fileBase64, fileName, mimeType, segment } = req.body.data || req.body;
+        if (!fileBase64) {
+            res.status(400).json({ error: { message: "O arquivo em base64 é obrigatório." } });
+            return;
+        }
+        // Call Gemini parsing service
+        const extractedData = await (0, gemini_service_1.analyzeTechnologyDocument)(fileBase64, mimeType || "application/pdf", fileName || "document.pdf");
+        // Dynamic Readiness Score calculation based on FIESC chamber weight system
+        const industryKey = (0, weights_service_1.mapSegmentToIndustryKey)(segment || extractedData.technologyDNA.industry[0]);
+        const overallScore = (0, weights_service_1.calculateOverallReadiness)(extractedData.readinessScores, industryKey);
+        // Override overall score with computed weighted result
+        extractedData.readinessScores.overall = overallScore;
+        if (extractedData.technologyDNA) {
+            extractedData.technologyDNA.trl = extractedData.technologyDNA.trl || Math.round(extractedData.readinessScores.technology / 10);
+        }
+        res.status(200).json({ data: extractedData });
+    }
+    catch (error) {
+        console.error("Erro na função analyzeTechnologyAsset:", error);
+        res.status(500).json({
+            error: {
+                message: error.message || "Falha ao analisar o documento de tecnologia.",
+                status: "INTERNAL"
+            }
         });
     }
 });

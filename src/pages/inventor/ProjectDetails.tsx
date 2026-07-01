@@ -345,99 +345,276 @@ export function ProjectDetails() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 space-y-6 shadow-sm backdrop-blur-sm">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <FileText className="text-indigo-400" size={20} />
-              Resumo do Projeto
-            </h3>
-            <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
-              {project.summary}
-            </p>
-          </div>
-
-          {/* Garantia Jurídica / IP Section */}
-          <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900/40 border border-indigo-500/20 hover:border-indigo-500/30 rounded-3xl p-8 space-y-6 relative overflow-hidden group shadow-lg transition-all duration-300 backdrop-blur-sm">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-1000" />
-            
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <Gavel className="text-indigo-400" size={20} />
-                  Garantia Jurídica (IP Check)
-                </h3>
-                <p className="text-xs text-slate-500 uppercase tracking-widest font-black">Ativos de Propriedade Intelectual Vinculados</p>
-              </div>
-              
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
-                <ShieldCheck size={14} className="text-indigo-400" />
-                <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Auditado via INPI</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
-              {linkedAssets.length > 0 ? (
-                linkedAssets.map(asset => (
-                  <div key={asset.id} className="bg-slate-950/50 border border-slate-850 rounded-2xl p-5 flex items-center gap-4 hover:border-indigo-500/25 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] transition-all duration-300 backdrop-blur-sm">
-                    <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-850">
-                      {asset.type === 'patent' ? <Briefcase className="text-amber-400" size={18} /> :
-                       asset.type === 'software' ? <Code className="text-emerald-400" size={18} /> :
-                       <ShieldCheck className="text-indigo-400" size={18} />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-xs font-bold text-slate-200 truncate">{asset.title}</h4>
-                      <p className="text-[9px] text-slate-500 font-mono mt-1">{asset.inpiNumber || 'Nº Pendente'}</p>
-                    </div>
-                    <span className="text-[8px] font-black uppercase bg-slate-900 px-2 py-1 rounded text-slate-500 border border-slate-800">
-                      {asset.status}
-                    </span>
+          {project.technologyDNA ? (
+            // Custom Digital Twin Details
+            <div className="space-y-8 text-left">
+              {/* Overall Score Banner */}
+              {project.readinessScores && (
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900/90 to-indigo-950/20 border border-indigo-500/10 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px]" />
+                  <div className="relative flex items-center justify-center w-20 h-20 shrink-0">
+                    <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur animate-pulse" />
+                    <div className="absolute w-18 h-18 border-2 border-indigo-500/20 rounded-full" />
+                    <span className="text-2xl font-black text-white">{project.readinessScores.overall}%</span>
                   </div>
-                ))
-              ) : (
-                <div className="col-span-full py-6 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl">
-                   <p className="text-xs text-slate-600 italic">Nenhum ativo formal vinculado ainda.</p>
+                  <div className="text-center md:text-left space-y-1">
+                    <h4 className="text-white font-bold text-base">Transfer Readiness Score</h4>
+                    <p className="text-xs text-slate-400">
+                      Pontuação geral ponderada para a indústria de <strong className="text-indigo-300">{project.technologyDNA.industry?.join(", ") || project.segment}</strong>.
+                    </p>
+                  </div>
                 </div>
               )}
+
+              {/* Executive Summary */}
+              <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 space-y-4 shadow-sm backdrop-blur-sm">
+                <h3 className="text-sm uppercase text-slate-500 tracking-wider font-bold flex items-center gap-2">
+                  <FileText className="text-indigo-400" size={16} /> Sumário Executivo (IA)
+                </h3>
+                <p className="text-sm text-slate-350 leading-relaxed text-justify whitespace-pre-wrap">
+                  {project.summary}
+                </p>
+              </div>
+
+              {/* Scores Grid */}
+              {project.readinessScores && (
+                <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 space-y-4 shadow-sm backdrop-blur-sm">
+                  <h3 className="text-sm uppercase text-slate-500 tracking-wider font-bold">Mapeamento de Readiness (Maturidade)</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                      { label: "Maturidade Técnica (TRL)", score: project.readinessScores.technology, desc: `Nível de prontidão técnica (TRL ${project.technologyDNA.trl || 1})` },
+                      { label: "Maturidade Comercial (IRL)", score: project.readinessScores.commercial, desc: "Status de validação comercial" },
+                      { label: "Status de Proteção Legal", score: project.readinessScores.legal, desc: "Proteção de Propriedade Intelectual" },
+                      { label: "Maturidade de Mercado", score: project.readinessScores.market, desc: "Atratividade e tração de mercado" },
+                      { label: "Prontidão de Transferência (TTR)", score: project.readinessScores.transfer, desc: "NIT e inventores aptos a transferir" },
+                      { label: "Moats Regulatórios", score: project.readinessScores.regulatory, desc: "Enquadramento regulatório" }
+                    ].map((item) => (
+                      <div key={item.label} className="p-4 rounded-2xl bg-slate-950/30 border border-slate-900/60 space-y-2">
+                        <div className="flex justify-between items-center text-xs">
+                          <span className="text-slate-300 font-bold">{item.label}</span>
+                          <span className="text-indigo-400 font-extrabold">{item.score}%</span>
+                        </div>
+                        <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
+                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${item.score}%` }} />
+                        </div>
+                        <p className="text-[10px] text-slate-500">{item.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Technology DNA (Keywords, Competencies, Risks) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Technology DNA</h4>
+                  <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 space-y-5 backdrop-blur-sm text-left">
+                    {project.technologyDNA.keywords && (
+                      <div>
+                        <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Palavras-chave</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {project.technologyDNA.keywords.map((kw: string) => (
+                            <span key={kw} className="px-2.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-300 font-semibold">{kw}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {project.technologyDNA.competencies && (
+                      <div>
+                        <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Competências Críticas</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {project.technologyDNA.competencies.map((cp: string) => (
+                            <span key={cp} className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] text-emerald-300 font-semibold">{cp}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {project.technologyDNA.risks && (
+                      <div>
+                        <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Riscos Monitorados</span>
+                        <div className="flex flex-wrap gap-1.5 mt-1.5">
+                          {project.technologyDNA.risks.map((rk: string) => (
+                            <span key={rk} className="px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 font-semibold">{rk}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Technology Protection & Team */}
+                <div className="space-y-6">
+                  {project.technologyProtection && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Proteção Tecnológica</h4>
+                      <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 text-xs space-y-3 backdrop-blur-sm">
+                        <div className="flex justify-between">
+                          <span className="text-slate-500 font-medium">Situação da PI</span>
+                          <span className="text-white font-bold bg-indigo-600/30 px-2 py-0.5 rounded border border-indigo-500/30 uppercase tracking-wide">{project.technologyProtection.status === 'granted' ? 'Concedida' : project.technologyProtection.status}</span>
+                        </div>
+                        {project.technologyProtection.registrations?.map((reg: any, idx: number) => (
+                          <div key={idx} className="flex justify-between">
+                            <span className="text-slate-500 font-medium">Registro ({reg.agency})</span>
+                            <span className="text-slate-350 font-mono">{reg.number}</span>
+                          </div>
+                        ))}
+                        <div className="h-px bg-slate-800/50 my-1" />
+                        <div className="space-y-1">
+                          <span className="text-slate-500 font-medium block">Titularidade</span>
+                          <p className="text-[11px] text-slate-300 font-bold leading-relaxed">
+                            {project.technologyProtection.owners?.join(" / ")}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {project.team && (
+                    <div className="space-y-2">
+                      <h4 className="text-xs uppercase text-slate-500 tracking-wider font-bold">Equipe & Disponibilidade</h4>
+                      <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 text-xs space-y-3 backdrop-blur-sm">
+                        <div>
+                          <p className="text-white font-bold">{project.team.principalInvestigator}</p>
+                          <p className="text-[10px] text-slate-500">{project.team.laboratoryName}</p>
+                        </div>
+                        <div className="flex gap-2.5 pt-1">
+                          {project.team.lattesUrl && <a href={project.team.lattesUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">Lattes</a>}
+                          {project.team.lattesUrl && project.team.orcid && <span className="text-slate-800">|</span>}
+                          {project.team.orcid && <a href={project.team.orcid} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">ORCID</a>}
+                          {project.team.orcid && project.team.linkedinUrl && <span className="text-slate-800">|</span>}
+                          {project.team.linkedinUrl && <a href={project.team.linkedinUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">LinkedIn</a>}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* VDR Virtual Data Room */}
+              <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 shadow-sm backdrop-blur-sm">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <Shield className="text-emerald-400" size={20} />
+                  Virtual Data Room (VDR)
+                </h3>
+                
+                {project.vdrAssets && project.vdrAssets.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
+                    {project.vdrAssets.map((asset: any) => (
+                      <div key={asset.id} className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex items-center gap-4 hover:border-slate-800 transition">
+                        <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+                          <FileText size={20} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-white truncate">{asset.name}</p>
+                          <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold">Partição: {asset.category}</p>
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-bold shrink-0">{asset.sizeBytes ? (asset.sizeBytes / (1024 * 1024)).toFixed(2) + " MB" : ""}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <VDRRoom inpiStatus={project.inpiStatus} />
+                )}
+              </div>
             </div>
+          ) : (
+            // Original basic layout
+            <>
+              <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 space-y-6 shadow-sm backdrop-blur-sm">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <FileText className="text-indigo-400" size={20} />
+                  Resumo do Projeto
+                </h3>
+                <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
+                  {project.summary}
+                </p>
+              </div>
 
-            <div className="pt-4 border-t border-slate-800/50 flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
-               <div className="flex items-center gap-2 text-[10px] text-slate-500">
-                 <Lock size={12} className="text-slate-600" /> Documentos sensíveis protegidos por criptografia
-               </div>
-               
-               {hasSignedNDA ? (
-                 <div className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-[10px] font-black uppercase tracking-widest">
-                   <ShieldCheck size={14} /> NDA Assinado • VDR Liberado
-                 </div>
-               ) : (
-                 <button 
-                  onClick={() => setShowNDAModal(true)}
-                  className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all group/btn"
-                 >
-                   Assinar NDA e Acessar VDR
-                   <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-all" />
-                 </button>
-               )}
-            </div>
-          </div>
+              {/* Garantia Jurídica / IP Section */}
+              <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900/40 border border-indigo-500/20 hover:border-indigo-500/30 rounded-3xl p-8 space-y-6 relative overflow-hidden group shadow-lg transition-all duration-300 backdrop-blur-sm">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-1000" />
+                
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <Gavel className="text-indigo-400" size={20} />
+                      Garantia Jurídica (IP Check)
+                    </h3>
+                    <p className="text-xs text-slate-500 uppercase tracking-widest font-black">Ativos de Propriedade Intelectual Vinculados</p>
+                  </div>
+                  
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
+                    <ShieldCheck size={14} className="text-indigo-400" />
+                    <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Auditado via INPI</span>
+                  </div>
+                </div>
 
-          <SmartNDAModal 
-            isOpen={showNDAModal}
-            onClose={() => setShowNDAModal(false)}
-            onSigned={() => {
-              setHasSignedNDA(true);
-              setShowNDAModal(false);
-            }}
-            project={project}
-            linkedAssets={linkedAssets}
-          />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                  {linkedAssets.length > 0 ? (
+                    linkedAssets.map(asset => (
+                      <div key={asset.id} className="bg-slate-950/50 border border-slate-850 rounded-2xl p-5 flex items-center gap-4 hover:border-indigo-500/25 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] transition-all duration-300 backdrop-blur-sm">
+                        <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-850">
+                          {asset.type === 'patent' ? <Briefcase className="text-amber-400" size={18} /> :
+                           asset.type === 'software' ? <Code className="text-emerald-400" size={18} /> :
+                           <ShieldCheck className="text-indigo-400" size={18} />}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-xs font-bold text-slate-200 truncate">{asset.title}</h4>
+                          <p className="text-[9px] text-slate-500 font-mono mt-1">{asset.inpiNumber || 'Nº Pendente'}</p>
+                        </div>
+                        <span className="text-[8px] font-black uppercase bg-slate-900 px-2 py-1 rounded text-slate-500 border border-slate-800">
+                          {asset.status}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="col-span-full py-6 text-center bg-slate-950/40 border border-dashed border-slate-800 rounded-2xl">
+                       <p className="text-xs text-slate-600 italic">Nenhum ativo formal vinculado ainda.</p>
+                    </div>
+                  )}
+                </div>
 
-          <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 shadow-sm backdrop-blur-sm">
-            <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-              <Shield className="text-emerald-400" size={20} />
-              Virtual Data Room (VDR)
-            </h3>
-            <VDRRoom inpiStatus={project.inpiStatus} />
-          </div>
+                <div className="pt-4 border-t border-slate-800/50 flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+                   <div className="flex items-center gap-2 text-[10px] text-slate-500">
+                     <Lock size={12} className="text-slate-600" /> Documentos sensíveis protegidos por criptografia
+                   </div>
+                   
+                   {hasSignedNDA ? (
+                     <div className="flex items-center gap-2 px-6 py-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-[10px] font-black uppercase tracking-widest">
+                       <ShieldCheck size={14} /> NDA Assinado • VDR Liberado
+                     </div>
+                   ) : (
+                     <button 
+                      onClick={() => setShowNDAModal(true)}
+                      className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all group/btn"
+                     >
+                       Assinar NDA e Acessar VDR
+                       <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-all" />
+                     </button>
+                   )}
+                </div>
+              </div>
+
+              <SmartNDAModal 
+                isOpen={showNDAModal}
+                onClose={() => setShowNDAModal(false)}
+                onSigned={() => {
+                  setHasSignedNDA(true);
+                  setShowNDAModal(false);
+                }}
+                project={project}
+                linkedAssets={linkedAssets}
+              />
+
+              <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 shadow-sm backdrop-blur-sm">
+                <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                  <Shield className="text-emerald-400" size={20} />
+                  Virtual Data Room (VDR)
+                </h3>
+                <VDRRoom inpiStatus={project.inpiStatus} />
+              </div>
+            </>
+          )}
 
           {/* AI INTELLIGENCE REPORT SECTION */}
           {aiReport && (
