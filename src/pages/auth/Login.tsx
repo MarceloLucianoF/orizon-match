@@ -100,7 +100,7 @@ export function Login() {
               setError("Erro ao entrar com Google. Tente novamente.");
             }
           }}
-          className="w-full bg-slate-950/45 hover:bg-slate-900 text-slate-350 hover:text-white rounded-xl py-3 font-semibold transition-all border border-slate-800 hover:border-slate-750 flex items-center justify-center gap-3 text-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
+          className="w-full bg-slate-950/45 hover:bg-slate-900 text-slate-350 hover:text-white rounded-xl py-3 font-semibold transition-all border border-slate-800 hover:border-slate-700 flex items-center justify-center gap-3 text-sm hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
         >
           <svg viewBox="0 0 24 24" width="16" height="16">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />

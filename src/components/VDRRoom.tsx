@@ -668,7 +668,7 @@ export function VDRRoom({
                         </button>
                         <button 
                           onClick={() => handleDownloadFile(file)}
-                          className="p-2 text-slate-405 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all duration-205 active:scale-90 border border-transparent hover:border-indigo-500/20" 
+                          className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all duration-205 active:scale-90 border border-transparent hover:border-indigo-500/20" 
                           title="Baixar"
                         >
                           <Download size={18} />

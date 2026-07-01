@@ -161,7 +161,7 @@ export function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className={surfaceClass}>
+        <div className={`${surfaceClass} p-6 md:p-8 space-y-6`}>
           <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-6">
             <PieChart className="text-indigo-400" size={20} /> {t("dashboard.admin.trlDistribution")}
           </h2>
@@ -192,7 +192,7 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        <div className={surfaceClass + " flex flex-col justify-center items-center text-center"}>
+        <div className={`${surfaceClass} p-6 md:p-8 flex flex-col justify-center items-center text-center`}>
           <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-4">
             <BarChart3 className="text-amber-400" size={20} /> {t("dashboard.admin.ecosystemHealth")}
           </h2>
@@ -300,7 +300,7 @@ export function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-[#0A0514] border border-slate-800 rounded-3xl p-6 shadow-xl">
+        <div className={`lg:col-span-2 ${surfaceClass} p-6 md:p-8`}>
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest">{t("dashboard.admin.ecosystemGrowth")}</h3>
             <div className="flex items-center gap-2 text-[10px] font-bold text-emerald-400 bg-emerald-400/10 px-2 py-1 rounded-full border border-emerald-400/20">
@@ -325,36 +325,40 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        <div className={surfaceClass + " flex flex-col"}>
-          <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">{t("dashboard.admin.regionalActivity")}</h3>
-          <div className="flex-1 flex flex-col justify-center space-y-4">
-             {[
-               { region: 'Santa Rita do Sapucaí / Vale da Eletrônica', activity: 95, color: 'bg-indigo-500' },
-               { region: 'Belo Horizonte / Região Metropolitana', activity: 88, color: 'bg-emerald-500' },
-               { region: 'Uberlândia / Triângulo Mineiro', activity: 64, color: 'bg-amber-500' },
-               { region: 'Juiz de Fora / Zona da Mata', activity: 48, color: 'bg-cyan-500' },
-             ].map((reg, idx) => (
-               <div key={idx} className="space-y-1">
-                 <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
-                   <span>{reg.region}</span>
-                   <span>{reg.activity}%</span>
+        <div className={`${surfaceClass} p-6 md:p-8 flex flex-col justify-between space-y-6`}>
+          <div>
+            <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">{t("dashboard.admin.regionalActivity")}</h3>
+            <div className="space-y-4">
+               {[
+                 { region: 'Santa Rita do Sapucaí / Vale da Eletrônica', activity: 95, color: 'bg-indigo-500' },
+                 { region: 'Belo Horizonte / Região Metropolitana', activity: 88, color: 'bg-emerald-500' },
+                 { region: 'Uberlândia / Triângulo Mineiro', activity: 64, color: 'bg-amber-500' },
+                 { region: 'Juiz de Fora / Zona da Mata', activity: 48, color: 'bg-cyan-500' },
+               ].map((reg, idx) => (
+                 <div key={idx} className="space-y-1">
+                   <div className="flex justify-between text-[10px] font-bold text-slate-400 uppercase">
+                     <span>{reg.region}</span>
+                     <span>{reg.activity}%</span>
+                   </div>
+                   <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800">
+                      <div className={`${reg.color} h-full rounded-full transition-all duration-1000`} style={{ width: `${reg.activity}%` }} />
+                   </div>
                  </div>
-                 <div className="w-full bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-800">
-                    <div className={`${reg.color} h-full rounded-full transition-all duration-1000`} style={{ width: `${reg.activity}%` }} />
-                 </div>
-               </div>
-             ))}
+               ))}
+            </div>
           </div>
-          <button 
-            onClick={() => alert("Planilha de densidade regional e atividade governamental exportada!")}
-            className="w-full mt-5 py-2.5 bg-slate-950 hover:bg-slate-900 text-slate-400 border border-slate-800 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-1.5"
-          >
-            <Download size={12} /> {t("dashboard.admin.exportRegionalBtn")}
-          </button>
-          <div className="mt-4 pt-4 border-t border-slate-800/80">
-            <p className="text-[10px] text-slate-500 italic flex items-center gap-2">
-              <Globe size={12} /> {t("dashboard.admin.heatmapDesc")}
-            </p>
+          <div>
+            <button 
+              onClick={() => alert("Planilha de densidade regional e atividade governamental exportada!")}
+              className="w-full mt-5 py-2.5 bg-slate-950 hover:bg-slate-900 text-slate-400 border border-slate-800 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+            >
+              <Download size={12} /> {t("dashboard.admin.exportRegionalBtn")}
+            </button>
+            <div className="mt-4 pt-4 border-t border-slate-800/80">
+              <p className="text-[10px] text-slate-500 italic flex items-center gap-2">
+                <Globe size={12} /> {t("dashboard.admin.heatmapDesc")}
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -382,10 +386,10 @@ export function AdminDashboard() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-500 bg-slate-900/80">
-              <th className="p-4 font-medium">{t("dashboard.admin.tableHeaders.nameEmail")}</th>
-              <th className="p-4 font-medium">{t("dashboard.admin.tableHeaders.role")}</th>
-              <th className="p-4 font-medium">{t("dashboard.admin.tableHeaders.badgePlan")}</th>
-              <th className="p-4 font-medium text-right">{t("dashboard.admin.tableHeaders.actions")}</th>
+              <th className="px-6 py-4 font-medium">{t("dashboard.admin.tableHeaders.nameEmail")}</th>
+              <th className="px-6 py-4 font-medium">{t("dashboard.admin.tableHeaders.role")}</th>
+              <th className="px-6 py-4 font-medium">{t("dashboard.admin.tableHeaders.badgePlan")}</th>
+              <th className="px-6 py-4 font-medium text-right">{t("dashboard.admin.tableHeaders.actions")}</th>
             </tr>
           </thead>
           <tbody>
@@ -394,13 +398,13 @@ export function AdminDashboard() {
             ) : (
               users.map(u => (
                 <tr key={u.id} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
-                  <td className="p-4">
+                  <td className="px-6 py-4.5">
                     <div className="flex flex-col">
                       <span className="text-slate-200 font-bold">{u.name || t("dashboard.admin.noName")}</span>
                       <span className="text-[10px] text-slate-500 font-mono mt-1">{u.email}</span>
                     </div>
                   </td>
-                  <td className="p-4">
+                  <td className="px-6 py-4.5">
                     <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${
                       u.role === 'industry' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
                       u.role === 'investor' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
@@ -410,7 +414,7 @@ export function AdminDashboard() {
                       {u.role}
                     </span>
                   </td>
-                  <td className="p-4">
+                  <td className="px-6 py-4.5">
                     <div className="flex flex-col gap-1.5">
                       {u.verified ? (
                          <span className="flex items-center gap-1 text-emerald-400 text-[10px] font-black uppercase"><CheckCircle size={12} /> {t("dashboard.admin.verified")}</span>
@@ -424,18 +428,18 @@ export function AdminDashboard() {
                       </span>
                     </div>
                   </td>
-                  <td className="p-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button onClick={() => handleToggleVerification(u.id, u.verified)} className={`px-2 py-1 rounded text-[10px] font-bold transition-all border ${u.verified ? 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'}`}>
+                  <td className="px-6 py-4.5 text-right">
+                    <div className="flex justify-end gap-2.5">
+                      <button onClick={() => handleToggleVerification(u.id, u.verified)} className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${u.verified ? 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'}`}>
                         {u.verified ? t("dashboard.admin.actions.unverify") : t("dashboard.admin.actions.verify")}
                       </button>
-                      <button onClick={() => handleUpdateSubscription(u.id, u.subscriptionStatus)} className={`px-2 py-1 rounded text-[10px] font-bold transition-all border ${u.subscriptionStatus === 'premium' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20'}`}>
+                      <button onClick={() => handleUpdateSubscription(u.id, u.subscriptionStatus)} className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${u.subscriptionStatus === 'premium' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20'}`}>
                         {u.subscriptionStatus === 'premium' ? t("dashboard.admin.actions.downgrade") : t("dashboard.admin.actions.premium")}
                       </button>
-                      <button onClick={() => { setImpersonatedUid(u.id); navigate('/dashboard'); }} className="px-2 py-1 rounded text-[10px] font-bold transition-all border bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 hover:bg-fuchsia-500/20">
+                      <button onClick={() => { setImpersonatedUid(u.id); navigate('/dashboard'); }} className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 hover:bg-fuchsia-500/20 cursor-pointer">
                         {t("dashboard.admin.actions.simulate")}
                       </button>
-                      <button onClick={() => handleDeleteUser(u.id)} className="px-2 py-1 rounded text-[10px] font-bold transition-all border bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20">
+                      <button onClick={() => handleDeleteUser(u.id)} className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20 cursor-pointer">
                         {t("dashboard.admin.actions.delete")}
                       </button>
                     </div>
@@ -462,9 +466,9 @@ export function AdminDashboard() {
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-500 bg-slate-900/80">
-              <th className="p-4 font-medium">{t("dashboard.admin.dealHeaders.idProject")}</th>
-              <th className="p-4 font-medium">{t("dashboard.admin.dealHeaders.stage")}</th>
-              <th className="p-4 font-medium text-right">{t("dashboard.admin.dealHeaders.lastInteraction")}</th>
+              <th className="px-6 py-4 font-medium">{t("dashboard.admin.dealHeaders.idProject")}</th>
+              <th className="px-6 py-4 font-medium">{t("dashboard.admin.dealHeaders.stage")}</th>
+              <th className="px-6 py-4 font-medium text-right">{t("dashboard.admin.dealHeaders.lastInteraction")}</th>
             </tr>
           </thead>
           <tbody>
@@ -473,13 +477,13 @@ export function AdminDashboard() {
             ) : (
               deals.map(deal => (
                 <tr key={deal.id} className="border-b border-slate-800/50 hover:bg-slate-800/20 transition-colors">
-                  <td className="p-4">
+                  <td className="px-6 py-4.5">
                     <div className="flex flex-col">
                        <span className="text-slate-200 font-bold">{deal.projectName || `Match ${deal.id?.slice(0,6)}`}</span>
                       <span className="text-[10px] text-slate-500 font-mono mt-1">Ref: {deal.id}</span>
                     </div>
                   </td>
-                  <td className="p-4">
+                  <td className="px-6 py-4.5">
                     <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${
                       deal.stage === 'contrato' || deal.stage === 'encerrado' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                       deal.stage === 'negociacao' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
@@ -490,7 +494,7 @@ export function AdminDashboard() {
                       {deal.stage || deal.status}
                     </span>
                   </td>
-                  <td className="p-4 text-right text-xs text-slate-400">
+                  <td className="px-6 py-4.5 text-right text-xs text-slate-400">
                     {deal.updatedAt?.toDate ? deal.updatedAt.toDate().toLocaleString() : t("dashboard.admin.recent")}
                   </td>
                 </tr>
@@ -514,18 +518,18 @@ export function AdminDashboard() {
         <table className="w-full text-left border-collapse text-xs">
           <thead>
             <tr className="border-b border-slate-800 uppercase tracking-wider text-slate-500 bg-slate-900/30">
-              <th className="p-4 font-medium">{t("dashboard.admin.tableHeaders.idStatus")}</th>
-              <th className="p-4 font-medium">{t("dashboard.admin.tableHeaders.resultingPitch")}</th>
-              <th className="p-4 font-medium">{t("dashboard.admin.tableHeaders.dateTime")}</th>
+              <th className="px-6 py-4 font-medium">{t("dashboard.admin.tableHeaders.idStatus")}</th>
+              <th className="px-6 py-4 font-medium">{t("dashboard.admin.tableHeaders.resultingPitch")}</th>
+              <th className="px-6 py-4 font-medium">{t("dashboard.admin.tableHeaders.dateTime")}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/50">
             {logs.length === 0 ? (
-              <tr><td colSpan={3} className="p-8 text-center text-slate-600 italic">{t("dashboard.admin.noLogs")}</td></tr>
+              <tr><td colSpan={3} className="p-8 text-center text-slate-650 italic">{t("dashboard.admin.noLogs")}</td></tr>
             ) : (
               logs.map(log => (
                 <tr key={log.id} className="hover:bg-slate-800/20 transition-colors">
-                  <td className="p-4">
+                  <td className="px-6 py-4.5">
                     <div className="flex flex-col gap-1">
                       <span className="font-mono text-slate-500">{log.id.slice(0, 8)}</span>
                       <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded w-fit ${log.status === 'success' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
@@ -533,10 +537,10 @@ export function AdminDashboard() {
                       </span>
                     </div>
                   </td>
-                  <td className="p-4 max-w-md">
+                  <td className="px-6 py-4.5 max-w-md">
                     <p className="text-slate-300 line-clamp-2 italic">"{log.output?.summary || 'N/A'}"</p>
                   </td>
-                  <td className="p-4 text-slate-500">
+                  <td className="px-6 py-4.5 text-slate-400">
                     {log.timestamp?.seconds ? new Date(log.timestamp.seconds * 1000).toLocaleString() : t("dashboard.admin.recent")}
                   </td>
                 </tr>
@@ -703,7 +707,7 @@ export function AdminDashboard() {
             id="simFullFlow"
             checked={simFullFlow}
             onChange={e => setSimFullFlow(e.target.checked)}
-            className="w-5 h-5 text-fuchsia-500 rounded border-slate-750 focus:ring-fuchsia-500 bg-slate-900"
+            className="w-5 h-5 text-fuchsia-500 rounded border-slate-700 focus:ring-fuchsia-500 bg-slate-900"
           />
           <label htmlFor="simFullFlow" className="text-xs font-bold text-slate-300 cursor-pointer select-none">
             Simular Fluxo Completo (Criar Chat & Conversas no CRM)
@@ -778,7 +782,7 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        <div className="bg-[#0A0514] border border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
+        <div className={surfaceClass}>
           {loadingCompliance ? (
             <div className="flex justify-center items-center py-20">
               <Loader2 className="animate-spin text-indigo-500" size={36} />
@@ -792,21 +796,21 @@ export function AdminDashboard() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="border-b border-slate-800 text-slate-400 uppercase tracking-wider bg-slate-900/60">
-                    <th className="p-4 font-bold">{t("dashboard.admin.tableHeaders.dateTime")}</th>
-                    <th className="p-4 font-bold">Ação</th>
-                    <th className="p-4 font-bold">Ator (Usuário)</th>
-                    <th className="p-4 font-bold">Contexto</th>
-                    <th className="p-4 font-bold">Telemetria (IP/Sessão)</th>
-                    <th className="p-4 font-bold">Alterações (Diff)</th>
+                    <th className="px-6 py-4 font-bold">{t("dashboard.admin.tableHeaders.dateTime")}</th>
+                    <th className="px-6 py-4 font-bold">Ação</th>
+                    <th className="px-6 py-4 font-bold">Ator (Usuário)</th>
+                    <th className="px-6 py-4 font-bold">Contexto</th>
+                    <th className="px-6 py-4 font-bold">Telemetria (IP/Sessão)</th>
+                    <th className="px-6 py-4 font-bold">Alterações (Diff)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/40 text-slate-300">
                   {filteredLogs.map(log => (
                     <tr key={log.id} className="hover:bg-slate-800/10 transition-colors">
-                      <td className="p-4 whitespace-nowrap text-slate-400">
+                      <td className="px-6 py-4.5 whitespace-nowrap text-slate-400">
                         {log.timestamp?.seconds ? new Date(log.timestamp.seconds * 1000).toLocaleString() : "Recent"}
                       </td>
-                      <td className="p-4">
+                      <td className="px-6 py-4.5">
                         <span className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider border ${
                           log.action?.includes("toggle") ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
                           log.action?.includes("create") ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
@@ -816,24 +820,24 @@ export function AdminDashboard() {
                           {log.action}
                         </span>
                       </td>
-                      <td className="p-4">
+                      <td className="px-6 py-4.5">
                         <div className="flex flex-col">
                           <span className="font-bold text-slate-200">{log.actorName}</span>
                           <span className="text-[10px] text-slate-500 font-mono mt-0.5">{log.actorEmail}</span>
                           <span className="text-[9px] text-slate-500 mt-1 uppercase font-bold tracking-tight">Role: {log.actorRole}</span>
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="px-6 py-4.5">
                         {log.projectId ? (
                           <div className="flex flex-col">
-                            <span className="font-bold text-slate-200">{log.projectTitle || "Sem Título"}</span>
+                             <span className="font-bold text-slate-200">{log.projectTitle || "Sem Título"}</span>
                             <span className="text-[9px] text-slate-500 font-mono mt-0.5">ID: {log.projectId}</span>
                           </div>
                         ) : (
                           <span className="text-slate-500 italic">Global</span>
                         )}
                       </td>
-                      <td className="p-4">
+                      <td className="px-6 py-4.5">
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-1">
                             <span className="text-slate-400">IP:</span>
@@ -853,7 +857,7 @@ export function AdminDashboard() {
                           )}
                         </div>
                       </td>
-                      <td className="p-4 max-w-sm">
+                      <td className="px-6 py-4.5 max-w-sm">
                         {log.before || log.after ? (
                           <div className="space-y-1.5">
                             {log.before && (
@@ -963,7 +967,7 @@ export function AdminDashboard() {
       </div>
 
       {/* TAB CONTENT */}
-      <div className="pt-2">
+      <div className="pt-6">
         {activeTab === 'overview' && renderOverview()}
         {activeTab === 'users' && renderUsers()}
         {activeTab === 'deals' && renderDeals()}

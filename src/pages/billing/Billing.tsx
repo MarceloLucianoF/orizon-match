@@ -104,7 +104,7 @@ export function Billing() {
           
           <div className="flex-1 flex flex-col justify-center items-center text-center space-y-2">
             <div className="bg-slate-950/60 p-4 rounded-2xl border border-slate-850 mb-2 shadow-inner">
-              <Calendar size={32} className="text-slate-405" />
+              <Calendar size={32} className="text-slate-400" />
             </div>
             <p className="text-2xl font-black text-white">{isPremium ? '10 Jun 2026' : '--'}</p>
             <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">{isPremium ? 'Cobrança Mensal' : 'Sem cobranças ativas'}</p>

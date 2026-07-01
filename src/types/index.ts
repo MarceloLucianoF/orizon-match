@@ -208,3 +208,7 @@ export interface ProfileOption {
   icon: string; // FontAwesome icon name
   color: string; // Tailwind color
 }
+
+export * from "./project";
+export * from "./weights";
+
