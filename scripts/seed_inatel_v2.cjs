@@ -118,7 +118,7 @@ async function clearCollection(collectionPath) {
 }
 
 async function seedV2() {
-  console.log("🚀 Iniciando Orizon Match Seed v3.0 (Merged Portuguese DeepTech Ecosystem & Rich Deal Flow)...");
+  console.log("🚀 Iniciando InovaHelix Match Seed v3.0 (Merged Portuguese DeepTech Ecosystem & Rich Deal Flow)...");
   
   // Clean Firebase Auth
   await cleanAuthUsers();
@@ -130,26 +130,26 @@ async function seedV2() {
 
   // Create Users in Firebase Auth
   console.log("🔑 Criando/atualizando contas no Firebase Auth...");
-  await getOrCreateUser('ict_inatel', 'ict@inatel.br', 'orizon123');
-  await getOrCreateUser('ict_fai_mg', 'ict_fai_mg@orizon.com', 'orizon123');
-  await getOrCreateUser('comp_ericsson', 'empresa@ericsson.com', 'orizon123');
-  await getOrCreateUser('comp_siemens', 'siemens@orizon.com', 'orizon123');
-  await getOrCreateUser('comp_weg', 'weg@orizon.com', 'orizon123');
-  await getOrCreateUser('inv_kaszek', 'kaszek@orizon.com', 'orizon123');
-  await getOrCreateUser('inv_canary', 'canary@orizon.com', 'orizon123');
-  await getOrCreateUser('inventor_rafael', 'inventor@wailab.br', 'orizon123');
-  await getOrCreateUser('inventor_camila', 'pesquisadora@wailab.br', 'orizon123');
+  await getOrCreateUser('ict_inatel', 'ict@inatel.br', 'inovahelix123');
+  await getOrCreateUser('ict_fai_mg', 'ict_fai_mg@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('comp_ericsson', 'empresa@ericsson.com', 'inovahelix123');
+  await getOrCreateUser('comp_siemens', 'siemens@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('comp_weg', 'weg@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('inv_kaszek', 'kaszek@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('inv_canary', 'canary@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('inventor_rafael', 'inventor@wailab.br', 'inovahelix123');
+  await getOrCreateUser('inventor_camila', 'pesquisadora@wailab.br', 'inovahelix123');
   
   // Extra corporations and investors for a realistic show/matching
-  await getOrCreateUser('company_qualcomm', 'qualcomm@orizon.com', 'orizon123');
-  await getOrCreateUser('company_cemig', 'cemig@orizon.com', 'orizon123');
-  await getOrCreateUser('company_nidec', 'nidec@orizon.com', 'orizon123');
-  await getOrCreateUser('company_schneider', 'schneider@orizon.com', 'orizon123');
-  await getOrCreateUser('company_embraer', 'embraer@orizon.com', 'orizon123');
-  await getOrCreateUser('company_vivo', 'vivo@orizon.com', 'orizon123');
-  await getOrCreateUser('company_tim', 'tim@orizon.com', 'orizon123');
-  await getOrCreateUser('investor_xG', 'xg@orizon.com', 'orizon123');
-  await getOrCreateUser('ict_outra', 'ict_outra@orizon.com', 'orizon123');
+  await getOrCreateUser('company_qualcomm', 'qualcomm@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('company_cemig', 'cemig@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('company_nidec', 'nidec@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('company_schneider', 'schneider@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('company_embraer', 'embraer@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('company_vivo', 'vivo@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('company_tim', 'tim@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('investor_xG', 'xg@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('ict_outra', 'ict_outra@inovahelix.com', 'inovahelix123');
 
   const batch = db.batch();
 
@@ -160,7 +160,7 @@ async function seedV2() {
       role: 'ict', 
       orgId: 'ict_fai_mg_org',
       name: 'FAI-MG (NPDI / INTEF)', 
-      email: 'ict_fai_mg@orizon.com',
+      email: 'ict_fai_mg@inovahelix.com',
       segment: 'Cloud / EdTech / TI',
       verified: true,
       subscriptionStatus: 'premium',
@@ -178,7 +178,7 @@ async function seedV2() {
       role: 'ict', 
       orgId: 'ict_outra_org',
       name: 'Universidade Federal de Itajubá - UNIFEI', 
-      email: 'ict_outra@orizon.com',
+      email: 'ict_outra@inovahelix.com',
       segment: 'Energia Limpa, Hidrogênio e Smart Grids',
       verified: true,
       subscriptionStatus: 'premium',
@@ -222,7 +222,7 @@ async function seedV2() {
       id: 'comp_siemens', 
       role: 'industry', 
       name: 'Siemens Brasil', 
-      email: 'siemens@orizon.com',
+      email: 'siemens@inovahelix.com',
       segment: 'Automação Industrial e Energia',
       verified: true,
       subscriptionStatus: 'premium',
@@ -233,7 +233,7 @@ async function seedV2() {
       id: 'comp_weg', 
       role: 'industry', 
       name: 'WEG S.A.', 
-      email: 'weg@orizon.com',
+      email: 'weg@inovahelix.com',
       segment: 'Máquinas Elétricas e Automação',
       verified: true,
       subscriptionStatus: 'premium',
@@ -244,7 +244,7 @@ async function seedV2() {
       id: 'inv_kaszek', 
       role: 'investor', 
       name: 'Kaszek DeepTech', 
-      email: 'kaszek@orizon.com',
+      email: 'kaszek@inovahelix.com',
       segment: 'CleanTech',
       verified: true,
       subscriptionStatus: 'premium',
@@ -255,7 +255,7 @@ async function seedV2() {
       id: 'inv_canary', 
       role: 'investor', 
       name: 'Canary VC', 
-      email: 'canary@orizon.com',
+      email: 'canary@inovahelix.com',
       segment: 'PropTech',
       verified: true,
       subscriptionStatus: 'premium',
@@ -306,7 +306,7 @@ async function seedV2() {
       id: 'company_qualcomm',
       role: 'industry',
       name: 'Qualcomm Brasil',
-      email: 'qualcomm@orizon.com',
+      email: 'qualcomm@inovahelix.com',
       segment: 'Semicondutores e Chipsets',
       verified: true,
       subscriptionStatus: 'premium',
@@ -317,18 +317,18 @@ async function seedV2() {
       id: 'company_cemig',
       role: 'industry',
       name: 'Cemig Inovação',
-      email: 'cemig@orizon.com',
+      email: 'cemig@inovahelix.com',
       segment: 'Energia e Cidades Inteligentes',
       verified: true,
       subscriptionStatus: 'premium',
-      location: 'Belo Horizonte, MG',
+      location: 'Belo Hinovahelixte, MG',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     },
     'company_nidec': {
       id: 'company_nidec',
       role: 'industry',
       name: 'Nidec Global Appliance',
-      email: 'nidec@orizon.com',
+      email: 'nidec@inovahelix.com',
       segment: 'Motores e Compressores',
       verified: true,
       subscriptionStatus: 'premium',
@@ -339,7 +339,7 @@ async function seedV2() {
       id: 'company_schneider',
       role: 'industry',
       name: 'Schneider Electric',
-      email: 'schneider@orizon.com',
+      email: 'schneider@inovahelix.com',
       segment: 'Gestão de Energia e Automação',
       verified: true,
       subscriptionStatus: 'premium',
@@ -350,7 +350,7 @@ async function seedV2() {
       id: 'company_embraer',
       role: 'industry',
       name: 'Embraer',
-      email: 'embraer@orizon.com',
+      email: 'embraer@inovahelix.com',
       segment: 'Aeroespacial e Defesa',
       verified: true,
       subscriptionStatus: 'premium',
@@ -361,7 +361,7 @@ async function seedV2() {
       id: 'company_vivo',
       role: 'industry',
       name: 'Vivo Empresas',
-      email: 'vivo@orizon.com',
+      email: 'vivo@inovahelix.com',
       segment: 'Telecomunicações e Conectividade IoT',
       verified: true,
       subscriptionStatus: 'premium',
@@ -372,7 +372,7 @@ async function seedV2() {
       id: 'company_tim',
       role: 'industry',
       name: 'TIM Brasil',
-      email: 'tim@orizon.com',
+      email: 'tim@inovahelix.com',
       segment: 'Serviços de Telecomunicações',
       verified: true,
       subscriptionStatus: 'premium',
@@ -383,7 +383,7 @@ async function seedV2() {
       id: 'investor_xG',
       role: 'investor',
       name: 'xGMobile Ventures',
-      email: 'xg@orizon.com',
+      email: 'xg@inovahelix.com',
       segment: 'VC Focado em Telecom & IoT',
       verified: true,
       subscriptionStatus: 'premium',
@@ -954,7 +954,7 @@ async function seedV2() {
     batch.set(privateRef, {
       researcher: p.researcher,
       patentStatus: p.patentStatus,
-      contactEmail: `${p.userId}@orizon.com`,
+      contactEmail: `${p.userId}@inovahelix.com`,
       confidentialNotes: `Detalhes de PI confidenciais para o projeto ${p.title}.`
     });
   });

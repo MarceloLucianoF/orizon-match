@@ -1,6 +1,6 @@
-# Orizon Match: Ecossistema de Inovação Estratégica B2B
+# InovaHelix: Ecossistema de Inovação Estratégica B2B
 
-Orizon Match é uma plataforma SaaS B2B projetada para conectar os três pilares da inovação: **Inventores**, **ICTs (Universidades)** e **Empresas/Investidores**. Utilizando Inteligência Artificial (LLaMA 3.1), a plataforma automatiza o matchmaking de projetos, auditoria de patentes e geração de briefings estratégicos.
+InovaHelix é uma plataforma SaaS B2B projetada para conectar os três pilares da inovação: **Inventores**, **ICTs (Universidades)** e **Empresas/Investidores**. Utilizando Inteligência Artificial (LLaMA 3.1), a plataforma automatiza o matchmaking de projetos, auditoria de patentes e geração de briefings estratégicos.
 
 ## 🚀 Visão Geral
 A plataforma resolve o gargalo de comunicação entre a academia e a indústria, permitindo que teses de inovação corporativas encontrem soluções técnicas validadas juridicamente.

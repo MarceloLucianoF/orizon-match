@@ -100,7 +100,7 @@
       "noMatchesDesc": "Complete su proyecto para que funcione el algoritmo.",
       "registerProject": "Registrar Proyecto",
       "details": "Detalles",
-      "radarOrizon": "Radar Orizon",
+      "radarInovaHelix": "Radar InovaHelix",
       "scanning": "Escaneando el mercado...",
       "radarDesc": "empresas e inversores que buscan innovaciones en **{{segment}}** en el ecosistema FIESC ahora.",
       "radarFallback": "Agregue proyectos con segmentos definidos para activar el radar de oportunidades.",
@@ -184,7 +184,7 @@
         "encerrado": "Cerrado / Archivado"
       },
       "smartPrompts": {
-        "dueDiligence": "Proyecto movido a Due Diligence. ¿Desea enviar la plantilla de NDA estándar de Orizon al Inventor?",
+        "dueDiligence": "Proyecto movido a Due Diligence. ¿Desea enviar la plantilla de NDA estándar de InovaHelix al Inventor?",
         "sendNda": "Enviar NDA",
         "negotiation": "Negociación iniciada. ¿Desea solicitar acceso al Data Room Virtual (VDR) del proyecto?",
         "requestVdr": "Solicitar Acceso al VDR"
@@ -192,7 +192,7 @@
     },
     "organization": {
       "noLinkedOrg": "Ninguna Institución Vinculada",
-      "noLinkedOrgDesc": "Aún no forma parte de una organización gestora o NIT en Orizon Match.",
+      "noLinkedOrgDesc": "Aún no forma parte de una organización gestora o NIT en InovaHelix.",
       "requestAccess": "Solicitar Acceso Institucional",
       "panelTitle": "Panel Institucional",
       "subtitle": "Gestión centralizada de innovación y activos de PI.",
@@ -268,7 +268,7 @@
       "inpiMonitorTitle": "Monitoreo INPI",
       "viewAllUpdates": "Ver Todas las Actualizaciones",
       "curatorOpportunities": "Oportunidades de Curaduría",
-      "opportunitiesDesc": "Orizon identificó **{{count}} nuevos proyectos** en el sector de {{sector}} que aún no cuentan con protección de patente registrada.",
+      "opportunitiesDesc": "InovaHelix identificó **{{count}} nuevos proyectos** en el sector de {{sector}} que aún no cuentan con protección de patente registrada.",
       "proposeConsultancy": "Proponer Consultoría",
       "columns": {
         "analise": "Esperando Invitación",
@@ -290,7 +290,7 @@
         "filters": "Filtros",
         "noAssets": "Ningún activo registrado",
         "noAssetsDesc": "Comience registrando su primera patente o marca.",
-        "auditOrizon": "Auditoría Orizon",
+        "auditInovaHelix": "Auditoría InovaHelix",
         "manage": "Gestionar",
         "modalTitle": "Registrar Nuevo Activo de PI",
         "modalSubtitle": "Ingrese los datos básicos de su propiedad intelectual.",
@@ -375,7 +375,7 @@
       "noName": "Sin Nombre",
       "recent": "Reciente",
       "godMode": "God Mode",
-      "centralControl": "Control Central de Orizon OS",
+      "centralControl": "Control Central de InovaHelix OS",
       "export": "Exportar",
       "engineActive": "Motor Activo",
       "enginePaused": "Motor Pausado",
@@ -423,7 +423,7 @@
   },
   "projects": {
     "title": "Portafolio de Inovación",
-    "subtitle": "Gestione los proyectos que el algoritmo de Orizon Match utiliza para buscar socios.",
+    "subtitle": "Gestione los proyectos que el algoritmo de InovaHelix utiliza para buscar socios.",
     "newProject": "Nuevo Proyecto",
     "readinessScore": "Score de Preparación",
     "radarActive": "Radar Activo",
@@ -450,7 +450,7 @@
       "projectTitle": "Título del Projeto",
       "segment": "Sector de Actividad",
       "type": "Tipo de Proyecto",
-      "tip": "Consejo Orizon: Mantener su segmento y tipo actualizados garantiza que el algoritmo de coincidencia encuentre socios con intereses estratégicos exactos para su fase actual.",
+      "tip": "Consejo InovaHelix: Mantener su segmento y tipo actualizados garantiza que el algoritmo de coincidencia encuentre socios con intereses estratégicos exactos para su fase actual.",
       "saving": "Guardando...",
       "saveChanges": "Guardar Cambios"
     },

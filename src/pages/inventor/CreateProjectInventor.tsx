@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import app from "../../firebase/config";
+import app, { getFunctionUrl } from "../../firebase/config";
 import { useAuth } from "../../hooks/useAuth";
 import { createProject } from "../../services/projectService";
 import { 
@@ -178,7 +178,7 @@ export function CreateProjectInventor() {
 
   // Hydration from sessionStorage (Lead Capture)
   useEffect(() => {
-    const cachedLead = sessionStorage.getItem('@orizon:lead_data');
+    const cachedLead = sessionStorage.getItem('@inovahelix:lead_data');
     if (cachedLead) {
       try {
         const leadData = JSON.parse(cachedLead);
@@ -196,7 +196,7 @@ export function CreateProjectInventor() {
           else if (leadData.role === 'ict') setStep('ICT_RESEARCH');
           else setStep('SEGMENT');
         }
-        sessionStorage.removeItem('@orizon:lead_data');
+        sessionStorage.removeItem('@inovahelix:lead_data');
       } catch (e) {
         console.error("Erro ao recuperar dados do lead", e);
       }
@@ -289,9 +289,10 @@ export function CreateProjectInventor() {
       const base64 = await fileToBase64(fileToProcess);
       
       const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || 'orizon-match';
       const functionUrl = isLocal
-        ? 'http://127.0.0.1:5001/orizon-match/southamerica-east1/analyzeTechnologyAsset'
-        : 'https://southamerica-east1-orizon-match.cloudfunctions.net/analyzeTechnologyAsset';
+        ? `http://127.0.0.1:5001/${projectId}/southamerica-east1/analyzeTechnologyAsset`
+        : getFunctionUrl('analyzeTechnologyAsset');
 
       const response = await fetch(functionUrl, {
         method: 'POST',
@@ -1039,7 +1040,7 @@ export function CreateProjectInventor() {
                           console.warn("Chamadas cliente falharam. Tentando Cloud Function como último recurso...", clientAiError);
                           
                           // Fallback final: manual fetch para a Cloud Function
-                          const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/enhancePitch', {
+                          const response = await fetch(getFunctionUrl('enhancePitch'), {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({

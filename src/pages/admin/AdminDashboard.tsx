@@ -571,7 +571,7 @@ export function AdminDashboard() {
       await setDoc(matchRef, {
         id: matchId,
         ownerProjectId: simProject,
-        ownerProjectTitle: selectedProj.title || "Projeto Orizon",
+        ownerProjectTitle: selectedProj.title || "Projeto InovaHelix",
         targetUserId: simUser,
         targetRole: selectedUser.role,
         targetSegment: selectedUser.segment || selectedUser.segments?.[0] || "Deep Tech",
@@ -599,7 +599,7 @@ export function AdminDashboard() {
           status: "active",
           initiatorId: selectedProj.userId || "inventor_rafael",
           updatedAt: serverTimestamp(),
-          projectTitle: selectedProj.title || "Projeto Orizon",
+          projectTitle: selectedProj.title || "Projeto InovaHelix",
           unreadCount: {
             [selectedProj.userId || "inventor_rafael"]: 0,
             [simUser]: 0

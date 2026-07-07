@@ -1,4 +1,4 @@
-# Plano de Update - Orizon Match
+# Plano de Update - InovaHelix
 
 Data de atualizacao: 2026-05-04
 

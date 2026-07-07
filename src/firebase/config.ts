@@ -36,4 +36,9 @@ export const db = getFirestore(app);
 export const functions = getFunctions(app, "southamerica-east1");
 export const storage = getStorage(app);
 
+export function getFunctionUrl(name: string): string {
+  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID || "orizon-match";
+  return `https://southamerica-east1-${projectId}.cloudfunctions.net/${name}`;
+}
+
 export default app;

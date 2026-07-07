@@ -43,7 +43,7 @@ export function CreateProjectCompany() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const cachedLead = sessionStorage.getItem('@orizon:lead_data');
+    const cachedLead = sessionStorage.getItem('@inovahelix:lead_data');
     if (cachedLead) {
       try {
         const leadData = JSON.parse(cachedLead);
@@ -59,7 +59,7 @@ export function CreateProjectCompany() {
           if (leadData.role === 'provider') setStep('PROVIDER_SERVICES');
           else setStep('SEGMENT');
         }
-        sessionStorage.removeItem('@orizon:lead_data');
+        sessionStorage.removeItem('@inovahelix:lead_data');
       } catch (e) {
         console.error("Erro ao recuperar dados do lead", e);
       }

@@ -103,7 +103,7 @@ async function runTests() {
     // TESTE 1: Fluxo ICT - Acesso a Projetos de sua Org
     // ----------------------------------------------------
     console.log("\n--- TESTE DE FLUXO ICT A (ict@inatel.br) ---");
-    const ictUser = await signInWithEmailAndPassword(auth, "ict@inatel.br", "orizon123");
+    const ictUser = await signInWithEmailAndPassword(auth, "ict@inatel.br", "inovahelix123");
     console.log(`Logado como ICT A: ${ictUser.user.email} (UID: ${ictUser.user.uid})`);
 
     try {
@@ -149,10 +149,10 @@ async function runTests() {
     await signOut(auth);
 
     // ----------------------------------------------------
-    // TESTE 5: Multi-tenant do ICT B (ict_outra@orizon.com)
+    // TESTE 5: Multi-tenant do ICT B (ict_outra@inovahelix.com)
     // ----------------------------------------------------
-    console.log("\n--- TESTE DE FLUXO ICT B (ict_outra@orizon.com) ---");
-    const ictBUser = await signInWithEmailAndPassword(auth, "ict_outra@orizon.com", "orizon123");
+    console.log("\n--- TESTE DE FLUXO ICT B (ict_outra@inovahelix.com) ---");
+    const ictBUser = await signInWithEmailAndPassword(auth, "ict_outra@inovahelix.com", "inovahelix123");
     console.log(`Logado como ICT B: ${ictBUser.user.email} (UID: ${ictBUser.user.uid})`);
 
     // ICT B tenta ler private/details de ICT A
@@ -171,11 +171,11 @@ async function runTests() {
     console.log("\n--- TESTES DE ARMAZENAMENTO E NDA (Firebase Storage) ---");
     
     // Logar de volta como ICT A para subir o arquivo de teste restrito no Storage
-    await signInWithEmailAndPassword(auth, "ict@inatel.br", "orizon123");
+    await signInWithEmailAndPassword(auth, "ict@inatel.br", "inovahelix123");
     
     const storagePath = "projects/proj_lte_box/vdr/restricted/contrato_confidencial.txt";
     const storageRef = ref(storage, storagePath);
-    const testFileContent = Buffer.from("CONTEUDO_ALTAMENTE_CONFIDENCIAL_ORIZON_MATCH_TRL7");
+    const testFileContent = Buffer.from("CONTEUDO_ALTAMENTE_CONFIDENCIAL_INOVAHELIX_MATCH_TRL7");
     
     // 6. Upload como Proprietário (ICT A)
     try {
@@ -188,7 +188,7 @@ async function runTests() {
     await signOut(auth);
 
     // Logar como Empresa (empresa@ericsson.com)
-    const compUser = await signInWithEmailAndPassword(auth, "empresa@ericsson.com", "orizon123");
+    const compUser = await signInWithEmailAndPassword(auth, "empresa@ericsson.com", "inovahelix123");
     console.log(`Logado como Empresa: ${compUser.user.email} (UID: ${compUser.user.uid})`);
 
     // 7. Tentar fazer upload em projeto alheio (Ericsson no projeto da Inatel)
@@ -342,7 +342,7 @@ async function runTests() {
     console.log("\n🧹 Limpando arquivo de testes do Storage...");
     try {
       await signOut(auth);
-      await signInWithEmailAndPassword(auth, "ict@inatel.br", "orizon123");
+      await signInWithEmailAndPassword(auth, "ict@inatel.br", "inovahelix123");
       await runWithTimeout(deleteObject(storageRef), 2000, "Deleção de arquivo");
       console.log("✅ Arquivo de testes do Storage removido com sucesso.");
     } catch (err) {

@@ -1,5 +1,5 @@
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
-import { db, auth } from "../firebase/config";
+import { db, auth, getFunctionUrl } from "../firebase/config";
 
 // UID do super admin (em um ambiente de prod seria uma custom claim)
 export const SUPER_ADMIN_UID = "nqBV3Da1iqPbU46jGvO1ljBbIze2";
@@ -93,7 +93,7 @@ export async function updateUserSubscription(userId: string, status: 'free' | 'p
 export async function adminCreateUserAPI(data: { email: string; password?: string; displayName?: string; role?: string }) {
   try {
     const token = await auth.currentUser?.getIdToken();
-    const response = await fetch("https://southamerica-east1-orizon-match.cloudfunctions.net/adminCreateUser", {
+    const response = await fetch(getFunctionUrl("adminCreateUser"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -117,7 +117,7 @@ export async function adminCreateUserAPI(data: { email: string; password?: strin
 export async function adminDeleteUserAPI(targetUid: string) {
   try {
     const token = await auth.currentUser?.getIdToken();
-    const response = await fetch("https://southamerica-east1-orizon-match.cloudfunctions.net/adminDeleteUser", {
+    const response = await fetch(getFunctionUrl("adminDeleteUser"), {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

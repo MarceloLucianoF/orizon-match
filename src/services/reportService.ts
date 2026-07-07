@@ -1,5 +1,5 @@
 import { collection, getDocs, doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import app, { db } from "../firebase/config";
+import app, { db, getFunctionUrl } from "../firebase/config";
 
 // Circuit breaker: se as chamadas cliente falharem (ex: falta de créditos ou chaves bloqueadas),
 // guardamos em memória para pular as chamadas cliente futuras e ir direto para o Cloud Function/NIM.
@@ -96,7 +96,7 @@ export async function generateProjectAiBriefing(projectId: string): Promise<stri
         - **Fase 3: Expansão de Mercado** - Detalhes...)
 
         ## Conclusão Consultiva
-        (Recomendação final e parecer da Orizon Match sobre o investimento/parceria.)
+        (Recomendação final e parecer da InovaHelix sobre o investimento/parceria.)
 
         > **[Risco]** (Escreva um aviso sobre o maior risco técnico, regulatório ou de mercado que precisa ser mitigado no curto prazo.)
 
@@ -105,7 +105,7 @@ export async function generateProjectAiBriefing(projectId: string): Promise<stri
 
     if (isClientAiDisabled) {
       console.log("IA cliente desativada devido a falhas anteriores de cota/billing. Chamando Cloud Function diretamente...");
-      const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/generateProjectReport', {
+      const response = await fetch(getFunctionUrl('generateProjectReport'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: { projectId } })
@@ -166,7 +166,7 @@ export async function generateProjectAiBriefing(projectId: string): Promise<stri
         console.warn("Geração cliente falhou. Desativando chamadas cliente e tentando Cloud Function como último recurso...", clientAiError);
         isClientAiDisabled = true;
         
-        const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/generateProjectReport', {
+        const response = await fetch(getFunctionUrl('generateProjectReport'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ data: { projectId } })

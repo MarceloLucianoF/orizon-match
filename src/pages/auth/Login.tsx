@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { Loader2, ArrowLeft, ShieldCheck, Lock } from "lucide-react";
 import { Link } from "react-router-dom";
+import { Logo } from "../../components/ui/Logo";
 
 export function Login() {
   const [email, setEmail] = useState("");
@@ -34,9 +35,9 @@ export function Login() {
         <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/[0.02] blur-[80px] pointer-events-none" />
         
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-3 group/logo">
-            <span className="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white font-black shadow-[0_0_15px_rgba(79,70,229,0.5)] group-hover/logo:scale-105 group-hover/logo:rotate-3 transition-all duration-300">O</span>
-            <span className="text-xl font-black text-white tracking-tight">Orizon</span>
+          <Link to="/" className="inline-flex items-center gap-2.5 mb-3 group/logo">
+            <Logo className="w-8 h-8 text-primary shadow-[0_0_15px_rgba(0,181,156,0.4)] group-hover/logo:scale-105 group-hover/logo:rotate-3 transition-all duration-300" />
+            <span className="text-xl font-bold text-white tracking-tight">InovaHelix</span>
           </Link>
           <h2 className="text-lg font-bold text-white tracking-tight">Entrar na plataforma</h2>
           <p className="text-slate-400 mt-1 text-xs">Insira suas credenciais para acessar os matches</p>
@@ -78,7 +79,7 @@ export function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-xl py-3 font-bold transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_25px_rgba(79,70,229,0.5)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] flex items-center justify-center gap-2 text-xs uppercase tracking-wider"
+            className="w-full mt-6 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white rounded-xl py-3 font-bold transition-all shadow-[0_0_20px_rgba(0,181,156,0.3)] hover:shadow-[0_0_25px_rgba(0,181,156,0.5)] hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] flex items-center justify-center gap-2 text-xs uppercase tracking-wider"
           >
             {loading ? <Loader2 className="animate-spin" size={16} /> : <>Acessar Ecossistema <Lock size={14} /></>}
           </button>

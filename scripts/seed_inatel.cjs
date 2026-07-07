@@ -48,7 +48,7 @@ async function clearCollection(collectionPath) {
 }
 
 async function seedInatelEcosystem() {
-  console.log("🚀 Iniciando Showcase Orizon Match: Inatel NGTI & EMBRAPII ICC (Versão 2.0)...");
+  console.log("🚀 Iniciando Showcase InovaHelix Match: Inatel NGTI & EMBRAPII ICC (Versão 2.0)...");
 
   const collectionsToClear = ['users', 'projects', 'challenges', 'matches', 'conversations', 'messages', 'logs_ai', 'assets_ip'];
   for (const col of collectionsToClear) {
@@ -61,13 +61,13 @@ async function seedInatelEcosystem() {
   console.log("🔑 Configurando credenciais e usuários de teste no Auth...");
   
   // Criar usuários no Firebase Auth
-  await getOrCreateUser('ict_inatel_icc', 'ict@inatel.br', 'orizon123');
-  await getOrCreateUser('ict_fai', 'ict_fai@orizon.com', 'orizon123');
-  await getOrCreateUser('company_ericsson', 'empresa@ericsson.com', 'orizon123');
-  await getOrCreateUser('inventor_rafael', 'inventor@wailab.br', 'orizon123');
-  await getOrCreateUser('inventor_camila', 'pesquisadora@wailab.br', 'orizon123');
-  await getOrCreateUser('company_qualcomm', 'qualcomm@orizon.com', 'orizon123');
-  await getOrCreateUser('company_cemig', 'cemig@orizon.com', 'orizon123');
+  await getOrCreateUser('ict_inatel_icc', 'ict@inatel.br', 'inovahelix123');
+  await getOrCreateUser('ict_fai', 'ict_fai@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('company_ericsson', 'empresa@ericsson.com', 'inovahelix123');
+  await getOrCreateUser('inventor_rafael', 'inventor@wailab.br', 'inovahelix123');
+  await getOrCreateUser('inventor_camila', 'pesquisadora@wailab.br', 'inovahelix123');
+  await getOrCreateUser('company_qualcomm', 'qualcomm@inovahelix.com', 'inovahelix123');
+  await getOrCreateUser('company_cemig', 'cemig@inovahelix.com', 'inovahelix123');
 
   const batch = db.batch();
 
@@ -75,7 +75,7 @@ async function seedInatelEcosystem() {
   const users = {
     'ict_fai': {
       id: 'ict_fai',
-      email: 'ict_fai@orizon.com',
+      email: 'ict_fai@inovahelix.com',
       name: 'FAI - Centro de Ensino Superior em Gestão, Tecnologia e Educação',
       role: 'ict',
       segment: 'Gestão, Tecnologia, Sistemas de Informação e Educação',
@@ -133,7 +133,7 @@ async function seedInatelEcosystem() {
     },
     'company_qualcomm': {
       id: 'company_qualcomm',
-      email: 'qualcomm@orizon.com',
+      email: 'qualcomm@inovahelix.com',
       name: 'Qualcomm Brasil',
       role: 'industry',
       segment: 'Semicondutores e Chipsets',
@@ -142,16 +142,16 @@ async function seedInatelEcosystem() {
     },
     'company_cemig': {
       id: 'company_cemig',
-      email: 'cemig@orizon.com',
+      email: 'cemig@inovahelix.com',
       name: 'Cemig Inovação',
       role: 'industry',
       segment: 'Energia e Cidades Inteligentes',
-      location: 'Belo Horizonte, MG',
+      location: 'Belo Hinovahelixte, MG',
       createdAt: admin.firestore.FieldValue.serverTimestamp()
     },
     'company_nidec': {
       id: 'company_nidec',
-      email: 'nidec@orizon.com',
+      email: 'nidec@inovahelix.com',
       name: 'Nidec Global Appliance',
       role: 'industry',
       segment: 'Motores e Compressores',
@@ -160,7 +160,7 @@ async function seedInatelEcosystem() {
     },
     'company_siemens': {
       id: 'company_siemens',
-      email: 'siemens@orizon.com',
+      email: 'siemens@inovahelix.com',
       name: 'Siemens Brasil',
       role: 'industry',
       segment: 'Automação Industrial e Energia',
@@ -169,7 +169,7 @@ async function seedInatelEcosystem() {
     },
     'company_schneider': {
       id: 'company_schneider',
-      email: 'schneider@orizon.com',
+      email: 'schneider@inovahelix.com',
       name: 'Schneider Electric',
       role: 'industry',
       segment: 'Gestão de Energia e Automação',
@@ -178,7 +178,7 @@ async function seedInatelEcosystem() {
     },
     'company_weg': {
       id: 'company_weg',
-      email: 'weg@orizon.com',
+      email: 'weg@inovahelix.com',
       name: 'WEG S.A.',
       role: 'industry',
       segment: 'Máquinas Elétricas e Automação',
@@ -187,7 +187,7 @@ async function seedInatelEcosystem() {
     },
     'company_embraer': {
       id: 'company_embraer',
-      email: 'embraer@orizon.com',
+      email: 'embraer@inovahelix.com',
       name: 'Embraer',
       role: 'industry',
       segment: 'Aeroespacial e Defesa',
@@ -196,7 +196,7 @@ async function seedInatelEcosystem() {
     },
     'company_vivo': {
       id: 'company_vivo',
-      email: 'vivo@orizon.com',
+      email: 'vivo@inovahelix.com',
       name: 'Vivo Empresas',
       role: 'industry',
       segment: 'Telecomunicações e Conectividade IoT',
@@ -205,7 +205,7 @@ async function seedInatelEcosystem() {
     },
     'company_tim': {
       id: 'company_tim',
-      email: 'tim@orizon.com',
+      email: 'tim@inovahelix.com',
       name: 'TIM Brasil',
       role: 'industry',
       segment: 'Serviços de Telecomunicações',
@@ -214,7 +214,7 @@ async function seedInatelEcosystem() {
     },
     'investor_xG': {
       id: 'investor_xG',
-      email: 'xg@orizon.com',
+      email: 'xg@inovahelix.com',
       name: 'xGMobile Ventures',
       role: 'investor',
       segment: 'VC Focado em Telecom & IoT',

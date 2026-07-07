@@ -337,7 +337,7 @@ export function InventorDashboard() {
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
               </div>
               <h3 className="text-xs font-black text-indigo-300 uppercase tracking-widest mb-3.5 flex items-center gap-2">
-                <Activity size={16} className="text-emerald-400 animate-pulse" /> {t("dashboard.inventor.radarOrizon")}
+                <Activity size={16} className="text-emerald-400 animate-pulse" /> {t("dashboard.inventor.radarInovaHelix")}
               </h3>
               {radarCount === null ? (
                 <p className="text-slate-400 text-sm">{t("dashboard.inventor.scanning")}</p>

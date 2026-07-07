@@ -160,7 +160,7 @@ export function AssetRegistry() {
                   </div>
                 )}
                 <div className="flex justify-between items-center text-[10px] uppercase font-black tracking-widest text-slate-500">
-                  <span className="flex items-center gap-1"><AlertCircle size={12} /> {t("dashboard.legal.assets.auditOrizon")}</span>
+                  <span className="flex items-center gap-1"><AlertCircle size={12} /> {t("dashboard.legal.assets.auditInovaHelix")}</span>
                   <button className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
                     {t("dashboard.legal.assets.manage")} <ExternalLink size={10} />
                   </button>

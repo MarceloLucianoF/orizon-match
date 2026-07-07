@@ -23,10 +23,10 @@ async function getClientIp(): Promise<string> {
 }
 
 function getSessionId(): string {
-  let sid = sessionStorage.getItem("orizon_session_id");
+  let sid = sessionStorage.getItem("inovahelix_session_id");
   if (!sid) {
     sid = "sess_" + Math.random().toString(36).substring(2, 15) + "_" + Date.now();
-    sessionStorage.setItem("orizon_session_id", sid);
+    sessionStorage.setItem("inovahelix_session_id", sid);
   }
   return sid;
 }

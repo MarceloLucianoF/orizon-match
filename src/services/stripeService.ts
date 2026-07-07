@@ -1,11 +1,11 @@
-import { auth } from "../firebase/config";
+import { auth, getFunctionUrl } from "../firebase/config";
 
 export async function createStripeCheckout(priceId: string) {
   try {
     const user = auth.currentUser;
     if (!user) throw new Error("Usuário não autenticado.");
 
-    const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/createCheckoutSession', {
+    const response = await fetch(getFunctionUrl('createCheckoutSession'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -38,7 +38,7 @@ export async function openCustomerPortal() {
     const user = auth.currentUser;
     if (!user) throw new Error("Usuário não autenticado.");
 
-    const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/createPortalSession', {
+    const response = await fetch(getFunctionUrl('createPortalSession'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

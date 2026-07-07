@@ -38,7 +38,7 @@ export async function searchPatentsInpi(taxId: string): Promise<INPIPatent[]> {
           processo: `BR 10 ${new Date().getFullYear()} 00${Math.floor(Math.random() * 9000) + 1000}-0`,
           deposito: new Date().toLocaleDateString('pt-BR'),
           ipc: "A61K 31/00",
-          titulo: "SISTEMA INTEGRADO DE MONITORAMENTO DE INOVAÇÃO ORIZON",
+          titulo: "SISTEMA INTEGRADO DE MONITORAMENTO DE INOVAÇÃO INOVAHELIX",
           link: `https://busca.inpi.gov.br/pePI/servlet/PatenteServletController?Action=detail&id=${Math.floor(Math.random() * 100000)}`
         }
       ];

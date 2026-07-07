@@ -12,7 +12,7 @@ export function Billing() {
   const { userProfile } = useAuth();
   
   const isPremium = userProfile?.subscriptionStatus === 'premium';
-  const planName = userProfile?.plan === 'pro' ? 'Orizon Pro' : (userProfile?.plan === 'enterprise' ? 'Enterprise' : 'Orizon Free');
+  const planName = userProfile?.plan === 'pro' ? 'InovaHelix Pro' : (userProfile?.plan === 'enterprise' ? 'Enterprise' : 'InovaHelix Free');
   const [loading, setLoading] = useState(false);
 
   const handleManageBilling = async () => {

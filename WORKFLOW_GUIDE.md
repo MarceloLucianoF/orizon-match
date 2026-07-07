@@ -1,4 +1,4 @@
-# Guia de Fluxos e Processos: Orizon Match
+# Guia de Fluxos e Processos: InovaHelix
 
 Este documento detalha o funcionamento lógico da plataforma para análise e validação da gestão do projeto.
 
@@ -25,7 +25,7 @@ O onboarding é dinâmico e segmenta o usuário em três perfis logo no primeiro
 
 ## 2. O Motor de Inteligência Artificial (LLaMA 3.1)
 
-A IA da Orizon não é apenas um chat; ela é uma camada de processamento de dados em três pontos:
+A IA da InovaHelix não é apenas um chat; ela é uma camada de processamento de dados em três pontos:
 
 1.  **Pitch Enhancer**: Transforma respostas simples em um "Executive Summary" persuasivo.
 2.  **Matching Engine**: Analisa a semântica entre a "Tese de Inovação" da Empresa e o "Resumo do Projeto" do Inventor/ICT.

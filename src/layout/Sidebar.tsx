@@ -2,6 +2,7 @@ import { LayoutDashboard, FolderKanban, Users, LogOut, MessageSquare, Building2,
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useTranslation } from "react-i18next";
+import { Logo } from "../components/ui/Logo";
 
 interface SidebarProps {
   onClose?: () => void;
@@ -60,9 +61,12 @@ export function Sidebar({ onClose }: SidebarProps) {
   return (
     <aside className="w-[19rem] xl:w-[21rem] border-r border-slate-800 bg-slate-900/50 backdrop-blur-xl flex flex-col h-full shrink-0">
       <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
-          Orizon Match
-        </h1>
+        <div className="flex items-center gap-2">
+          <Logo className="w-6 h-6 text-primary" />
+          <span className="text-xl font-bold bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">
+            InovaHelix
+          </span>
+        </div>
         {/* Close button visible only on mobile */}
         <button 
           onClick={onClose}

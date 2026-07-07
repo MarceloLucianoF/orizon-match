@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { maskPhone } from "../../lib/validators";
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
+import { getFunctionUrl } from "../../firebase/config";
 
 const FIESC_CHAMBERS = [
   "Agroindústria",
@@ -74,7 +75,7 @@ export default function PublicOnboarding() {
     setError(null);
     
     try {
-      const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/getMatchesPreview', {
+      const response = await fetch(getFunctionUrl('getMatchesPreview'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -189,7 +190,7 @@ export default function PublicOnboarding() {
         role: formData.role === 'idea' ? 'inventor' : formData.role === 'provider' ? 'industry' : 'ict'
       });
 
-      sessionStorage.setItem('@orizon:lead_data', JSON.stringify({
+      sessionStorage.setItem('@inovahelix:lead_data', JSON.stringify({
         role: formData.role,
         segment: formData.segment,
         summaryQuestions: formData.summaryQuestions,

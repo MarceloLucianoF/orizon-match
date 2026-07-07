@@ -108,7 +108,7 @@ export async function analyzeTechnologyDocument(
   }
 
   const prompt = `
-    Você é um Engenheiro de Patentes e Analista de M&A de Tecnologia Sênior na Orizon Match.
+    Você é um Engenheiro de Patentes e Analista de M&A de Tecnologia Sênior na InovaHelix.
     Sua tarefa é analisar o documento tecnológico fornecido e construir o seu "Gêmeo Digital (Digital Twin)" e mapeamento de "Technology DNA".
 
     Instruções e Regras de Negócio:

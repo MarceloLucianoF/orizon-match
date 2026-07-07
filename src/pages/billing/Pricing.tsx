@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { getFunctionUrl } from "../../firebase/config";
 
 const INVENTOR_PLANS = [
   {
@@ -127,7 +128,7 @@ export default function Pricing() {
 
     setLoading(planId);
     try {
-      const response = await fetch('https://southamerica-east1-orizon-match.cloudfunctions.net/createCheckoutSession', {
+      const response = await fetch(getFunctionUrl('createCheckoutSession'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

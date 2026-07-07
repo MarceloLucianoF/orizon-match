@@ -13,6 +13,7 @@ interface NavbarProps {
 }
 
 import { NotificationBell } from "./NotificationBell";
+import { Logo } from "./ui/Logo";
 
 interface NavItem {
   label: string;
@@ -77,11 +78,11 @@ export default function Navbar({
       <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
         <button
           type="button"
-          className="rounded-2xl bg-orizon-gradient px-4 py-2 text-left text-white shadow-glow"
+          className="rounded-2xl bg-helix-gradient px-4 py-2 flex items-center gap-2.5 text-white shadow-glow"
           onClick={() => onNavigate?.("/")}
         >
-          <span className="block text-xs uppercase tracking-[0.22em] text-cyan-100">Orizon</span>
-          <span className="text-lg font-semibold leading-tight">Match</span>
+          <Logo className="w-6 h-6 text-white" />
+          <span className="text-lg font-bold tracking-tight">InovaHelix</span>
         </button>
 
         <ul className="flex flex-wrap items-center gap-2">

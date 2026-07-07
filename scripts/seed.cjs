@@ -222,7 +222,7 @@ async function seed() {
   await deleteCollection("chats");
   await deleteCollection("matches");
   
-  console.log("🌱 Populando Orizon Match com dados realistas...");
+  console.log("🌱 Populando InovaHelix Match com dados realistas...");
 
   // Limpar coleções (opcional, mas recomendado para seed limpo)
   // Nota: Em produção, cuidado com isso!
@@ -231,7 +231,7 @@ async function seed() {
     await db.collection("users").doc(user.id).set({
       ...user,
       createdAt: now,
-      email: `${user.id}@orizon.test`,
+      email: `${user.id}@inovahelix.test`,
       onboardingComplete: true
     });
   }

@@ -1,12 +1,12 @@
 # Certificado de Autoria e Integridade de Software
 
-Este documento serve como registro técnico de autoria do software **Orizon Match** e sua respectiva "Impressão Digital" (Hash) para fins de proteção de Propriedade Intelectual (PI).
+Este documento serve como registro técnico de autoria do software **InovaHelix** e sua respectiva "Impressão Digital" (Hash) para fins de proteção de Propriedade Intelectual (PI).
 
 ## 📄 Informações do Projeto
-*   **Nome do Software**: Orizon Match
+*   **Nome do Software**: InovaHelix
 *   **Versão**: 1.0.0 (MVP - Marketplace de Inovação)
 *   **Data de Referência**: 11 de Maio de 2026
-*   **Autor/Titular**: Marcelo Filho (e/ou entidade Orizon Match)
+*   **Autor/Titular**: Marcelo Filho (e/ou entidade InovaHelix)
 
 ## 🔐 Assinatura Digital (Hash)
 O código-fonte completo (Frontend, Backend e Regras de Segurança), excluindo dependências de terceiros, foi processado através do algoritmo de criptografia **SHA-256**, resultando na seguinte impressão digital:
