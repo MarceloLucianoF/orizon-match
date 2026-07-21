@@ -93,7 +93,7 @@ export function Chat() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-full"><Loader2 className="animate-spin text-indigo-500" size={48} /></div>;
+    return <div className="flex justify-center items-center h-full"><Loader2 className="animate-spin text-teal-500" size={48} /></div>;
   }
 
   return (
@@ -103,7 +103,7 @@ export function Chat() {
       <div className="w-full md:w-1/3 md:max-w-sm lg:max-w-md border-b md:border-b-0 md:border-r border-slate-850 bg-slate-900/20 flex flex-col md:max-h-none">
         <div className="p-5 border-b border-slate-850/80 bg-slate-900/10">
           <h2 className="text-base font-black text-white tracking-tight flex items-center gap-2">
-            <MessageSquare size={18} className="text-indigo-400" /> Negociações
+            <MessageSquare size={18} className="text-teal-400" /> Negociações
           </h2>
         </div>
         <div className="flex-1 overflow-visible md:overflow-y-auto">
@@ -125,14 +125,14 @@ export function Chat() {
                 key={conv.id}
                 onClick={() => setActiveConvId(conv.id)}
                 className={`w-full text-left p-5 border-b border-slate-855 transition-all relative duration-300 ${
-                  isActive ? "bg-indigo-500/10 border-l-4 border-l-indigo-500" : "hover:bg-slate-900/30 border-l-4 border-l-transparent"
+                  isActive ? "bg-teal-500/10 border-l-4 border-l-teal-500" : "hover:bg-slate-900/30 border-l-4 border-l-transparent"
                 }`}
               >
                 <div className="flex justify-between items-start mb-1.5 gap-2">
                   <span className={`font-semibold text-sm truncate ${unreadCount > 0 ? "text-white" : "text-slate-200"}`}>
                     {conv.projectTitle || `Match #${conv.id.slice(0,5)}`}
                   </span>
-                  <span className="text-[9px] uppercase font-bold text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded ml-2 flex-shrink-0 border border-indigo-500/20 tracking-wider">
+                  <span className="text-[9px] uppercase font-bold text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded ml-2 flex-shrink-0 border border-teal-500/20 tracking-wider">
                     {conv.stage}
                   </span>
                 </div>
@@ -173,12 +173,12 @@ export function Chat() {
               </div>
             )}
             {activeConv.status === "pending" && (
-              <div className="p-6 bg-indigo-500/5 border-b border-indigo-500/15 text-center flex flex-col items-center gap-4 animate-in fade-in duration-300">
+              <div className="p-6 bg-teal-500/5 border-b border-teal-500/15 text-center flex flex-col items-center gap-4 animate-in fade-in duration-300">
                 {activeConv.initiatorId === user?.uid ? (
-                  <p className="text-indigo-400 font-semibold text-xs uppercase tracking-wider">Aguardando o parceiro aceitar a conexão para liberar o chat livre.</p>
+                  <p className="text-teal-400 font-semibold text-xs uppercase tracking-wider">Aguardando o parceiro aceitar a conexão para liberar o chat livre.</p>
                 ) : (
                   <>
-                    <p className="text-indigo-305 font-bold text-sm">Esta organização tem interesse em iniciar um Deal Flow com você.</p>
+                    <p className="text-teal-305 font-bold text-sm">Esta organização tem interesse em iniciar um Deal Flow com você.</p>
                     <div className="flex gap-3">
                       <button 
                         onClick={() => updateConversationStatus(activeConv.id, "active")}
@@ -227,17 +227,17 @@ export function Chat() {
                 <div className="w-px h-6 bg-slate-800 mx-1 self-center"></div>
 
                 {activeConv.stage === "initial_contact" && (
-                  <button onClick={() => handleAdvanceStage("nda")} className="text-xs bg-indigo-650 hover:bg-indigo-600 text-white px-4.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(79,70,229,0.2)] font-bold active:scale-95 duration-200">
+                  <button onClick={() => handleAdvanceStage("nda")} className="text-xs bg-teal-650 hover:bg-teal-600 text-white px-4.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(0,181,156,0.2)] font-bold active:scale-95 duration-200">
                     Avançar para NDA <ChevronRight size={13} />
                   </button>
                 )}
                 {activeConv.stage === "nda" && (
-                  <button onClick={() => handleAdvanceStage("proposal")} className="text-xs bg-indigo-650 hover:bg-indigo-600 text-white px-4.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(79,70,229,0.2)] font-bold active:scale-95 duration-200">
+                  <button onClick={() => handleAdvanceStage("proposal")} className="text-xs bg-teal-650 hover:bg-teal-600 text-white px-4.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(0,181,156,0.2)] font-bold active:scale-95 duration-200">
                     Avançar para Proposta <ChevronRight size={13} />
                   </button>
                 )}
                 {activeConv.stage === "proposal" && (
-                  <button onClick={() => handleAdvanceStage("negotiation")} className="text-xs bg-indigo-650 hover:bg-indigo-600 text-white px-4.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(79,70,229,0.2)] font-bold active:scale-95 duration-200">
+                  <button onClick={() => handleAdvanceStage("negotiation")} className="text-xs bg-teal-650 hover:bg-teal-600 text-white px-4.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-[0_0_10px_rgba(0,181,156,0.2)] font-bold active:scale-95 duration-200">
                     Iniciar Negociação <ChevronRight size={13} />
                   </button>
                 )}
@@ -256,7 +256,7 @@ export function Chat() {
                   return (
                     <div key={msg.id} className="flex justify-center my-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
                       <span className="bg-slate-950/85 border border-slate-850 text-slate-450 text-[9px] px-4 py-2 rounded-full uppercase tracking-widest font-black shadow-sm flex items-center gap-1.5 backdrop-blur-sm">
-                        <Lock size={10} className="text-indigo-400/80" /> {msg.text}
+                        <Lock size={10} className="text-teal-400/80" /> {msg.text}
                       </span>
                     </div>
                   );
@@ -281,10 +281,10 @@ export function Chat() {
                           <p className="text-xs md:text-sm text-slate-350 leading-relaxed mb-4">{msg.text}</p>
                           <div className="flex justify-end gap-2 flex-wrap">
                             {msg.type === "nda" && !isMe && (
-                              <button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all duration-200 active:scale-95">Assinar NDA</button>
+                              <button className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all duration-200 active:scale-95">Assinar NDA</button>
                             )}
                             {msg.type === "meeting" && !isMe && (
-                              <button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all duration-200 active:scale-95">Aceitar Horário</button>
+                              <button className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white text-xs font-bold px-4 py-2 rounded-lg transition-all duration-200 active:scale-95">Aceitar Horário</button>
                             )}
                             <button onClick={() => setModalData({type: msg.type as MessageType, text: msg.text})} className="bg-slate-900 border border-slate-800 hover:border-slate-700 hover:text-white text-slate-400 text-xs font-semibold px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 active:scale-95">
                               <Download size={13} /> Detalhes
@@ -301,7 +301,7 @@ export function Chat() {
                   <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"} animate-in fade-in duration-300`}>
                     <div className={`max-w-[70%] rounded-2xl px-5 py-3 text-sm leading-relaxed ${
                       isMe 
-                        ? "bg-indigo-600 text-white rounded-tr-sm shadow-[0_4px_15px_rgba(99,102,241,0.25)] font-sans" 
+                        ? "bg-teal-600 text-white rounded-tr-sm shadow-[0_4px_15px_rgba(0,181,156,0.25)] font-sans" 
                         : "bg-slate-900/80 text-slate-200 rounded-tl-sm border border-slate-800 font-sans"
                     }`}>
                       {msg.text}
@@ -319,13 +319,13 @@ export function Chat() {
                   value={input}
                   onChange={e => setInput(e.target.value)}
                   placeholder={activeConv.status === "pending" ? "Chat bloqueado aguardando aceite..." : activeConv.status === "declined" ? "Negociação encerrada." : "Digite sua mensagem..."}
-                  className="flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-3 text-slate-200 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm placeholder:text-slate-600 disabled:opacity-50 disabled:bg-slate-950 disabled:cursor-not-allowed"
+                  className="flex-1 bg-slate-950/80 border border-slate-800 rounded-xl px-5 py-3 text-slate-200 focus:outline-none focus:border-teal-500/80 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm placeholder:text-slate-600 disabled:opacity-50 disabled:bg-slate-950 disabled:cursor-not-allowed"
                   disabled={activeConv.stage === "closed" || activeConv.status === "pending" || activeConv.status === "declined"}
                 />
                 <button
                   type="submit"
                   disabled={!input.trim() || activeConv.stage === "closed" || activeConv.status === "pending" || activeConv.status === "declined"}
-                  className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900 disabled:text-slate-600 disabled:cursor-not-allowed text-white w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)] active:scale-95 duration-200"
+                  className="bg-teal-600 hover:bg-teal-500 disabled:bg-slate-900 disabled:text-slate-600 disabled:cursor-not-allowed text-white w-12 h-12 rounded-xl flex items-center justify-center transition-all shadow-[0_0_15px_rgba(0,181,156,0.2)] active:scale-95 duration-200"
                 >
                   <Send size={16} />
                 </button>
@@ -341,7 +341,7 @@ export function Chat() {
             <h2 className="text-base font-bold text-slate-350 mb-1.5 text-center">Deal Flow CRM</h2>
             <p className="text-xs text-slate-500 text-center max-w-sm leading-relaxed">Selecione uma negociação ao lado para enviar mensagens e propostas.</p>
             <div className="md:hidden mt-6 w-full max-w-xs">
-              <a href="/explore" className="w-full inline-flex items-center justify-center bg-indigo-650 hover:bg-indigo-600 text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)] active:scale-95 duration-200">
+              <a href="/explore" className="w-full inline-flex items-center justify-center bg-teal-650 hover:bg-teal-600 text-white px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(0,181,156,0.2)] active:scale-95 duration-200">
                 Explorar matches
               </a>
             </div>
@@ -364,7 +364,7 @@ export function Chat() {
               <p className="text-slate-350 text-xs md:text-sm leading-relaxed mb-6">{modalData.text}</p>
               
               <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-850 mb-6 text-[10px] text-slate-500 leading-relaxed font-sans">
-                <p className="mb-2"><strong className="text-slate-350">Status:</strong> Documento travado criptograficamente pelo Orizon Match.</p>
+                <p className="mb-2"><strong className="text-slate-350">Status:</strong> Documento travado criptograficamente pelo InovaHelix.</p>
                 <p><strong className="text-slate-350">Hash de Segurança:</strong> {Math.random().toString(36).substring(2, 15).toUpperCase()}</p>
               </div>
 
@@ -437,7 +437,7 @@ export function Chat() {
                           onClick={async () => {
                             await signNDA(activeConv.id, user.uid);
                           }}
-                          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded-lg transition shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+                          className="w-full bg-teal-600 hover:bg-teal-500 text-white font-bold py-2 rounded-lg transition shadow-[0_0_15px_rgba(0,181,156,0.3)]"
                         >
                           Assinar NDA Eletrônico
                         </button>

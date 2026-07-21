@@ -60,8 +60,8 @@ async function createCheckoutSession(userId, email, priceId) {
             },
         ],
         mode: 'subscription',
-        success_url: `https://orizon-match.web.app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `https://orizon-match.web.app/pricing`,
+        success_url: `https://inovahelix.web.app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `https://inovahelix.web.app/pricing`,
         customer_email: email,
         metadata: {
             userId,
@@ -80,7 +80,7 @@ async function createPortalSession(userId) {
     }
     const session = await stripe.billingPortal.sessions.create({
         customer: customerId,
-        return_url: 'https://orizon-match.web.app/billing',
+        return_url: 'https://inovahelix.web.app/billing',
     });
     return { url: session.url };
 }

@@ -45,7 +45,7 @@ export function Topbar({ onMenuToggle }: TopbarProps) {
         <div className="relative">
           <button
             onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-            className="flex items-center gap-2 text-slate-400 hover:text-indigo-400 transition-all font-medium text-sm bg-slate-800/40 hover:bg-slate-800/80 border border-slate-800/80 px-2.5 py-1.5 rounded-xl cursor-pointer"
+            className="flex items-center gap-2 text-slate-400 hover:text-teal-400 transition-all font-medium text-sm bg-slate-800/40 hover:bg-slate-800/80 border border-slate-800/80 px-2.5 py-1.5 rounded-xl cursor-pointer"
             title="Alterar idioma / Change language"
           >
             <Globe size={16} />
@@ -66,12 +66,12 @@ export function Topbar({ onMenuToggle }: TopbarProps) {
                     onClick={() => handleLanguageChange(lang.code)}
                     className={`flex items-center justify-between w-full px-3 py-2 rounded-lg text-left text-xs font-semibold transition-all ${
                       currentLanguage === lang.code
-                        ? "bg-indigo-600/10 text-indigo-400"
+                        ? "bg-teal-600/10 text-teal-400"
                         : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
                     }`}
                   >
                     <span>{lang.label}</span>
-                    {currentLanguage === lang.code && <Check size={14} className="text-indigo-400" />}
+                    {currentLanguage === lang.code && <Check size={14} className="text-teal-400" />}
                   </button>
                 ))}
               </div>
@@ -88,7 +88,7 @@ export function Topbar({ onMenuToggle }: TopbarProps) {
             </p>
             <p className="text-xs text-slate-400 truncate max-w-[160px]">{user?.email}</p>
           </div>
-          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-bold uppercase overflow-hidden text-sm">
+          <div className="w-9 h-9 md:w-10 md:h-10 rounded-full bg-teal-500/20 border border-teal-500/30 flex items-center justify-center text-teal-400 font-bold uppercase overflow-hidden text-sm">
             {user?.email ? user.email.charAt(0) : "U"}
           </div>
         </div>

@@ -249,7 +249,7 @@ export const onLegalInviteCreated = functions.region("southamerica-east1").runWi
       const inviterDoc = await db.collection("users").doc(invite.invitedBy).get();
       const inviterName = inviterDoc.data()?.name || "Um inventor";
 
-      const inviteLink = `https://inovahelix-match.web.app/onboarding?ref=legal&invite=${snap.id}`;
+      const inviteLink = `https://inovahelix.web.app/onboarding?ref=legal&invite=${snap.id}`;
 
       const { subject, html } = legalInviteEmail({
         inviterName,

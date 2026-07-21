@@ -30,9 +30,9 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.08),transparent_50%)] flex items-center justify-center p-4 font-sans text-slate-200">
+    <div className="min-h-screen bg-[#020617] bg-[radial-gradient(circle_at_top,rgba(0,181,156,0.08),transparent_50%)] flex items-center justify-center p-4 font-sans text-slate-200">
       <div className="w-full max-w-md bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-[2rem] p-8 md:p-10 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/[0.02] blur-[80px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/[0.02] blur-[80px] pointer-events-none" />
         
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-3 group/logo">
@@ -57,7 +57,7 @@ export function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-slate-950/70 border border-slate-800 hover:border-slate-700/60 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm placeholder:text-slate-600"
+              className="w-full bg-slate-950/70 border border-slate-800 hover:border-slate-700/60 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-teal-500/80 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm placeholder:text-slate-600"
               placeholder="seu@email.com"
             />
           </div>
@@ -71,7 +71,7 @@ export function Login() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-slate-950/70 border border-slate-800 hover:border-slate-700/60 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-indigo-500/80 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm placeholder:text-slate-600"
+              className="w-full bg-slate-950/70 border border-slate-800 hover:border-slate-700/60 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:border-teal-500/80 focus:ring-2 focus:ring-teal-500/20 transition-all text-sm placeholder:text-slate-600"
               placeholder="••••••••"
             />
           </div>
@@ -112,7 +112,7 @@ export function Login() {
           Google
         </button>
 
-        <div className="mt-6 p-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 flex items-start gap-3 shadow-inner group/disclaimer transition-colors duration-300 hover:border-indigo-500/20">
+        <div className="mt-6 p-4 rounded-xl bg-teal-500/5 border border-teal-500/10 flex items-start gap-3 shadow-inner group/disclaimer transition-colors duration-300 hover:border-teal-500/20">
           <ShieldCheck size={18} className="text-emerald-400 shrink-0 mt-0.5 group-hover/disclaimer:scale-105 group-hover/disclaimer:text-emerald-300 transition-all duration-300" />
           <p className="text-[10px] text-slate-500 leading-relaxed">
             Seus dados são protegidos por criptografia militar de ponta a ponta. As negociações ocorrem em ambiente seguro e sob acordos automáticos de NDA.
@@ -129,7 +129,7 @@ export function Login() {
           
           <div className="text-center text-xs text-slate-500">
             Não tem uma conta?{" "}
-            <Link to="/onboarding" className="text-indigo-400 hover:text-indigo-300 font-medium underline underline-offset-4 decoration-indigo-500/30 hover:decoration-indigo-500 transition-all">
+            <Link to="/onboarding" className="text-teal-400 hover:text-teal-300 font-medium underline underline-offset-4 decoration-teal-500/30 hover:decoration-teal-500 transition-all">
               Começar agora
             </Link>
           </div>

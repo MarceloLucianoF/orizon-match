@@ -45,9 +45,9 @@ const COLUMNS: { id: DealStatus; title: string; indicatorColor: string }[] = [
   { id: 'descoberta', title: 'Descoberta', indicatorColor: 'bg-slate-500' },
   { id: 'interesse', title: 'Interesse', indicatorColor: 'bg-blue-500' },
   { id: 'nda', title: 'NDA', indicatorColor: 'bg-cyan-500' },
-  { id: 'avaliacao', title: 'Análise Técnica', indicatorColor: 'bg-indigo-500' },
+  { id: 'avaliacao', title: 'Análise Técnica', indicatorColor: 'bg-teal-500' },
   { id: 'due_diligence', title: 'Due Diligence', indicatorColor: 'bg-amber-500' },
-  { id: 'comite', title: 'Comitê', indicatorColor: 'bg-fuchsia-500' },
+  { id: 'comite', title: 'Comitê', indicatorColor: 'bg-teal-500' },
   { id: 'negociacao', title: 'Negociação', indicatorColor: 'bg-purple-500' },
   { id: 'contrato', title: 'Contrato', indicatorColor: 'bg-emerald-500' },
   { id: 'encerrado', title: 'Encerrado', indicatorColor: 'bg-rose-500' },
@@ -311,7 +311,7 @@ export function CompanyDashboard() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="animate-spin text-indigo-500" size={48} />
+        <Loader2 className="animate-spin text-teal-500" size={48} />
       </div>
     );
   }
@@ -347,7 +347,7 @@ export function CompanyDashboard() {
             onClick={() => setActiveTab('overview')}
             className={`flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
               activeTab === 'overview' 
-                ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.35)]' 
+                ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-[0_0_15px_rgba(0,181,156,0.35)]' 
                 : 'text-slate-500 hover:text-slate-350'
             }`}
           >
@@ -359,8 +359,8 @@ export function CompanyDashboard() {
             onClick={() => setActiveTab('radar')}
             className={`flex items-center gap-2 px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
               activeTab === 'radar' 
-                ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.35)]' 
-                : 'text-slate-500 hover:text-indigo-400'
+                ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-[0_0_15px_rgba(0,181,156,0.35)]' 
+                : 'text-slate-500 hover:text-teal-400'
             }`}
           >
             <MapIcon size={14} />
@@ -377,7 +377,7 @@ export function CompanyDashboard() {
               label={t("dashboard.investor.inScreening")} 
               value={deals.filter(d => d.status === 'descoberta' || d.status === 'interesse' || d.status === 'nda').length} 
               icon={Zap} 
-              color="indigo" 
+              color="teal" 
             />
             <StatsCard 
               label={t("dashboard.investor.dueDiligence")} 
@@ -444,13 +444,13 @@ export function CompanyDashboard() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-900/40 to-slate-900 border border-indigo-500/20 rounded-3xl p-6">
-              <h3 className="text-sm font-bold text-indigo-300 uppercase tracking-widest mb-4">{t("dashboard.investor.marketMatchScore")}</h3>
+            <div className="bg-gradient-to-br from-teal-900/40 to-slate-900 border border-teal-500/20 rounded-3xl p-6">
+              <h3 className="text-sm font-bold text-teal-300 uppercase tracking-widest mb-4">{t("dashboard.investor.marketMatchScore")}</h3>
               <div className="flex flex-col items-center justify-center h-full pb-6">
                 <div className="relative w-32 h-32 flex items-center justify-center mb-4">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                     <path className="text-slate-800" strokeWidth="2.5" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path className="text-indigo-500" strokeWidth="2.5" strokeDasharray="88, 100" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path className="text-teal-500" strokeWidth="2.5" strokeDasharray="88, 100" strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                   </svg>
                   <div className="absolute flex flex-col items-center">
                     <span className="text-3xl font-black text-white">88%</span>
@@ -464,14 +464,14 @@ export function CompanyDashboard() {
           </div>
 
           {smartPrompt && (
-            <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-              <div className="flex items-center gap-3 text-indigo-300">
+            <div className="bg-teal-500/10 border border-teal-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3 text-teal-300">
                 <AlertCircle size={18} className="flex-shrink-0" />
                 <span className="font-medium text-sm">{smartPrompt.message}</span>
               </div>
               <div className="flex gap-2 flex-shrink-0">
                 <button onClick={() => setSmartPrompt(null)} className="text-slate-400 hover:text-slate-200 px-3 py-1.5 text-xs">{t("dashboard.investor.ignore")}</button>
-                <button onClick={() => setSmartPrompt(null)} className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(79,70,229,0.3)] transition-all">
+                <button onClick={() => setSmartPrompt(null)} className="bg-teal-600 hover:bg-teal-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold shadow-[0_0_10px_rgba(0,181,156,0.3)] transition-all">
                   {smartPrompt.action}
                 </button>
               </div>
@@ -492,7 +492,7 @@ export function CompanyDashboard() {
                     onClick={() => setActiveMobileColumn(col.id)}
                     className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider whitespace-nowrap border transition-all cursor-pointer ${
                       isActive
-                        ? "bg-indigo-500/10 border-indigo-500/30 text-indigo-400 shadow-lg"
+                        ? "bg-teal-500/10 border-teal-500/30 text-teal-400 shadow-lg"
                         : "bg-slate-900/40 border-slate-850 text-slate-400 hover:text-slate-200"
                     }`}
                   >
@@ -535,8 +535,8 @@ export function CompanyDashboard() {
 
                           if (isEditing) {
                             return (
-                              <div key={deal.id} className="bg-slate-950 border border-indigo-500/35 rounded-xl p-4.5 transition-all shadow-2xl shadow-indigo-500/5 space-y-3.5">
-                                <div className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-1">Editar CRM</div>
+                              <div key={deal.id} className="bg-slate-950 border border-teal-500/35 rounded-xl p-4.5 transition-all shadow-2xl shadow-teal-500/5 space-y-3.5">
+                                <div className="text-xs font-bold text-teal-400 uppercase tracking-wider mb-1">Editar CRM</div>
                                 
                                 <div className="space-y-1">
                                   <label className="text-[9px] text-slate-500 font-bold block uppercase tracking-wider">Responsável</label>
@@ -544,7 +544,7 @@ export function CompanyDashboard() {
                                     type="text" 
                                     value={editOwnerName} 
                                     onChange={e => setEditOwnerName(e.target.value)}
-                                    className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
+                                    className="bg-slate-950 border border-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                   />
                                 </div>
 
@@ -554,7 +554,7 @@ export function CompanyDashboard() {
                                     type="number" 
                                     value={editEstimatedValue} 
                                     onChange={e => setEditEstimatedValue(Number(e.target.value))}
-                                    className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
+                                    className="bg-slate-950 border border-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                   />
                                 </div>
 
@@ -567,7 +567,7 @@ export function CompanyDashboard() {
                                       max="100" 
                                       value={editProbability} 
                                       onChange={e => setEditProbability(Number(e.target.value))}
-                                      className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
+                                      className="bg-slate-950 border border-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                     />
                                   </div>
                                   <div className="space-y-1">
@@ -576,7 +576,7 @@ export function CompanyDashboard() {
                                       type="date" 
                                       value={editExpectedCloseDate} 
                                       onChange={e => setEditExpectedCloseDate(e.target.value)}
-                                      className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
+                                      className="bg-slate-950 border border-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                     />
                                   </div>
                                 </div>
@@ -587,7 +587,7 @@ export function CompanyDashboard() {
                                     type="text" 
                                     value={editNextAction} 
                                     onChange={e => setEditNextAction(e.target.value)}
-                                    className="bg-slate-950 border border-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
+                                    className="bg-slate-950 border border-slate-800 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 text-xs text-slate-200 rounded-xl p-2.5 w-full outline-none transition-all"
                                   />
                                 </div>
 
@@ -606,7 +606,7 @@ export function CompanyDashboard() {
                                       probability: editProbability,
                                       nextAction: editNextAction
                                     })}
-                                    className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 px-3.5 py-1.5 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 shadow-md shadow-indigo-650/20 active:scale-95 cursor-pointer"
+                                    className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 px-3.5 py-1.5 rounded-lg text-[10px] font-bold text-white transition-all flex items-center gap-1 shadow-md shadow-teal-650/20 active:scale-95 cursor-pointer"
                                   >
                                     <Save size={12} /> Salvar
                                   </button>
@@ -616,7 +616,7 @@ export function CompanyDashboard() {
                           }
 
                           return (
-                            <div key={deal.id} className="bg-slate-950/50 border border-slate-850/80 hover:border-indigo-500/25 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 transition-all duration-300 rounded-xl p-4.5 flex flex-col gap-3 group relative backdrop-blur-sm shadow-sm">
+                            <div key={deal.id} className="bg-slate-950/50 border border-slate-850/80 hover:border-teal-500/25 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 transition-all duration-300 rounded-xl p-4.5 flex flex-col gap-3 group relative backdrop-blur-sm shadow-sm">
                               {/* Edit Button overlay on hover */}
                               <button 
                                 onClick={() => {
@@ -653,8 +653,8 @@ export function CompanyDashboard() {
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-1 text-slate-400 justify-end">
-                                  <TrendingUp size={11} className="text-indigo-400" />
-                                  <span className="font-bold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20">
+                                  <TrendingUp size={11} className="text-teal-400" />
+                                  <span className="font-bold text-teal-400 bg-teal-500/10 px-1.5 py-0.5 rounded border border-teal-500/20">
                                     {deal.probability !== undefined ? deal.probability : 10}%
                                   </span>
                                 </div>
@@ -682,7 +682,7 @@ export function CompanyDashboard() {
                               </div>
 
                               <select 
-                                className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-[11px] text-slate-355 rounded-lg p-2 w-full outline-none focus:border-indigo-500 mt-1 cursor-pointer transition-all hover:bg-slate-900"
+                                className="bg-slate-950 border border-slate-800 hover:border-slate-700 text-[11px] text-slate-355 rounded-lg p-2 w-full outline-none focus:border-teal-500 mt-1 cursor-pointer transition-all hover:bg-slate-900"
                                 value={deal.status}
                                 onChange={(e) => moveDeal(deal.id, e.target.value as DealStatus)}
                               >
@@ -707,8 +707,8 @@ export function CompanyDashboard() {
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
           <div className="flex justify-between items-center bg-slate-900/40 p-4 rounded-2xl border border-slate-800">
             <div className="flex items-center gap-4">
-              <div className="p-3 bg-indigo-500/10 rounded-xl">
-                <Target className="text-indigo-400" size={20} />
+              <div className="p-3 bg-teal-500/10 rounded-xl">
+                <Target className="text-teal-400" size={20} />
               </div>
               <div>
                 <h2 className="text-lg font-bold text-white">{t("dashboard.investor.geoIntel")}</h2>

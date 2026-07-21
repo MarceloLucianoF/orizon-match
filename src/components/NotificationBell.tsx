@@ -21,7 +21,7 @@ export function NotificationBell() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'match': return <Zap size={16} className="text-indigo-400" />;
+      case 'match': return <Zap size={16} className="text-teal-400" />;
       case 'nda': return <ShieldCheck size={16} className="text-emerald-400" />;
       case 'invite': return <MessageSquare size={16} className="text-cyan-400" />;
       default: return <Info size={16} className="text-slate-400" />;
@@ -36,7 +36,7 @@ export function NotificationBell() {
       >
         <Bell size={20} />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-indigo-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-slate-900 animate-in zoom-in">
+          <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-teal-500 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-slate-900 animate-in zoom-in">
             {unreadCount}
           </span>
         )}
@@ -49,7 +49,7 @@ export function NotificationBell() {
             {unreadCount > 0 && (
               <button 
                 onClick={markAllAsRead}
-                className="text-[10px] text-indigo-400 hover:text-indigo-300 font-bold uppercase tracking-wider"
+                className="text-[10px] text-teal-400 hover:text-teal-300 font-bold uppercase tracking-wider"
               >
                 Limpar tudo
               </button>
@@ -71,9 +71,9 @@ export function NotificationBell() {
                     if (n.link) navigate(n.link);
                     setIsOpen(false);
                   }}
-                  className={`w-full p-4 text-left border-b border-slate-800/50 hover:bg-slate-800/40 transition flex gap-3 ${!n.read ? 'bg-indigo-500/5' : ''}`}
+                  className={`w-full p-4 text-left border-b border-slate-800/50 hover:bg-slate-800/40 transition flex gap-3 ${!n.read ? 'bg-teal-500/5' : ''}`}
                 >
-                  <div className={`mt-1 w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${!n.read ? 'bg-indigo-500/20' : 'bg-slate-800'}`}>
+                  <div className={`mt-1 w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${!n.read ? 'bg-teal-500/20' : 'bg-slate-800'}`}>
                     {getIcon(n.type)}
                   </div>
                   <div className="space-y-1">
@@ -84,7 +84,7 @@ export function NotificationBell() {
                     </p>
                   </div>
                   {!n.read && (
-                    <div className="w-2 h-2 rounded-full bg-indigo-500 mt-2 shrink-0" />
+                    <div className="w-2 h-2 rounded-full bg-teal-500 mt-2 shrink-0" />
                   )}
                 </button>
               ))

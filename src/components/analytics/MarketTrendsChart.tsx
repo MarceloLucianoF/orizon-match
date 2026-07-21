@@ -11,7 +11,7 @@ const defaultData = [
   { name: 'Indústria', value: 18 },
 ];
 
-const COLORS = ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'];
+const COLORS = ['#00B59C', '#06b6d4', '#10b981', '#14b8a6', '#34d399'];
 
 interface MarketTrendsChartProps {
   data?: any[];

@@ -32,12 +32,12 @@ export function ProjectPerformanceChart({ data = defaultData, title, height = 30
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={data}
-            margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            margin={{ top: 10, right: 10, left: -10, bottom: 0 }}
           >
             <defs>
               <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
-                <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
+                <stop offset="5%" stopColor="#00B59C" stopOpacity={0.3}/>
+                <stop offset="95%" stopColor="#00B59C" stopOpacity={0}/>
               </linearGradient>
               <linearGradient id="colorSaves" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
@@ -58,6 +58,7 @@ export function ProjectPerformanceChart({ data = defaultData, title, height = 30
               fontSize={10} 
               tickLine={false} 
               axisLine={false} 
+              width={25}
             />
             <Tooltip 
               contentStyle={{ 
@@ -80,7 +81,7 @@ export function ProjectPerformanceChart({ data = defaultData, title, height = 30
               type="monotone" 
               dataKey="views" 
               name="Visualizações"
-              stroke="#6366f1" 
+              stroke="#00B59C" 
               strokeWidth={3}
               fillOpacity={1} 
               fill="url(#colorViews)" 

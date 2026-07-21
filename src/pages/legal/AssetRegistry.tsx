@@ -77,16 +77,16 @@ export function AssetRegistry() {
   const getIcon = (type: AssetType) => {
     switch (type) {
       case 'patent': return <Briefcase className="text-amber-400" size={18} />;
-      case 'trademark': return <ShieldCheck className="text-indigo-400" size={18} />;
+      case 'trademark': return <ShieldCheck className="text-teal-400" size={18} />;
       case 'software': return <Code className="text-emerald-400" size={18} />;
-      case 'design': return <GraduationCap className="text-fuchsia-400" size={18} />;
+      case 'design': return <GraduationCap className="text-teal-400" size={18} />;
     }
   };
 
   if (loading && assets.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="animate-spin text-indigo-500" size={48} />
+        <Loader2 className="animate-spin text-teal-500" size={48} />
       </div>
     );
   }
@@ -96,13 +96,13 @@ export function AssetRegistry() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
-            <FileText className="text-indigo-400" /> {t("dashboard.legal.assets.title")}
+            <FileText className="text-teal-400" /> {t("dashboard.legal.assets.title")}
           </h1>
           <p className="text-slate-400 mt-1 text-sm">{t("dashboard.legal.assets.subtitle")}</p>
         </div>
         <button 
           onClick={() => setShowModal(true)}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)] text-sm"
+          className="bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(0,181,156,0.3)] text-sm"
         >
           <Plus size={18} /> {t("dashboard.legal.assets.newAssetBtn")}
         </button>
@@ -115,7 +115,7 @@ export function AssetRegistry() {
           <input 
             type="text" 
             placeholder={t("dashboard.legal.assets.searchPlaceholder")}
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm"
+            className="w-full bg-slate-900/50 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-slate-200 outline-none focus:border-teal-500 transition-all text-sm"
           />
         </div>
         <div className="flex gap-2">
@@ -135,9 +135,9 @@ export function AssetRegistry() {
           </div>
         ) : (
           assets.map(asset => (
-            <div key={asset.id} className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-all group">
+            <div key={asset.id} className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 hover:border-teal-500/50 transition-all group">
               <div className="flex justify-between items-start mb-4">
-                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 group-hover:border-indigo-500/30 transition-colors">
+                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 group-hover:border-teal-500/30 transition-colors">
                   {getIcon(asset.type)}
                 </div>
                 <span className={`text-[10px] font-black uppercase tracking-widest px-2 py-1 rounded border ${
@@ -161,7 +161,7 @@ export function AssetRegistry() {
                 )}
                 <div className="flex justify-between items-center text-[10px] uppercase font-black tracking-widest text-slate-500">
                   <span className="flex items-center gap-1"><AlertCircle size={12} /> {t("dashboard.legal.assets.auditInovaHelix")}</span>
-                  <button className="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition-colors">
+                  <button className="text-teal-400 hover:text-teal-300 flex items-center gap-1 transition-colors">
                     {t("dashboard.legal.assets.manage")} <ExternalLink size={10} />
                   </button>
                 </div>
@@ -188,7 +188,7 @@ export function AssetRegistry() {
                   type="text" 
                   value={newAsset.title}
                   onChange={e => setNewAsset({...newAsset, title: e.target.value})}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-teal-500 transition-all"
                   placeholder={t("dashboard.legal.assets.assetTitlePlaceholder")}
                 />
               </div>
@@ -199,7 +199,7 @@ export function AssetRegistry() {
                   <select 
                     value={newAsset.type}
                     onChange={e => setNewAsset({...newAsset, type: e.target.value as any})}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-teal-500 transition-all"
                   >
                     <option value="patent">{t("dashboard.legal.assets.types.patent")}</option>
                     <option value="trademark">{t("dashboard.legal.assets.types.trademark")}</option>
@@ -213,7 +213,7 @@ export function AssetRegistry() {
                     type="text" 
                     value={newAsset.inpiNumber}
                     onChange={e => setNewAsset({...newAsset, inpiNumber: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-teal-500 transition-all"
                     placeholder={t("dashboard.legal.assets.inpiNumberPlaceholder")}
                   />
                 </div>
@@ -226,7 +226,7 @@ export function AssetRegistry() {
                   value={newAsset.description}
                   onChange={e => setNewAsset({...newAsset, description: e.target.value})}
                   rows={3}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all resize-none"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-teal-500 transition-all resize-none"
                   placeholder={t("dashboard.legal.assets.descPlaceholder")}
                 />
               </div>
@@ -242,7 +242,7 @@ export function AssetRegistry() {
                 <button 
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold transition-all shadow-lg shadow-teal-500/20 disabled:opacity-50"
                 >
                   {loading ? <Loader2 className="animate-spin mx-auto" size={20} /> : t("dashboard.legal.assets.registerBtn")}
                 </button>

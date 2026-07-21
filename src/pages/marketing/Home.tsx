@@ -11,17 +11,17 @@ import {
   Sparkles,
   Search,
   CheckCircle2,
-  Network,
   ArrowUpRight,
   BarChart3,
   Briefcase,
   GraduationCap,
-  Building2
+  Building2,
+  Landmark
 } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="bg-[#030712] text-slate-100 min-h-screen overflow-x-hidden selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="bg-[#030712] text-slate-100 min-h-screen overflow-x-hidden selection:bg-teal-500/30 selection:text-teal-200">
 
       {/* HEADER */}
       <header className="fixed top-0 w-full z-50 bg-slate-950/70 backdrop-blur-md border-b border-slate-800/60 transition-all duration-300">
@@ -48,42 +48,50 @@ export default function Home() {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] md:w-[900px] h-[400px] md:h-[600px] bg-gradient-to-b from-teal-500/20 via-cyan-500/10 to-transparent blur-[120px] pointer-events-none" />
         <div className="absolute top-20 left-1/4 w-[300px] h-[300px] bg-cyan-500/10 blur-[100px] pointer-events-none" />
         <div className="max-w-5xl mx-auto px-4 md:px-6 text-center relative z-10">
+          <div className="text-[10px] md:text-xs font-black tracking-[0.25em] text-teal-400/80 mb-6 select-none">
+            CONNECTING IDEAS. ACCELERATING INNOVATION.
+          </div>
           <div className="inline-flex items-center gap-2 bg-teal-500/10 border border-teal-500/20 text-teal-400 px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold mb-6 backdrop-blur-md">
             <Sparkles size={14} className="text-teal-400" />
             IA que reduz semanas de prospecção tecnológica para minutos
           </div>
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight text-white mb-6">
-            A plataforma de transferência tecnológica{" "}
+            A infraestrutura digital para conectar{" "}
             <span className="bg-gradient-to-r from-teal-400 via-cyan-400 to-emerald-400 bg-clip-text text-transparent">
-              segura e inteligente.
+              ciência, tecnologia e mercado.
             </span>
           </h1>
 
-          <p className="text-slate-400 text-base md:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed mb-8">
-            Conectamos universidades, inventores e indústrias em um ambiente transacional blindado. 
-            Identifique ativos de propriedade intelectual compatíveis com sua tese de inovação e negocie sob NDAs automáticos.
+          <p className="text-slate-400 text-base md:text-lg lg:text-xl max-w-3xl mx-auto leading-relaxed mb-8 font-light">
+            A InovaHelix ajuda universidades, ICTs, empresas e inventores a transformar ativos tecnológicos em oportunidades de licenciamento, parceria e investimento com apoio de inteligência artificial.
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 mb-10">
             <Link
               to="/onboarding"
-              className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-indigo-600 hover:from-indigo-500 hover:via-indigo-400 hover:to-indigo-500 transition-all duration-300 font-bold text-white shadow-[0_0_25px_rgba(79,70,229,0.3)] hover:shadow-[0_0_35px_rgba(79,70,229,0.5)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm md:text-base flex items-center justify-center gap-2"
+              className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-teal-650 via-teal-500 to-teal-650 hover:from-teal-550 hover:via-teal-400 hover:to-teal-550 transition-all duration-300 font-bold text-white shadow-[0_0_25px_rgba(0,181,156,0.3)] hover:shadow-[0_0_35px_rgba(0,181,156,0.5)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-sm md:text-base flex items-center justify-center gap-2"
             >
-              Iniciar transferência tecnológica
+              Cadastrar uma tecnologia
               <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform duration-200" />
             </Link>
             <Link
               to="/sobre"
               className="px-8 py-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700/80 hover:bg-slate-900 hover:text-white transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 text-slate-350 font-semibold text-sm md:text-base text-center"
             >
-              Verificar segurança do VDR
+              Conhecer ambiente seguro
             </Link>
           </div>
 
-          <div className="border-t border-slate-800/60 pt-8 max-w-3xl mx-auto flex flex-wrap justify-center gap-x-12 gap-y-4 text-xs text-slate-500 font-semibold uppercase tracking-wider">
-            <span>✓ Conectado a +3.000 Patentes de ICTs</span>
-            <span>✓ Em conformidade com a Lei de Inovação</span>
-            <span>✓ VDR com auditoria militar e LGPD</span>
+          <div className="border-t border-slate-800/60 pt-8 max-w-4xl mx-auto mt-6">
+            <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold mb-4">Desenvolvido para conectar</p>
+            <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs text-slate-400 font-semibold">
+              <span className="bg-slate-900/40 border border-slate-800/60 px-3.5 py-1.5 rounded-xl text-teal-400/90">✓ Universidades</span>
+              <span className="bg-slate-900/40 border border-slate-800/60 px-3.5 py-1.5 rounded-xl text-teal-400/90">✓ ICTs & NITs</span>
+              <span className="bg-slate-900/40 border border-slate-800/60 px-3.5 py-1.5 rounded-xl text-teal-400/90">✓ Empresas & Indústrias</span>
+              <span className="bg-slate-900/40 border border-slate-800/60 px-3.5 py-1.5 rounded-xl text-teal-400/90">✓ Centros de Pesquisa</span>
+              <span className="bg-slate-900/40 border border-slate-800/60 px-3.5 py-1.5 rounded-xl text-teal-400/90">✓ Inventores</span>
+              <span className="bg-slate-900/40 border border-slate-800/60 px-3.5 py-1.5 rounded-xl text-teal-400/90">✓ Startups & Matchmakers</span>
+            </div>
           </div>
         </div>
       </section>
@@ -92,7 +100,7 @@ export default function Home() {
       <section className="border-y border-slate-800/40 bg-slate-950/40 relative">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-400">O Gargalo Tecnológico</span>
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-teal-400">O Gargalo Tecnológico</span>
             <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-2 mb-4">
               Por que a transferência de tecnologia falha hoje?
             </h2>
@@ -121,7 +129,7 @@ export default function Home() {
             ].map(({ icon, title, body }) => (
               <div 
                 key={title} 
-                className="p-6 md:p-8 rounded-2xl bg-gradient-to-b from-slate-900/50 to-slate-950/30 border border-slate-850 hover:border-indigo-500/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.5),0_0_15px_rgba(99,102,241,0.05)] hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 backdrop-blur-sm"
+                className="p-6 md:p-8 rounded-2xl bg-gradient-to-b from-slate-900/50 to-slate-950/30 border border-slate-850 hover:border-teal-500/30 hover:shadow-[0_8px_30px_rgb(0,0,0,0.5),0_0_15px_rgba(0,181,156,0.05)] hover:-translate-y-1 active:scale-[0.99] transition-all duration-300 backdrop-blur-sm"
               >
                 <div className="w-12 h-12 rounded-xl bg-slate-850 border border-slate-800 flex items-center justify-center mb-6 shadow-inner">
                   {icon}
@@ -134,55 +142,185 @@ export default function Home() {
         </div>
       </section>
 
-      {/* DIAGRAMA DO ECOSSISTEMA */}
+      {/* DIAGRAMA DO ECOSSISTEMA (A QUÁDRUPLA HÉLICE DE ETZKOWITZ) */}
       <section className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24 relative text-center">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[350px] h-[350px] bg-teal-500/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-teal-500/5 blur-[120px] pointer-events-none" />
         
         <div className="max-w-2xl mx-auto mb-16">
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-teal-400">Integração Total</span>
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-teal-400">A Hélice de Etzkowitz</span>
           <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-2 mb-4">
-            Um Ecossistema Conectado e Seguro
+            A Quádrupla Hélice Conectada
           </h2>
-          <p className="text-slate-400 text-sm">
-            O InovaHelix orquestra o fluxo de transações entre todas as pontas da inovação.
+          <p className="text-slate-400 text-sm md:text-base font-light leading-relaxed">
+            A InovaHelix não é apenas um local de matchmaking; ela atua como a infraestrutura digital que integra os quatro pilares fundamentais da inovação aberta para transformar ideias em impacto.
           </p>
         </div>
 
-        {/* Ecosystem CSS Diagram */}
-        <div className="max-w-4xl mx-auto p-8 rounded-3xl bg-slate-950/40 border border-slate-800/60 flex flex-col md:flex-row items-center justify-between gap-10 md:gap-4 relative overflow-hidden backdrop-blur-sm">
-          <div className="absolute inset-0 bg-indigo-500/[0.01] pointer-events-none" />
+        {/* Quadruple Helix Grid */}
+        <div className="max-w-5xl mx-auto p-6 md:p-12 rounded-3xl bg-slate-950/40 border border-slate-800/60 relative overflow-hidden backdrop-blur-sm shadow-card">
+          <div className="absolute inset-0 bg-teal-500/[0.01] pointer-events-none" />
           
-          {/* Node 1: ICTs */}
-          <div className="flex flex-col items-center p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 hover:border-slate-700 hover:shadow-[0_0_15px_rgba(20,184,166,0.1)] transition-all duration-300 w-52 relative z-10">
-            <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center mb-3">
-              <GraduationCap className="text-teal-400 w-6 h-6" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center relative z-10">
+            {/* Left Column: Universidade & Governo */}
+            <div className="space-y-8 flex flex-col items-center">
+              {/* Actor 1: Universidade */}
+              <div className="flex flex-col items-center p-6 rounded-2xl border border-slate-800 bg-slate-900/60 hover:border-teal-500/30 hover:shadow-[0_0_15px_rgba(20,184,166,0.15)] transition-all duration-300 w-full max-w-[240px]">
+                <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center mb-3">
+                  <GraduationCap className="text-teal-400 w-6 h-6" />
+                </div>
+                <h4 className="font-bold text-white text-sm">Universidade</h4>
+                <p className="text-slate-400 text-[11px] mt-1.5 text-center leading-relaxed">Produção de conhecimento científico, patentes, spin-offs e laboratórios de pesquisa.</p>
+              </div>
+
+              {/* Actor 2: Governo */}
+              <div className="flex flex-col items-center p-6 rounded-2xl border border-slate-800 bg-slate-900/60 hover:border-teal-500/30 hover:shadow-[0_0_15px_rgba(20,184,166,0.15)] transition-all duration-300 w-full max-w-[240px]">
+                <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center mb-3">
+                  <Landmark className="text-teal-400 w-6 h-6" />
+                </div>
+                <h4 className="font-bold text-white text-sm">Governo e Fomento</h4>
+                <p className="text-slate-400 text-[11px] mt-1.5 text-center leading-relaxed">Subvenção econômica, editais públicos, incentivos fiscais e marcos regulatórios.</p>
+              </div>
             </div>
-            <h4 className="font-bold text-white text-sm">ICTs & NITs</h4>
-            <p className="text-slate-400 text-[10px] mt-1 text-center leading-relaxed">Portfólios de Patentes e Linhas de Pesquisa</p>
+
+            {/* Center Column: InovaHelix Platform Hub */}
+            <div className="flex flex-col items-center py-8">
+              <div className="w-24 h-24 rounded-full bg-teal-500/15 border-2 border-teal-500/30 flex items-center justify-center mb-4 relative shadow-[0_0_40px_rgba(0,181,156,0.25)] transition-transform duration-300 group">
+                <Logo className="w-14 h-14 text-teal-400 animate-[spin_30s_linear_infinite]" />
+                <div className="absolute inset-0 rounded-full border border-teal-400/20 animate-ping pointer-events-none" />
+              </div>
+              <h3 className="font-black text-white text-lg tracking-tight">INOVAHELIX</h3>
+              <p className="text-teal-400 text-xs mt-1.5 text-center font-bold uppercase tracking-wider">O Núcleo Conector</p>
+              <p className="text-slate-500 text-[10px] max-w-[200px] mt-2 text-center leading-relaxed">A inteligência de negócios e segurança jurídica ligando todos os agentes do ecossistema.</p>
+            </div>
+
+            {/* Right Column: Empresa & Sociedade */}
+            <div className="space-y-8 flex flex-col items-center">
+              {/* Actor 3: Empresa */}
+              <div className="flex flex-col items-center p-6 rounded-2xl border border-slate-800 bg-slate-900/60 hover:border-teal-500/30 hover:shadow-[0_0_15px_rgba(20,184,166,0.15)] transition-all duration-300 w-full max-w-[240px]">
+                <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center mb-3">
+                  <Building2 className="text-teal-400 w-6 h-6" />
+                </div>
+                <h4 className="font-bold text-white text-sm">Empresa e Mercado</h4>
+                <p className="text-slate-400 text-[11px] mt-1.5 text-center leading-relaxed">Teses de inovação aberta, capital de investimento, gargalos industriais e canais comerciais.</p>
+              </div>
+
+              {/* Actor 4: Sociedade */}
+              <div className="flex flex-col items-center p-6 rounded-2xl border border-slate-800 bg-slate-900/60 hover:border-teal-500/30 hover:shadow-[0_0_15px_rgba(20,184,166,0.15)] transition-all duration-300 w-full max-w-[240px]">
+                <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center mb-3">
+                  <Users className="text-teal-400 w-6 h-6" />
+                </div>
+                <h4 className="font-bold text-white text-sm">Sociedade</h4>
+                <p className="text-slate-400 text-[11px] mt-1.5 text-center leading-relaxed">Demandas de mercado, sustentabilidade (ESG), desenvolvimento social e impacto de consumo.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* O FLUXO DA PLATAFORMA (PIPELINE DE INOVAÇÃO ABERTA) */}
+      <section className="bg-slate-950/20 border-b border-slate-800/40 relative">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-teal-400">Jornada de Inovação</span>
+            <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-2 mb-4">
+              Como funciona a plataforma
+            </h2>
+            <p className="text-slate-400 text-sm md:text-base font-light">
+              Uma jornada simplificada do cadastro da inovação ao acordo de licenciamento.
+            </p>
           </div>
 
-          {/* Connection vector 1 */}
-          <div className="hidden md:block flex-1 h-[2px] bg-gradient-to-r from-teal-500/30 via-teal-500/50 to-teal-500 z-0" />
-
-          {/* Central Hub: InovaHelix */}
-          <div className="flex flex-col items-center p-6 rounded-2xl border border-teal-500/30 bg-teal-950/20 w-60 relative z-10 shadow-[0_0_30px_rgba(20,184,166,0.15)] hover:border-teal-500/50 transition-all duration-300">
-            <div className="w-14 h-14 rounded-full bg-teal-500/10 flex items-center justify-center mb-3 animate-pulse shadow-[0_0_15px_rgba(20,184,166,0.2)]">
-              <Network className="text-teal-400 w-8 h-8" />
-            </div>
-            <h3 className="font-black text-white text-base tracking-tight">INOVAHELIX</h3>
-            <p className="text-teal-300 text-[10px] mt-1 text-center font-semibold uppercase tracking-wider">Motor de IA e VDR Blindado</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center relative z-10">
+            {[
+              { step: "01", title: "Cadastrar tecnologia", desc: "Inventores e NITs cadastram ativos com facilidade" },
+              { step: "02", title: "Avaliar maturidade com IA", desc: "Nossa IA calcula o nível de maturidade (TRL/IRL) e gera resumos" },
+              { step: "03", title: "Conectar com parceiros", desc: "Cruzamento semântico inteligente de teses com demandas reais do mercado" },
+              { step: "04", title: "Proteger e Negociar", desc: "Compartilhamento seguro (VDR) sob acordos de confidencialidade (NDA)" }
+            ].map(({ step, title, desc }) => (
+              <div key={step} className="flex flex-col items-center bg-slate-900/40 border border-slate-850 rounded-2xl p-6 hover:border-teal-500/25 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 backdrop-blur-sm shadow-sm group">
+                <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-400 text-sm font-black flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                  {step}
+                </div>
+                <h4 className="font-bold text-white text-sm md:text-base tracking-tight mb-2">{title}</h4>
+                <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
+              </div>
+            ))}
           </div>
+        </div>
+      </section>
 
-          {/* Connection vector 2 */}
-          <div className="hidden md:block flex-1 h-[2px] bg-gradient-to-r from-teal-500 via-emerald-500/50 to-emerald-500/30 z-0" />
-
-          {/* Node 2: Empresas */}
-          <div className="flex flex-col items-center p-5 rounded-2xl border border-slate-800/80 bg-slate-900/50 hover:border-slate-700 hover:shadow-[0_0_15px_rgba(16,185,129,0.1)] transition-all duration-300 w-52 relative z-10">
-            <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-3">
-              <Building2 className="text-emerald-400 w-6 h-6" />
+      {/* IA QUE TRABALHA PARA VOCÊ */}
+      <section className="bg-slate-950/60 border-b border-slate-800/40 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,rgba(0,181,156,0.03),transparent_40%)]" />
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Copy side */}
+            <div className="space-y-6 text-left">
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-teal-400">Inteligência a Serviço da Ciência</span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+                A IA como o motor de conexões reais
+              </h2>
+              <p className="text-slate-400 text-sm md:text-base font-light leading-relaxed">
+                A tecnologia não substitui as pessoas. Ela faz o trabalho pesado de classificar, resumir e parear teses para que pesquisadores e gestores foquem na negociação.
+              </p>
+              
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  "Resume patentes complexas",
+                  "Calcula TRL (Maturidade)",
+                  "Pontua IRL (Maturidade Comercial)",
+                  "Gera Executive Briefings",
+                  "Pareia teses semânticas",
+                  "Identifica parceiros de mercado",
+                  "Classifica DNA Tecnológico",
+                  "Organiza evidências de patentes"
+                ].map((feature) => (
+                  <div key={feature} className="flex items-center gap-2.5 text-xs text-slate-350 font-medium">
+                    <div className="w-5 h-5 rounded-md bg-teal-500/10 flex items-center justify-center border border-teal-500/20 text-teal-400 font-bold">✓</div>
+                    {feature}
+                  </div>
+                ))}
+              </div>
             </div>
-            <h4 className="font-bold text-white text-sm">Indústrias & Investidores</h4>
-            <p className="text-slate-400 text-[10px] mt-1 text-center leading-relaxed">Teses de Inovação e Demandas de Mercado</p>
+
+            {/* Visual side: Simulated AI processing card */}
+            <div className="p-6 md:p-8 rounded-3xl bg-slate-950/40 border border-slate-850 relative overflow-hidden backdrop-blur-sm shadow-2xl flex flex-col justify-between h-[340px]">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 blur-[100px] pointer-events-none" />
+              
+              <div className="flex justify-between items-center pb-4 border-b border-slate-850">
+                <div className="flex items-center gap-2">
+                  <Logo className="w-6 h-6 text-teal-400 animate-[spin_20s_linear_infinite]" />
+                  <span className="text-xs font-bold text-white uppercase tracking-wider">InovaHelix AI Engine</span>
+                </div>
+                <span className="text-[10px] text-teal-400 bg-teal-500/10 px-2 py-0.5 rounded-full font-bold">Processando</span>
+              </div>
+
+              <div className="space-y-4 py-6 flex-1 justify-center flex flex-col">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-teal-400 mt-1.5" />
+                  <p className="text-slate-400 text-xs leading-relaxed text-left">
+                    Analisando texto da patente <strong className="text-slate-200">"Sistema Integrado de Monitoramento InovaHelix"</strong>...
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-teal-400 mt-1.5" />
+                  <p className="text-slate-400 text-xs leading-relaxed text-left">
+                    Pontuando maturidade tecnológica: <strong className="text-teal-400 font-bold">TRL 7 (Protótipo operacional)</strong>.
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-teal-400 mt-1.5" />
+                  <p className="text-slate-400 text-xs leading-relaxed text-left">
+                    Executive Briefing gerado em 1.4s. Classificado em <strong className="text-slate-200">Deep Tech / IoT</strong>.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-slate-850 flex items-center justify-between text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                <span>API Status: Online</span>
+                <span>Modelo: LLaMA 3.1 70B</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -310,10 +448,6 @@ export default function Home() {
                 <span className="text-red-400 mt-0.5">✕</span>
                 <span>Sem controle de quem leu os dados ou fez download</span>
               </li>
-              <li className="flex items-start gap-3">
-                <span className="text-red-400 mt-0.5">✕</span>
-                <span>Sem tradução de valor técnico para linguagem comercial</span>
-              </li>
             </ul>
           </div>
 
@@ -326,23 +460,23 @@ export default function Home() {
             <ul className="space-y-4 text-xs md:text-sm text-slate-200">
               <li className="flex items-start gap-3">
                 <span className="text-teal-400 mt-0.5">✓</span>
-                <span>**Matchmaking Semântico**: IA cruza ideias a demandas reais</span>
+                <span><strong>Recomendações Inteligentes</strong>: A IA cruza ideias a demandas reais de mercado</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-teal-400 mt-0.5">✓</span>
-                <span>**Smart NDAs Clickwrap**: Assinaturas digitais em 1 clique</span>
+                <span><strong>Acordo de Confidencialidade (NDA)</strong>: Garantia jurídica assinada digitalmente em um clique</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-teal-400 mt-0.5">✓</span>
-                <span>**Data Room Seguro (VDR)**: Documentos blindados e protegidos</span>
+                <span><strong>Compartilhamento Seguro (VDR)</strong>: Seus documentos técnicos de patentes blindados</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-teal-400 mt-0.5">✓</span>
-                <span>**Trilha de Auditoria**: Telemetria de acessos por segundo</span>
+                <span><strong>Trilha de Auditoria</strong>: Log imutável de quem visualizou cada página do arquivo</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="text-teal-400 mt-0.5">✓</span>
-                <span>**IA Pitch Enhancer**: Ciência traduzida para negócios</span>
+                <span><strong>Tradutor de Patentes</strong>: Transformação de jargões técnicos em linguagem de mercado</span>
               </li>
             </ul>
           </div>
@@ -360,7 +494,7 @@ export default function Home() {
               Blindagem completa de segredos comerciais
             </h2>
             <p className="text-slate-400 text-sm md:text-base">
-              Desenvolvemos os mecanismos necessários para mitigar qualquer possibilidade de vazamento de propriedade intelectual sensível.
+              Mecanismos automáticos para que inventores e empresas possam negociar sem risco de vazamento de propriedade intelectual sensível.
             </p>
           </div>
 
@@ -368,23 +502,23 @@ export default function Home() {
             {[
               {
                 icon: <FileCheck className="text-emerald-400" size={26} />,
-                title: "Smart NDAs Clickwrap",
-                desc: "Anexos e especificações confidenciais são restritos e borrados visualmente no Explore até que o usuário assine digitalmente um termo de confidencialidade vinculante."
+                title: "Acordo de Confidencialidade (Smart NDA)",
+                desc: "Arquivos e especificações confidenciais são restritos e borrados visualmente no catálogo de patentes até que o interessado assine digitalmente um termo de confidencialidade vinculante."
               },
               {
                 icon: <Lock className="text-emerald-400" size={26} />,
-                title: "Virtual Data Room (VDR)",
-                desc: "Arquivos sensíveis abrem em nosso visualizador seguro que desativa de forma nativa atalhos de impressão, cópia (`Ctrl+C`/`Ctrl+P`) ou downloads não autorizados."
+                title: "Compartilhamento Seguro (VDR)",
+                desc: "Seus PDFs abrem em nosso visualizador blindado que desativa atalhos de impressão, cópia de texto (Ctrl+C/Ctrl+P), download e capturas de tela não autorizadas."
               },
               {
                 icon: <Eye className="text-emerald-400" size={26} />,
                 title: "Marca d'água Dinâmica",
-                desc: "Cada documento recebe uma marca d'água diagonal personalizada com o E-mail, IP e Session ID do visualizador, garantindo rastreamento visual."
+                desc: "Cada documento recebe uma marca d'água diagonal personalizada com o E-mail, IP e Session ID do visualizador para inibir fotos e rastrear vazamentos."
               },
               {
                 icon: <Users className="text-emerald-400" size={26} />,
                 title: "Telemetria de Leitura",
-                desc: "Monitoramos e salvamos em um log de auditoria imutável o tempo exato de leitura (`view.start` / `view.end`) de cada página por cada ator."
+                desc: "Registramos em um log de auditoria imutável o tempo exato de leitura de cada página e documento técnico, garantindo rastreabilidade jurídica completa."
               }
             ].map(({ icon, title, desc }) => (
               <div key={title} className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 hover:border-emerald-500/25 hover:-translate-y-0.5 hover:shadow-lg transition-all duration-300 backdrop-blur-sm shadow-sm">
@@ -407,7 +541,7 @@ export default function Home() {
             A infraestrutura completa de transferência
           </h2>
           <p className="text-slate-400 text-sm md:text-base">
-            Uma plataforma integrada de ponta a ponta que cobre desde a ideação do projeto ao fechamento comercial.
+            Uma plataforma integrada de ponta a ponta que cobre desde a captação do projeto ao fechamento do licenciamento.
           </p>
         </div>
 
@@ -415,33 +549,33 @@ export default function Home() {
           {[
             {
               icon: <Cpu size={22} className="text-teal-400" />,
-              title: "IA de Análise de Patentes",
-              desc: "Otimiza a leitura e a conversão de textos de patentes complexas em linguagem comercial."
+              title: "Tradutor de Patentes por IA",
+              desc: "Otimiza a leitura e a conversão de textos de patentes complexas em linguagem comercial simples."
             },
             {
               icon: <Search size={22} className="text-teal-400" />,
-              title: "Matching Semântico",
+              title: "Recomendações Inteligentes (Matching)",
               desc: "Recomendações automáticas conectando teses de indústrias e projetos científicos."
             },
             {
               icon: <BarChart3 size={22} className="text-teal-400" />,
-              title: "Gestão de Portfólio (NITs)",
-              desc: "Painel exclusivo para NITs acadêmicos monitorarem o andamento do portfólio de pesquisas da instituição."
+              title: "Mapeamento e Maturidade (TRL/IRL)",
+              desc: "Classificação automática do nível de maturidade tecnológica e preparação para o mercado de consumo."
             },
             {
               icon: <Lock size={22} className="text-teal-400" />,
-              title: "Virtual Data Room (VDR)",
-              desc: "Espaço seguro de documentação técnica com criptografia e proteção contra downloads."
+              title: "Espaço de Documentos Seguro (VDR)",
+              desc: "Espaço seguro de documentação técnica com criptografia e proteção contra cópias ou downloads."
             },
             {
               icon: <FileCheck size={22} className="text-teal-400" />,
-              title: "Smart NDAs integrados",
-              desc: "Acordos Clickwrap com log de auditoria jurídica imediato e rastreabilidade."
+              title: "Acordo de Confidencialidade (Smart NDA)",
+              desc: "Acordos digitais integrados com log de auditoria jurídica imediato e rastreabilidade."
             },
             {
               icon: <Users size={22} className="text-teal-400" />,
               title: "Organizações Multi-institucionais",
-              desc: "Acesso multi-tenant para administradores simularem papéis e gerenciarem dezenas de membros."
+              desc: "Acesso multi-tenant para universidades, NITs e holdings gerenciarem dezenas de membros e pesquisas."
             }
           ].map(({ icon, title, desc }) => (
             <div 

@@ -78,7 +78,7 @@ export function SecureNDA({ projectId, projectTitle, onAccept }: SecureNDAProps)
     <div className="absolute inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md rounded-3xl">
       <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-300">
         <div className="text-center space-y-4">
-          <div className="w-16 h-16 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center mx-auto mb-4">
             {accepted ? <CheckCircle2 size={32} className="text-emerald-400" /> : <Shield size={32} />}
           </div>
           
@@ -109,15 +109,15 @@ export function SecureNDA({ projectId, projectTitle, onAccept }: SecureNDAProps)
               className={`w-full py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 ${
                 accepted 
                   ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
-                  : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(79,70,229,0.3)]'
+                  : 'bg-teal-650 hover:bg-teal-550 text-white shadow-[0_0_20px_rgba(0,181,156,0.3)]'
               }`}
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : (
                 accepted ? "Acesso Autorizado" : "Aceitar NDA e Ver VDR"
               )}
             </button>
-            <p className="text-[10px] text-slate-600">
-              Ao clicar, você concorda com os termos padrão de confidencialidade da plataforma Orizon Match.
+            <p className="text-[10px] text-slate-650">
+              Ao clicar, você concorda com os termos padrão de confidencialidade da plataforma InovaHelix.
             </p>
           </div>
         </div>

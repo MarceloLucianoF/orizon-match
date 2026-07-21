@@ -171,7 +171,7 @@ export function DueDiligenceChecklist({ projectId, projectTitle }: { projectId?:
   if (loading) {
     return (
       <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-6 flex justify-center items-center py-12">
-        <Loader2 className="animate-spin text-indigo-400" size={24} />
+        <Loader2 className="animate-spin text-teal-400" size={24} />
       </div>
     );
   }
@@ -186,10 +186,10 @@ export function DueDiligenceChecklist({ projectId, projectTitle }: { projectId?:
           <p className="text-[10px] text-slate-500 mt-1 uppercase tracking-tight">Status de auditoria jurídica e técnica</p>
         </div>
         <div className="text-right">
-          <span className={`text-xl font-black ${isReady ? 'text-emerald-400' : 'text-indigo-400'}`}>{progress}%</span>
+          <span className={`text-xl font-black ${isReady ? 'text-emerald-400' : 'text-teal-400'}`}>{progress}%</span>
           <div className="w-24 h-1.5 bg-slate-800 rounded-full mt-1 overflow-hidden">
             <div 
-              className={`h-full transition-all duration-500 ${isReady ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-indigo-500'}`} 
+              className={`h-full transition-all duration-500 ${isReady ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-teal-500'}`} 
               style={{ width: `${progress}%` }} 
             />
           </div>
@@ -224,9 +224,9 @@ export function DueDiligenceChecklist({ projectId, projectTitle }: { projectId?:
               </span>
             </div>
             <div className={`w-2 h-2 rounded-full ${
-              item.category === 'pi' ? 'bg-indigo-500' : 
+              item.category === 'pi' ? 'bg-teal-500' : 
               item.category === 'finance' ? 'bg-amber-500' : 
-              item.category === 'legal' ? 'bg-fuchsia-500' : 'bg-cyan-500'
+              item.category === 'legal' ? 'bg-emerald-500' : 'bg-cyan-500'
             } opacity-40`} />
           </div>
         ))}
@@ -248,7 +248,7 @@ export function DueDiligenceChecklist({ projectId, projectTitle }: { projectId?:
             <AlertCircle className="text-slate-500" size={18} />
             <span className="text-[10px] text-slate-400 font-bold uppercase">Aguardando auditoria jurídica</span>
           </div>
-          <button className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 uppercase tracking-widest">
+          <button className="text-[10px] font-bold text-teal-400 hover:text-teal-300 flex items-center gap-1 uppercase tracking-widest">
             Convidar Especialista <ArrowRight size={10} />
           </button>
         </div>

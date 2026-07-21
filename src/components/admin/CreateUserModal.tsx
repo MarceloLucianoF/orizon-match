@@ -82,7 +82,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/60 bg-slate-900/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20 text-indigo-400">
+            <div className="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center border border-teal-500/20 text-teal-400">
               <UserPlus size={20} />
             </div>
             <div>
@@ -118,7 +118,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
                   value={formData.name}
                   onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
                   placeholder={t("dashboard.admin.createUserModal.placeholderName")}
-                  className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                  className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
                 />
               </div>
             </div>
@@ -133,7 +133,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
                   value={formData.email}
                   onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))}
                   placeholder="email@empresa.com"
-                  className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                  className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all"
                 />
               </div>
             </div>
@@ -143,7 +143,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
               <select 
                 value={formData.role}
                 onChange={(e) => setFormData(p => ({ ...p, role: e.target.value }))}
-                className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 px-4 text-sm text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer"
+                className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 px-4 text-sm text-slate-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all appearance-none cursor-pointer"
               >
                 {roles.map(r => (
                   <option key={r.id} value={r.id} className="bg-slate-900 text-slate-200">
@@ -159,7 +159,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
                 <button 
                   type="button"
                   onClick={handleGeneratePassword}
-                  className="text-[10px] text-indigo-400 font-bold hover:text-indigo-300 transition-colors uppercase tracking-widest"
+                  className="text-[10px] text-teal-400 font-bold hover:text-teal-300 transition-colors uppercase tracking-widest"
                 >
                   {t("dashboard.admin.createUserModal.generateRandom")}
                 </button>
@@ -172,13 +172,13 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
                   value={formData.password}
                   onChange={(e) => setFormData(p => ({ ...p, password: e.target.value }))}
                   placeholder={t("dashboard.admin.createUserModal.passwordPlaceholder")}
-                  className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-12 text-sm text-slate-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all font-mono"
+                  className="w-full bg-slate-900/50 border border-slate-800 rounded-xl py-3 pl-10 pr-12 text-sm text-slate-200 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 outline-none transition-all font-mono"
                 />
                 <button
                   type="button"
                   onClick={handleCopyPassword}
                   title="Copiar senha"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 rounded-lg transition-colors"
                 >
                   {copied ? <Check size={16} className="text-emerald-400" /> : <Copy size={16} />}
                 </button>
@@ -202,7 +202,7 @@ export function CreateUserModal({ onClose, onSuccess }: CreateUserModalProps) {
             type="submit"
             form="create-user-form"
             disabled={loading || !formData.email || !formData.password}
-            className="px-5 py-2.5 rounded-xl font-bold text-xs bg-indigo-600 hover:bg-indigo-500 text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 min-w-[140px]"
+            className="px-5 py-2.5 rounded-xl font-bold text-xs bg-teal-600 hover:bg-teal-500 text-white shadow-[0_0_20px_rgba(0,181,156,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50 min-w-[140px]"
           >
             {loading ? <Loader2 size={16} className="animate-spin" /> : t("dashboard.admin.createUserModal.saveUser")}
           </button>

@@ -26,24 +26,24 @@ const extractText = (node: any): string => {
 
 const CustomH2 = ({ children }: any) => {
   const text = React.Children.toArray(children).join('').toLowerCase();
-  let icon = <FileText className="text-indigo-400" size={18} />;
+  let icon = <FileText className="text-teal-400" size={18} />;
   let id = "summary";
   
   if (text.includes("swot")) {
-    icon = <TrendingUp className="text-indigo-400" size={18} />;
+    icon = <TrendingUp className="text-teal-400" size={18} />;
     id = "swot";
   } else if (text.includes("roadmap")) {
-    icon = <Map className="text-indigo-400" size={18} />;
+    icon = <Map className="text-teal-400" size={18} />;
     id = "roadmap";
   } else if (text.includes("conclus") || text.includes("recomend")) {
-    icon = <Target className="text-indigo-400" size={18} />;
+    icon = <Target className="text-teal-400" size={18} />;
     id = "conclusion";
   }
   
   return (
     <div id={id} className="pt-8 pb-4 border-b border-slate-800/80 mb-6 scroll-mt-28">
       <div className="flex items-center gap-2.5">
-        <div className="p-1.5 bg-indigo-500/10 rounded-lg text-indigo-400 border border-indigo-500/20">
+        <div className="p-1.5 bg-teal-500/10 rounded-lg text-teal-400 border border-teal-500/20">
           {icon}
         </div>
         <h2 className="text-lg font-bold tracking-tight text-white m-0 !border-b-0 !pb-0 !mt-0 !bg-none !webkit-text-fill-color-initial">
@@ -63,7 +63,7 @@ const CustomH3 = ({ children }: any) => {
   } else if (text.includes("fraqueza")) {
     icon = <AlertTriangle className="text-amber-500 mr-2" size={16} />;
   } else if (text.includes("oportunidade")) {
-    icon = <TrendingUp className="text-indigo-400 mr-2" size={16} />;
+    icon = <TrendingUp className="text-teal-400 mr-2" size={16} />;
   } else if (text.includes("ameaça")) {
     icon = <AlertOctagon className="text-rose-500 mr-2" size={16} />;
   }
@@ -81,9 +81,9 @@ const CustomBlockquote = ({ children }: any) => {
   const isOpportunity = /oportunidade|opportunity/i.test(text);
   const isRisk = /risco|risk/i.test(text);
 
-  let containerClass = "border-l-4 border-indigo-500 bg-indigo-950/20 text-slate-300";
+  let containerClass = "border-l-4 border-teal-500 bg-teal-950/20 text-slate-300";
   let title = "Key Insight";
-  let icon = <ShieldCheck className="text-indigo-400" size={16} />;
+  let icon = <ShieldCheck className="text-teal-400" size={16} />;
 
   if (isOpportunity) {
     containerClass = "border-l-4 border-amber-500 bg-amber-950/20 text-slate-300";
@@ -144,10 +144,10 @@ const getKpis = (project: ProjectData, linkedAssets: any[]) => {
   let confidenceColor = "text-amber-400";
   if (confidence >= 95) {
     confidenceLabel = "Muito Alta (Very High)";
-    confidenceColor = "text-indigo-400";
+    confidenceColor = "text-teal-400";
   } else if (confidence >= 90) {
     confidenceLabel = "Alta (High Confidence)";
-    confidenceColor = "text-indigo-400";
+    confidenceColor = "text-teal-400";
   }
 
   // 2. TRL Maturity
@@ -164,7 +164,7 @@ const getKpis = (project: ProjectData, linkedAssets: any[]) => {
 
   // 4. Enterprise Readiness & AI Executive Score
   let readiness = "Média (Medium)";
-  let readinessColor = "text-indigo-400";
+  let readinessColor = "text-teal-400";
   if (trlVal >= 7 && (project.isProtected || hasAssets)) {
     readiness = "Altíssima (Very High)";
     readinessColor = "text-emerald-400";
@@ -186,12 +186,49 @@ const getKpis = (project: ProjectData, linkedAssets: any[]) => {
   execScore = Math.min(98, execScore);
 
   return [
-    { title: "AI Executive Score", value: `${execScore}/100`, detail: `Readiness: ${readiness}`, icon: <Target size={14} className="text-indigo-400" />, valColor: readinessColor },
+    { title: "AI Executive Score", value: `${execScore}/100`, detail: `Readiness: ${readiness}`, icon: <Target size={14} className="text-teal-400" />, valColor: readinessColor },
     { title: "Confidence", value: `${confidence}%`, detail: confidenceLabel, icon: <Zap size={14} className="text-amber-400" />, valColor: confidenceColor },
     { title: "Maturidade TRL", value: `TRL ${trlVal}`, detail: isTrlValidated ? "Validada (INPI)" : "Declarada", icon: <ShieldCheck size={14} className="text-emerald-400" /> },
     { title: "Força de IP", value: ipStrength, detail: ipDetail, icon: <Briefcase size={14} className="text-amber-400" /> }
   ];
 };
+
+function parseBriefing(report: string) {
+  const sections: { [key: string]: string } = {
+    summary: "",
+    swot: "",
+    roadmap: "",
+    conclusion: ""
+  };
+  
+  if (!report) return sections;
+  
+  // Split by ## 
+  const parts = report.split(/##\s+/);
+  
+  parts.forEach(part => {
+    const lines = part.trim().split("\n");
+    if (lines.length === 0) return;
+    const title = lines[0].trim().toLowerCase();
+    
+    if (title.includes("sumário") || title.includes("sumario") || title.includes("executive") || title.includes("executivo")) {
+      sections.summary = "## " + part;
+    } else if (title.includes("swot") || title.includes("análise") || title.includes("analise")) {
+      sections.swot = "## " + part;
+    } else if (title.includes("roadmap") || title.includes("parceria") || title.includes("estratégico") || title.includes("estrategico")) {
+      sections.roadmap = "## " + part;
+    } else if (title.includes("conclusão") || title.includes("conclusao") || title.includes("recomendações") || title.includes("recomendacoes")) {
+      sections.conclusion = "## " + part;
+    }
+  });
+
+  // Fallbacks if any section was not parsed properly, split by order
+  if (!sections.summary && !sections.swot && !sections.roadmap && !sections.conclusion) {
+    sections.summary = report;
+  }
+  
+  return sections;
+}
 
 export function ProjectDetails() {
   const { id } = useParams();
@@ -204,28 +241,18 @@ export function ProjectDetails() {
   const [showNDAModal, setShowNDAModal] = useState(false);
   const [hasSignedNDA, setHasSignedNDA] = useState(false);
   const [activeSection, setActiveSection] = useState("summary");
+  const [parsedBriefing, setParsedBriefing] = useState<{ [key: string]: string }>({
+    summary: "",
+    swot: "",
+    roadmap: "",
+    conclusion: ""
+  });
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!aiReport) return;
-    const sections = ["summary", "swot", "roadmap", "conclusion"];
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveSection(entry.target.id);
-          }
-        });
-      },
-      { rootMargin: "-20% 0px -60% 0px" }
-    );
-    
-    sections.forEach((id) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-    
-    return () => observer.disconnect();
+    if (aiReport) {
+      setParsedBriefing(parseBriefing(aiReport));
+    }
   }, [aiReport]);
 
   useEffect(() => {
@@ -288,7 +315,7 @@ export function ProjectDetails() {
   };
 
   if (loading) return (
-    <div className="flex justify-center p-20 text-indigo-500">
+    <div className="flex justify-center p-20 text-teal-500">
       <Zap className="animate-spin" size={48} />
     </div>
   );
@@ -319,7 +346,7 @@ export function ProjectDetails() {
               {(project.isIctVerified || project.validatedMaturity) && (
                 <>
                   <span>•</span>
-                  <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2.5 py-0.5 rounded border border-indigo-500/20 font-black uppercase tracking-wider flex items-center gap-1 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+                  <span className="bg-teal-500/10 text-teal-400 text-[10px] px-2.5 py-0.5 rounded border border-teal-500/20 font-black uppercase tracking-wider flex items-center gap-1 shadow-[0_0_15px_rgba(0,181,156,0.1)]">
                     <ShieldCheck size={12} /> Risco Mitigado (ICT Verified)
                   </span>
                 </>
@@ -331,12 +358,12 @@ export function ProjectDetails() {
           <button 
             onClick={handleGenerateReport}
             disabled={generatingReport}
-            className="bg-slate-900 border border-slate-800 text-indigo-400 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 hover:bg-slate-800"
+            className="bg-slate-900 border border-slate-800 text-teal-400 px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2 hover:bg-slate-800"
           >
             {generatingReport ? <Loader2 className="animate-spin" size={18} /> : <Zap size={18} />} 
             {aiReport ? "Atualizar Inteligência" : "Gerar Inteligência"}
           </button>
-          <Link to={`/matches?project=${project.id}`} className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
+          <Link to={`/matches?project=${project.id}`} className="bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-xl font-bold transition flex items-center gap-2">
             <Zap size={18} /> Ver Matches
           </Link>
         </div>
@@ -350,17 +377,17 @@ export function ProjectDetails() {
             <div className="space-y-8 text-left">
               {/* Overall Score Banner */}
               {project.readinessScores && (
-                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900/90 to-indigo-950/20 border border-indigo-500/10 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px]" />
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900/90 to-teal-950/20 border border-teal-500/10 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 blur-[50px]" />
                   <div className="relative flex items-center justify-center w-20 h-20 shrink-0">
-                    <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur animate-pulse" />
-                    <div className="absolute w-18 h-18 border-2 border-indigo-500/20 rounded-full" />
+                    <div className="absolute inset-0 bg-teal-500/10 rounded-full blur animate-pulse" />
+                    <div className="absolute w-18 h-18 border-2 border-teal-500/20 rounded-full" />
                     <span className="text-2xl font-black text-white">{project.readinessScores.overall}%</span>
                   </div>
                   <div className="text-center md:text-left space-y-1">
                     <h4 className="text-white font-bold text-base">Transfer Readiness Score</h4>
                     <p className="text-xs text-slate-400">
-                      Pontuação geral ponderada para a indústria de <strong className="text-indigo-300">{project.technologyDNA.industry?.join(", ") || project.segment}</strong>.
+                      Pontuação geral ponderada para a indústria de <strong className="text-teal-300">{project.technologyDNA.industry?.join(", ") || project.segment}</strong>.
                     </p>
                   </div>
                 </div>
@@ -369,7 +396,7 @@ export function ProjectDetails() {
               {/* Executive Summary */}
               <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 space-y-4 shadow-sm backdrop-blur-sm">
                 <h3 className="text-sm uppercase text-slate-500 tracking-wider font-bold flex items-center gap-2">
-                  <FileText className="text-indigo-400" size={16} /> Sumário Executivo (IA)
+                  <FileText className="text-teal-400" size={16} /> Sumário Executivo (IA)
                 </h3>
                 <p className="text-sm text-slate-350 leading-relaxed text-justify whitespace-pre-wrap">
                   {project.summary}
@@ -392,10 +419,10 @@ export function ProjectDetails() {
                       <div key={item.label} className="p-4 rounded-2xl bg-slate-950/30 border border-slate-900/60 space-y-2">
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-slate-300 font-bold">{item.label}</span>
-                          <span className="text-indigo-400 font-extrabold">{item.score}%</span>
+                          <span className="text-teal-400 font-extrabold">{item.score}%</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${item.score}%` }} />
+                          <div className="h-full bg-teal-500 rounded-full" style={{ width: `${item.score}%` }} />
                         </div>
                         <p className="text-[10px] text-slate-500">{item.desc}</p>
                       </div>
@@ -414,7 +441,7 @@ export function ProjectDetails() {
                         <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Palavras-chave</span>
                         <div className="flex flex-wrap gap-1.5 mt-1.5">
                           {project.technologyDNA.keywords.map((kw: string) => (
-                            <span key={kw} className="px-2.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-300 font-semibold">{kw}</span>
+                            <span key={kw} className="px-2.5 py-0.5 rounded-md bg-teal-500/10 border border-teal-500/20 text-[11px] text-teal-300 font-semibold">{kw}</span>
                           ))}
                         </div>
                       </div>
@@ -450,7 +477,7 @@ export function ProjectDetails() {
                       <div className="p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 text-xs space-y-3 backdrop-blur-sm">
                         <div className="flex justify-between">
                           <span className="text-slate-500 font-medium">Situação da PI</span>
-                          <span className="text-white font-bold bg-indigo-600/30 px-2 py-0.5 rounded border border-indigo-500/30 uppercase tracking-wide">{project.technologyProtection.status === 'granted' ? 'Concedida' : project.technologyProtection.status}</span>
+                          <span className="text-white font-bold bg-teal-600/30 px-2 py-0.5 rounded border border-teal-500/30 uppercase tracking-wide">{project.technologyProtection.status === 'granted' ? 'Concedida' : project.technologyProtection.status}</span>
                         </div>
                         {project.technologyProtection.registrations?.map((reg: any, idx: number) => (
                           <div key={idx} className="flex justify-between">
@@ -478,11 +505,11 @@ export function ProjectDetails() {
                           <p className="text-[10px] text-slate-500">{project.team.laboratoryName}</p>
                         </div>
                         <div className="flex gap-2.5 pt-1">
-                          {project.team.lattesUrl && <a href={project.team.lattesUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">Lattes</a>}
+                          {project.team.lattesUrl && <a href={project.team.lattesUrl} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">Lattes</a>}
                           {project.team.lattesUrl && project.team.orcid && <span className="text-slate-800">|</span>}
-                          {project.team.orcid && <a href={project.team.orcid} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">ORCID</a>}
+                          {project.team.orcid && <a href={project.team.orcid} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">ORCID</a>}
                           {project.team.orcid && project.team.linkedinUrl && <span className="text-slate-800">|</span>}
-                          {project.team.linkedinUrl && <a href={project.team.linkedinUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">LinkedIn</a>}
+                          {project.team.linkedinUrl && <a href={project.team.linkedinUrl} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">LinkedIn</a>}
                         </div>
                       </div>
                     </div>
@@ -501,7 +528,7 @@ export function ProjectDetails() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
                     {project.vdrAssets.map((asset: any) => (
                       <div key={asset.id} className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex items-center gap-4 hover:border-slate-800 transition">
-                        <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-400 shrink-0">
                           <FileText size={20} />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -513,7 +540,7 @@ export function ProjectDetails() {
                     ))}
                   </div>
                 ) : (
-                  <VDRRoom inpiStatus={project.inpiStatus} />
+                  <VDRRoom projectId={project.id} projectTitle={project.title} inpiStatus={project.inpiStatus} />
                 )}
               </div>
             </div>
@@ -522,7 +549,7 @@ export function ProjectDetails() {
             <>
               <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl p-8 space-y-6 shadow-sm backdrop-blur-sm">
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  <FileText className="text-indigo-400" size={20} />
+                  <FileText className="text-teal-400" size={20} />
                   Resumo do Projeto
                 </h3>
                 <p className="text-slate-300 leading-relaxed whitespace-pre-wrap">
@@ -531,32 +558,32 @@ export function ProjectDetails() {
               </div>
 
               {/* Garantia Jurídica / IP Section */}
-              <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900/40 border border-indigo-500/20 hover:border-indigo-500/30 rounded-3xl p-8 space-y-6 relative overflow-hidden group shadow-lg transition-all duration-300 backdrop-blur-sm">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-1000" />
+              <div className="bg-gradient-to-br from-teal-950/20 to-slate-900/40 border border-teal-500/20 hover:border-teal-500/30 rounded-3xl p-8 space-y-6 relative overflow-hidden group shadow-lg transition-all duration-300 backdrop-blur-sm">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 blur-3xl rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-all duration-1000" />
                 
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
                   <div className="space-y-1">
                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                      <Gavel className="text-indigo-400" size={20} />
+                      <Gavel className="text-teal-400" size={20} />
                       Garantia Jurídica (IP Check)
                     </h3>
                     <p className="text-xs text-slate-500 uppercase tracking-widest font-black">Ativos de Propriedade Intelectual Vinculados</p>
                   </div>
                   
-                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20">
-                    <ShieldCheck size={14} className="text-indigo-400" />
-                    <span className="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Auditado via INPI</span>
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/20">
+                    <ShieldCheck size={14} className="text-teal-400" />
+                    <span className="text-[10px] font-black text-teal-300 uppercase tracking-widest">Auditado via INPI</span>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
                   {linkedAssets.length > 0 ? (
                     linkedAssets.map(asset => (
-                      <div key={asset.id} className="bg-slate-950/50 border border-slate-850 rounded-2xl p-5 flex items-center gap-4 hover:border-indigo-500/25 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] transition-all duration-300 backdrop-blur-sm">
+                      <div key={asset.id} className="bg-slate-950/50 border border-slate-850 rounded-2xl p-5 flex items-center gap-4 hover:border-teal-500/25 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_rgba(0,0,0,0.15)] transition-all duration-300 backdrop-blur-sm">
                         <div className="p-3 bg-slate-950/80 rounded-xl border border-slate-850">
                           {asset.type === 'patent' ? <Briefcase className="text-amber-400" size={18} /> :
                            asset.type === 'software' ? <Code className="text-emerald-400" size={18} /> :
-                           <ShieldCheck className="text-indigo-400" size={18} />}
+                           <ShieldCheck className="text-teal-400" size={18} />}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-xs font-bold text-slate-200 truncate">{asset.title}</h4>
@@ -586,7 +613,7 @@ export function ProjectDetails() {
                    ) : (
                      <button 
                       onClick={() => setShowNDAModal(true)}
-                      className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all group/btn"
+                      className="w-full md:w-auto bg-teal-600 hover:bg-teal-500 text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,181,156,0.3)] transition-all group/btn"
                      >
                        Assinar NDA e Acessar VDR
                        <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-all" />
@@ -611,17 +638,17 @@ export function ProjectDetails() {
                   <Shield className="text-emerald-400" size={20} />
                   Virtual Data Room (VDR)
                 </h3>
-                <VDRRoom inpiStatus={project.inpiStatus} />
+                <VDRRoom projectId={project.id} projectTitle={project.title} inpiStatus={project.inpiStatus} />
               </div>
             </>
           )}
 
           {/* AI INTELLIGENCE REPORT SECTION */}
           {aiReport && (
-            <div className="bg-[#0C061A]/70 border border-indigo-500/15 rounded-[32px] shadow-[0_24px_80px_rgba(99,102,241,0.08)] backdrop-blur-md overflow-hidden print-container">
-              <div className="bg-gradient-to-r from-indigo-950/40 via-transparent to-transparent p-8 border-b border-slate-800/60 flex justify-between items-center no-print">
+            <div className="bg-[#0C061A]/70 border border-teal-500/15 rounded-[32px] shadow-[0_24px_80px_rgba(0,181,156,0.08)] backdrop-blur-md overflow-hidden print-container">
+              <div className="bg-gradient-to-r from-teal-950/40 via-transparent to-transparent p-8 border-b border-slate-800/60 flex justify-between items-center no-print">
                 <div className="flex items-center gap-3">
-                  <div className="p-2.5 bg-indigo-500/10 rounded-xl text-indigo-400 border border-indigo-500/20">
+                  <div className="p-2.5 bg-teal-500/10 rounded-xl text-teal-400 border border-teal-500/20">
                     <Zap size={20} />
                   </div>
                   <div>
@@ -644,7 +671,7 @@ export function ProjectDetails() {
               <div className="print-only print-header">
                 <div className="flex justify-between items-start">
                    <div>
-                      <h1 className="text-2xl font-black text-indigo-900">ORIZON MATCH</h1>
+                      <h1 className="text-2xl font-black text-teal-400">INOVAHELIX</h1>
                       <p className="text-xs text-slate-500 uppercase tracking-widest">Executive Intelligence Briefing</p>
                    </div>
                    <div className="text-right">
@@ -657,7 +684,7 @@ export function ProjectDetails() {
               {/* KPIs Row */}
               <div className="p-6 md:p-8 border-b border-slate-800/60 grid grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-950/40 no-print">
                 {getKpis(project, linkedAssets).map((kpi, idx) => (
-                  <div key={idx} className="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-indigo-500/25 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-8px_rgba(99,102,241,0.06)] transition-all duration-300 backdrop-blur-sm shadow-sm">
+                  <div key={idx} className="bg-slate-900/50 border border-slate-800/80 rounded-2xl p-5 flex flex-col justify-between hover:border-teal-500/25 hover:-translate-y-0.5 hover:shadow-[0_12px_24px_-8px_rgba(0,181,156,0.06)] transition-all duration-300 backdrop-blur-sm shadow-sm">
                     <div className="flex items-center justify-between text-slate-500 mb-3">
                       <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">{kpi.title}</span>
                       <div className="p-1.5 bg-slate-950/80 border border-slate-800/50 rounded-lg shadow-inner">
@@ -683,39 +710,53 @@ export function ProjectDetails() {
                       { id: "swot", label: "SWOT Analysis", icon: <TrendingUp size={14} /> },
                       { id: "roadmap", label: "Roadmap", icon: <Map size={14} /> },
                       { id: "conclusion", label: "Recommendations", icon: <Target size={14} /> }
-                    ].map((item) => (
-                      <a
-                        key={item.id}
-                        href={`#${item.id}`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
-                          setActiveSection(item.id);
-                        }}
-                        className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          activeSection === item.id 
-                            ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.05)]" 
-                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40"
-                        }`}
-                      >
-                        {item.icon}
-                        <span>{item.label}</span>
-                      </a>
-                    ))}
+                    ].map((item) => {
+                      const hasContent = !!parsedBriefing[item.id];
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => setActiveSection(item.id)}
+                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all text-left ${
+                            activeSection === item.id 
+                              ? "bg-teal-500/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgba(20,184,166,0.05)]" 
+                              : hasContent 
+                                ? "text-slate-400 hover:text-slate-200 hover:bg-slate-900/40 border border-transparent"
+                                : "text-slate-600 border border-transparent cursor-default opacity-50"
+                          }`}
+                        >
+                          {item.icon}
+                          <span>{item.label}</span>
+                          {!hasContent && <span className="ml-auto text-[8px] text-slate-700 uppercase tracking-widest">—</span>}
+                        </button>
+                      );
+                    })}
                   </nav>
                 </div>
 
                 {/* Right content column */}
                 <div className="lg:col-span-3 p-8 md:p-10 lg:p-12 prose prose-invert max-w-none">
-                  <ReactMarkdown
-                    components={{
-                      h2: CustomH2,
-                      h3: CustomH3,
-                      blockquote: CustomBlockquote
-                    }}
-                  >
-                    {aiReport}
-                  </ReactMarkdown>
+                  {parsedBriefing[activeSection] ? (
+                    <ReactMarkdown
+                      components={{
+                        h2: CustomH2,
+                        h3: CustomH3,
+                        blockquote: CustomBlockquote
+                      }}
+                    >
+                      {parsedBriefing[activeSection]}
+                    </ReactMarkdown>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-4">
+                        <FileText className="text-slate-600" size={24} />
+                      </div>
+                      <p className="text-sm font-bold text-slate-500 mb-1">Seção não disponível</p>
+                      <p className="text-xs text-slate-600 max-w-xs">
+                        Esta seção não foi identificada no relatório gerado pela IA. 
+                        Tente regenerar o briefing ou consulte o <button onClick={() => setActiveSection("summary")} className="text-teal-400 hover:underline font-bold">Overview</button>.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -733,8 +774,8 @@ export function ProjectDetails() {
               </div>
 
               <div className="print-only print-footer">
-                Este relatório foi gerado automaticamente pela Inteligência Artificial da Orizon Match.
-                Acesse orizon-match.web.app para mais detalhes.
+                Este relatório foi gerado automaticamente pela Inteligência Artificial da InovaHelix.
+                Acesse inovahelix.web.app para mais detalhes.
               </div>
             </div>
           )}

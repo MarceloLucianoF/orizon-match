@@ -26,7 +26,7 @@ export function DealFlowPipeline({ currentStage }: DealFlowPipelineProps) {
           <div className="absolute left-0 top-4 -translate-y-1/2 w-full h-1 bg-slate-800 rounded-full z-0 hidden md:block"></div>
           
           <div 
-            className="absolute left-0 top-4 -translate-y-1/2 h-1 bg-indigo-500 rounded-full z-0 transition-all duration-500 hidden md:block"
+            className="absolute left-0 top-4 -translate-y-1/2 h-1 bg-teal-500 rounded-full z-0 transition-all duration-500 hidden md:block"
             style={{ width: `${(currentIndex / (STAGES.length - 1)) * 100}%` }}
           ></div>
 
@@ -40,14 +40,14 @@ export function DealFlowPipeline({ currentStage }: DealFlowPipelineProps) {
                 <div 
                   className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
                     isCompleted 
-                      ? "bg-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.5)]" 
+                      ? "bg-teal-500 text-white shadow-[0_0_15px_rgba(0,181,156,0.5)]" 
                       : "bg-slate-900 border-2 border-slate-700 text-slate-500"
                   }`}
                 >
                   {isCompleted ? <CheckCircle2 size={16} /> : <Circle size={16} />}
                 </div>
                 <span className={`text-[10px] sm:text-xs font-medium md:absolute md:top-10 whitespace-normal md:whitespace-nowrap text-center md:left-1/2 md:-translate-x-1/2 transition-colors max-w-[72px] md:max-w-none ${
-                  isCurrent ? "text-indigo-400 font-bold" : isCompleted ? "text-slate-300" : "text-slate-500"
+                  isCurrent ? "text-teal-400 font-bold" : isCompleted ? "text-slate-300" : "text-slate-500"
                 }`}>
                   {stage.label}
                 </span>

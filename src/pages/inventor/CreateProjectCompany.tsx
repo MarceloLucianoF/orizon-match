@@ -140,7 +140,7 @@ export function CreateProjectCompany() {
           <div 
             key={s} 
             className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-              i <= currentIndex ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-slate-800'
+              i <= currentIndex ? 'bg-teal-500 shadow-[0_0_10px_rgba(0,181,156,0.5)]' : 'bg-slate-800'
             }`} 
           />
         ))}
@@ -304,7 +304,7 @@ export function CreateProjectCompany() {
               <div className="p-4 bg-emerald-500/5 rounded-xl border border-emerald-500/20 flex gap-3 items-start">
                 <Zap size={20} className="text-emerald-400 mt-1" />
                 <p className="text-[11px] text-slate-400 leading-relaxed">
-                  <strong>Dica Orizon:</strong> Descreva seus desafios atuais. Nossa IA usará este texto para encontrar inventores que tenham a solução exata para você.
+                  <strong>Dica InovaHelix:</strong> Descreva seus desafios atuais. Nossa IA usará este texto para encontrar inventores que tenham a solução exata para você.
                 </p>
               </div>
             </div>

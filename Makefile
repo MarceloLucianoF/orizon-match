@@ -34,7 +34,7 @@ lint: ## Verifica erros de TypeScript sem gerar build
 deploy: build ## Build + Deploy completo (Hosting + Firestore Rules)
 	@echo "$(CYAN)▶ Fazendo deploy para Firebase...$(RESET)"
 	firebase deploy --only hosting,firestore:rules
-	@echo "$(GREEN)✔ Deploy concluído: https://inovahelix-match.web.app$(RESET)"
+	@echo "$(GREEN)✔ Deploy concluído: https://orizon-match.web.app$(RESET)"
 
 deploy-all: build ## Build + Deploy de tudo (Hosting + Rules + Functions)
 	@echo "$(CYAN)▶ Deploy completo (hosting + rules + functions)...$(RESET)"
@@ -44,7 +44,7 @@ deploy-all: build ## Build + Deploy de tudo (Hosting + Rules + Functions)
 deploy-hosting: build ## Build + Deploy apenas do Hosting
 	@echo "$(CYAN)▶ Deploy do Hosting...$(RESET)"
 	firebase deploy --only hosting
-	@echo "$(GREEN)✔ Hosting atualizado: https://inovahelix-match.web.app$(RESET)"
+	@echo "$(GREEN)✔ Hosting atualizado: https://orizon-match.web.app$(RESET)"
 
 deploy-rules: ## Deploy apenas das regras do Firestore (sem build)
 	@echo "$(CYAN)▶ Deploy das regras Firestore...$(RESET)"
@@ -69,16 +69,16 @@ seed: ## Alimenta o banco com dados realistas
 	@echo "$(GREEN)✔ Banco populado$(RESET)"
 
 open: ## Abre o site em produção no browser
-	@echo "$(CYAN)▶ Abrindo https://inovahelix-match.web.app$(RESET)"
-	xdg-open https://inovahelix-match.web.app 2>/dev/null || open https://inovahelix-match.web.app 2>/dev/null || echo "Acesse: https://inovahelix-match.web.app"
+	@echo "$(CYAN)▶ Abrindo https://orizon-match.web.app$(RESET)"
+	xdg-open https://orizon-match.web.app 2>/dev/null || open https://orizon-match.web.app 2>/dev/null || echo "Acesse: https://orizon-match.web.app"
 
 console: ## Abre o console do Firebase
 	@echo "$(CYAN)▶ Abrindo console Firebase...$(RESET)"
-	xdg-open https://console.firebase.google.com/project/inovahelix-match/overview 2>/dev/null || echo "Acesse: https://console.firebase.google.com/project/inovahelix-match/overview"
+	xdg-open https://console.firebase.google.com/project/orizon-match/overview 2>/dev/null || echo "Acesse: https://console.firebase.google.com/project/orizon-match/overview"
 
 status: ## Mostra status do projeto Firebase
 	@echo "$(CYAN)▶ Status do projeto:$(RESET)"
-	@firebase projects:list 2>/dev/null | grep inovahelix
+	@firebase projects:list 2>/dev/null | grep orizon
 	@echo ""
 	@echo "$(CYAN)▶ Último deploy:$(RESET)"
 	@firebase hosting:channel:list 2>/dev/null || echo "  Use 'firebase hosting:channel:list' para ver canais"

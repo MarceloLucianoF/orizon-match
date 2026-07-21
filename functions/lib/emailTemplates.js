@@ -1,6 +1,6 @@
 "use strict";
 /**
- * Email templates for Orizon Match transactional emails.
+ * Email templates for InovaHelix transactional emails.
  * Uses inline styles for maximum email client compatibility.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -8,7 +8,7 @@ exports.legalInviteEmail = legalInviteEmail;
 function legalInviteEmail(params) {
     const { inviterName, projectTitle, message, inviteLink } = params;
     return {
-        subject: `[Orizon Match] Convite para Curadoria Jurídica — ${projectTitle}`,
+        subject: `[InovaHelix] Convite para Curadoria Jurídica — ${projectTitle}`,
         html: `
 <!DOCTYPE html>
 <html>
@@ -24,9 +24,9 @@ function legalInviteEmail(params) {
           
           <!-- Header -->
           <tr>
-            <td style="padding:32px 40px;background:linear-gradient(135deg,#312e81 0%,#0f172a 100%);border-bottom:1px solid #1e293b;">
-              <h1 style="margin:0;font-size:24px;font-weight:700;background:linear-gradient(to right,#818cf8,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-                Orizon Match
+            <td style="padding:32px 40px;background:linear-gradient(135deg,#00897B 0%,#0d1520 100%);border-bottom:1px solid #1e293b;">
+              <h1 style="margin:0;font-size:24px;font-weight:700;background:linear-gradient(to right,#00B59C,#22d3ee);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+                InovaHelix
               </h1>
               <p style="margin:8px 0 0;color:#94a3b8;font-size:13px;">
                 Ecossistema de Inovação Aberta
@@ -43,7 +43,7 @@ function legalInviteEmail(params) {
               
               <p style="color:#94a3b8;font-size:14px;line-height:1.6;margin:0 0 24px;">
                 <strong style="color:#c7d2fe;">${inviterName}</strong> convidou seu escritório para atuar como curador jurídico do projeto 
-                <strong style="color:#c7d2fe;">"${projectTitle}"</strong> na plataforma Orizon Match.
+                <strong style="color:#c7d2fe;">"${projectTitle}"</strong> na plataforma InovaHelix.
               </p>
 
               ${message ? `
@@ -64,7 +64,7 @@ function legalInviteEmail(params) {
 
               <table cellpadding="0" cellspacing="0" style="margin:0 auto;">
                 <tr>
-                  <td style="background:linear-gradient(135deg,#4f46e5,#06b6d4);border-radius:12px;padding:14px 32px;">
+                  <td style="background:linear-gradient(135deg,#00897B,#00B59C);border-radius:12px;padding:14px 32px;">
                     <a href="${inviteLink}" style="color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;display:block;">
                       Aceitar Convite
                     </a>
@@ -78,7 +78,7 @@ function legalInviteEmail(params) {
           <tr>
             <td style="padding:24px 40px;border-top:1px solid #1e293b;background-color:#020617;">
               <p style="color:#475569;font-size:11px;line-height:1.5;margin:0;text-align:center;">
-                Este email foi enviado automaticamente pela plataforma Orizon Match.<br/>
+                Este email foi enviado automaticamente pela plataforma InovaHelix.<br/>
                 Seus dados são protegidos por criptografia e todas as negociações ocorrem sob NDA digital.
               </p>
             </td>

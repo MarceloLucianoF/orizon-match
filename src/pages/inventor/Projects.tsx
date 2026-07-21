@@ -99,7 +99,7 @@ export function Projects() {
         </div>
         <Link 
           to="/projects/new"
-          className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] flex items-center gap-2"
+          className="bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(0,181,156,0.3)] flex items-center gap-2"
         >
           <Plus size={18} /> {t("projects.newProject")}
         </Link>
@@ -107,7 +107,7 @@ export function Projects() {
 
       {loading ? (
         <div className="flex justify-center p-12">
-          <Loader2 className="animate-spin text-indigo-500" size={32} />
+          <Loader2 className="animate-spin text-teal-500" size={32} />
         </div>
       ) : projects.length === 0 ? (
         <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800 rounded-2xl p-8">
@@ -126,7 +126,7 @@ export function Projects() {
             const typeLabel = t(`projects.types.${project.type}`, { defaultValue: project.type });
             return (
               <div key={project.id} className={`bg-slate-900/60 backdrop-blur-xl border rounded-2xl p-6 transition-all shadow-xl flex flex-col md:flex-row gap-6 ${
-                project.active ? "border-slate-700 hover:border-indigo-500/50" : "border-slate-800 opacity-60 grayscale-[50%]"
+                project.active ? "border-slate-700 hover:border-teal-500/50" : "border-slate-800 opacity-60 grayscale-[50%]"
               }`}>
                 
                 {/* Lado Esquerdo: Score Radial */}
@@ -135,7 +135,7 @@ export function Projects() {
                   <div className="relative w-16 h-16 flex items-center justify-center">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                       <path className="text-slate-800" strokeWidth="4" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                      <path className={`transition-all duration-1000 ease-out ${project.readinessScore >= 80 ? 'text-emerald-500' : project.readinessScore >= 50 ? 'text-indigo-500' : 'text-amber-500'}`} strokeWidth="4" strokeDasharray={`${project.readinessScore}, 100`} strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                      <path className={`transition-all duration-1000 ease-out ${project.readinessScore >= 80 ? 'text-emerald-500' : project.readinessScore >= 50 ? 'text-teal-500' : 'text-amber-500'}`} strokeWidth="4" strokeDasharray={`${project.readinessScore}, 100`} strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                     </svg>
                     <div className="absolute flex flex-col items-center justify-center">
                       <span className="text-sm font-bold text-slate-100">{project.readinessScore}%</span>
@@ -166,7 +166,7 @@ export function Projects() {
                   {/* Footer: Métricas Básicas */}
                   <div className="flex flex-wrap gap-4 pt-4 border-t border-slate-800/80">
                     <div className="flex items-center gap-1.5 text-slate-300">
-                      <Activity size={14} className="text-indigo-400" />
+                      <Activity size={14} className="text-teal-400" />
                       <span className="text-sm font-medium">{t("projects.radarActive")}</span>
                     </div>
                     <div className="flex items-center gap-1.5 text-slate-300">
@@ -186,7 +186,7 @@ export function Projects() {
                   </Link>
                   <Link 
                     to={`/matches?project=${project.id}`} 
-                    className="flex-1 md:flex-none text-center bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    className="flex-1 md:flex-none text-center bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     {t("projects.actions.viewMatches")}
                   </Link>
@@ -220,7 +220,7 @@ export function Projects() {
           <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-800/50">
               <h3 className="font-bold text-slate-100 flex items-center gap-2">
-                <Settings2 className="text-indigo-400" size={20} />
+                <Settings2 className="text-teal-400" size={20} />
                 {t("projects.editModal.title")}
               </h3>
               <button 
@@ -240,7 +240,7 @@ export function Projects() {
                     type="text" 
                     value={editingProject.title}
                     onChange={(e) => setEditingProject({...editingProject, title: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/50"
                     required
                   />
                 </div>
@@ -250,7 +250,7 @@ export function Projects() {
                   <select 
                     value={editingProject.segment}
                     onChange={(e) => setEditingProject({...editingProject, segment: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/50 appearance-none"
                     required
                   >
                     <option value="agro">Agro/FoodTech</option>
@@ -266,7 +266,7 @@ export function Projects() {
                   <select 
                     value={editingProject.type}
                     onChange={(e) => setEditingProject({...editingProject, type: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 appearance-none"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 focus:outline-none focus:ring-2 focus:ring-teal-500/50 appearance-none"
                     required
                   >
                     <option value="software">Software/Plataforma</option>
@@ -276,8 +276,8 @@ export function Projects() {
                   </select>
                 </div>
 
-                <div className="bg-indigo-500/10 border border-indigo-500/20 p-4 rounded-xl mt-6">
-                  <p className="text-xs text-indigo-300 leading-relaxed">
+                <div className="bg-teal-500/10 border border-teal-500/20 p-4 rounded-xl mt-6">
+                  <p className="text-xs text-teal-300 leading-relaxed">
                     {t("projects.editModal.tip")}
                   </p>
                 </div>
@@ -298,7 +298,7 @@ export function Projects() {
                 type="submit" 
                 form="editProjectForm"
                 disabled={isSaving}
-                className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+                className="bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white px-5 py-2.5 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors shadow-[0_0_15px_rgba(0,181,156,0.3)]"
               >
                 {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                 {isSaving ? t("projects.editModal.saving") : t("projects.editModal.saveChanges")}

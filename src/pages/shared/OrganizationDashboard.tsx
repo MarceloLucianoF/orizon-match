@@ -203,7 +203,7 @@ export default function OrganizationDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="animate-spin w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full" />
+        <div className="animate-spin w-12 h-12 border-4 border-teal-500 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -214,7 +214,7 @@ export default function OrganizationDashboard() {
         <Building2 className="mx-auto text-slate-800" size={64} />
         <h2 className="text-2xl font-bold text-white">{t("dashboard.organization.noLinkedOrg")}</h2>
         <p className="text-slate-400">{t("dashboard.organization.noLinkedOrgDesc")}</p>
-        <button className="bg-indigo-600 px-6 py-3 rounded-xl font-bold text-white">{t("dashboard.organization.requestAccess")}</button>
+        <button className="bg-teal-600 px-6 py-3 rounded-xl font-bold text-white">{t("dashboard.organization.requestAccess")}</button>
       </div>
     );
   }
@@ -225,10 +225,10 @@ export default function OrganizationDashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-1">
-             <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-400">
+             <div className="p-2 bg-teal-500/10 rounded-lg text-teal-400">
                 <Building2 size={20} />
              </div>
-             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-500/80">ICT & EMBRAPII Hub</span>
+             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-teal-500/80">ICT & EMBRAPII Hub</span>
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">{org.name}</h1>
           <p className="text-slate-400 text-sm mt-1">Centro de Comando de Fomento e Gestão de Portfólio Deep Tech</p>
@@ -242,7 +242,7 @@ export default function OrganizationDashboard() {
           </button>
           <button 
             onClick={handleExportEmbrapiiReport}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_25px_rgba(79,70,229,0.5)] transition-all"
+            className="bg-teal-600 hover:bg-teal-500 text-white px-5 py-2.5 rounded-xl text-sm font-bold shadow-[0_0_20px_rgba(0,181,156,0.3)] hover:shadow-[0_0_25px_rgba(0,181,156,0.5)] transition-all"
           >
              Relatório EMBRAPII
           </button>
@@ -261,7 +261,7 @@ export default function OrganizationDashboard() {
           <button 
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/10' : 'text-slate-400 hover:text-slate-200'}`}
+            className={`px-4 py-2.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/10' : 'text-slate-400 hover:text-slate-200'}`}
           >
             {tab.label}
           </button>
@@ -327,17 +327,17 @@ export default function OrganizationDashboard() {
               : 'max-w-lg'
           } bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-6 overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar transition-all`}>
             {/* Background decorative lights */}
-            <div className="absolute top-0 right-0 w-36 h-36 bg-indigo-500/10 blur-[40px] rounded-full -mr-16 -mt-16 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-36 h-36 bg-fuchsia-500/10 blur-[40px] rounded-full -ml-16 -mb-16 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-36 h-36 bg-teal-500/10 blur-[40px] rounded-full -mr-16 -mt-16 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-36 h-36 bg-emerald-500/10 blur-[40px] rounded-full -ml-16 -mb-16 pointer-events-none" />
 
             {/* Modal Header */}
             <div className="flex justify-between items-center relative z-10 border-b border-slate-850 pb-4">
               <div className="flex items-center gap-2.5">
-                {activeModal === 'mass_notification' && <Bell className="text-indigo-400" size={20} />}
-                {activeModal === 'validate_trl' && <Award className="text-fuchsia-400" size={20} />}
+                {activeModal === 'mass_notification' && <Bell className="text-teal-400" size={20} />}
+                {activeModal === 'validate_trl' && <Award className="text-teal-400" size={20} />}
                 {activeModal === 'prepare_proposal' && <Coins className="text-amber-400" size={20} />}
                 {activeModal === 'add_lab' && <Plus className="text-emerald-400" size={20} />}
-                {activeModal === 'allocate_researcher' && <GraduationCap className="text-indigo-400" size={20} />}
+                {activeModal === 'allocate_researcher' && <GraduationCap className="text-teal-400" size={20} />}
                 {activeModal === 'embrapit_report' && <FileText className="text-emerald-400" size={20} />}
                 {activeModal === 'consult_inventor' && <Search className="text-slate-400" size={20} />}
                 
@@ -368,15 +368,15 @@ export default function OrganizationDashboard() {
                 <div className="py-12 flex flex-col items-center justify-center space-y-6 text-center animate-in fade-in duration-300">
                   <div className="relative flex items-center justify-center">
                     <div className="w-20 h-20 border-4 border-slate-800 rounded-full" />
-                    <div className="absolute w-20 h-20 border-4 border-t-indigo-500 border-r-fuchsia-500 rounded-full animate-spin" />
+                    <div className="absolute w-20 h-20 border-4 border-t-teal-500 border-r-emerald-500 rounded-full animate-spin" />
                     <span className="absolute font-mono text-xs font-black text-white">{progress}%</span>
                   </div>
                   <div className="space-y-2">
                     <h4 className="text-xs font-black text-slate-400 tracking-[0.2em] uppercase animate-pulse">Processando Transação</h4>
-                    <p className="text-xs text-indigo-200/80 italic max-w-xs">{progressMsg}</p>
+                    <p className="text-xs text-teal-200/80 italic max-w-xs">{progressMsg}</p>
                   </div>
                   <div className="w-full max-w-xs bg-slate-950 h-1.5 rounded-full overflow-hidden border border-slate-850">
-                    <div className="bg-gradient-to-r from-indigo-500 to-fuchsia-500 h-full rounded-full transition-all duration-100" style={{ width: `${progress}%` }} />
+                    <div className="bg-gradient-to-r from-teal-500 to-emerald-500 h-full rounded-full transition-all duration-100" style={{ width: `${progress}%` }} />
                   </div>
                 </div>
               )}
@@ -453,7 +453,7 @@ export default function OrganizationDashboard() {
                           className={`w-full bg-slate-950 border ${
                             notifLevel === 'critical' ? 'focus:border-rose-500 focus:ring-rose-500/15' :
                             notifLevel === 'warning' ? 'focus:border-amber-500 focus:ring-amber-500/15' :
-                            'focus:border-indigo-500 focus:ring-indigo-500/15'
+                            'focus:border-teal-500 focus:ring-teal-500/15'
                           } border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:ring-2 transition-all`}
                         />
                       </div>
@@ -464,7 +464,7 @@ export default function OrganizationDashboard() {
                           <select 
                             value={notifLevel}
                             onChange={e => setNotifLevel(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                           >
                             <option value="info">Normal (Informativo)</option>
                             <option value="warning">Atenção (Recomendações e Prazos)</option>
@@ -476,7 +476,7 @@ export default function OrganizationDashboard() {
                           <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Público Alvo</label>
                           <div className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 flex items-center justify-between h-[38px]">
                             <span>14 Pesquisadores ativos</span>
-                            <span className="bg-indigo-500/10 text-indigo-400 text-[9px] px-2 py-0.5 rounded border border-indigo-500/20 font-bold uppercase">Inatel NGTI</span>
+                            <span className="bg-teal-500/10 text-teal-400 text-[9px] px-2 py-0.5 rounded border border-teal-500/20 font-bold uppercase">Inatel NGTI</span>
                           </div>
                         </div>
                       </div>
@@ -489,7 +489,7 @@ export default function OrganizationDashboard() {
                           onChange={e => setNotifBody(e.target.value)}
                           placeholder="Digite as instruções para os pesquisadores. Ex: Solicitamos que revisem os arquivos do VDR até sexta-feira para o edital EMBRAPII."
                           rows={4}
-                          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all resize-none"
+                          className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all resize-none"
                         />
                       </div>
 
@@ -497,7 +497,7 @@ export default function OrganizationDashboard() {
                       <div className="p-3.5 bg-slate-950/40 rounded-2xl border border-slate-850 flex items-center justify-between">
                         <div className="flex -space-x-2">
                           {['RS', 'AL', 'CS', 'JM', 'FP'].map((initials, idx) => (
-                            <div key={idx} className="w-6 h-6 rounded-full bg-indigo-950 border border-indigo-500/30 flex items-center justify-center text-[9px] font-bold text-indigo-300">
+                            <div key={idx} className="w-6 h-6 rounded-full bg-teal-950 border border-teal-500/30 flex items-center justify-center text-[9px] font-bold text-teal-300">
                               {initials}
                             </div>
                           ))}
@@ -506,8 +506,8 @@ export default function OrganizationDashboard() {
                           </div>
                         </div>
                         <div className="flex gap-3 text-[10px] text-slate-400 font-bold uppercase">
-                          <span className="flex items-center gap-1 text-indigo-400/90"><Mail size={11} /> Email</span>
-                          <span className="flex items-center gap-1 text-indigo-400/90"><Bell size={11} /> Push</span>
+                          <span className="flex items-center gap-1 text-teal-400/90"><Mail size={11} /> Email</span>
+                          <span className="flex items-center gap-1 text-teal-400/90"><Bell size={11} /> Push</span>
                         </div>
                       </div>
 
@@ -516,7 +516,7 @@ export default function OrganizationDashboard() {
                         className={`w-full py-3.5 ${
                           notifLevel === 'critical' ? 'bg-rose-600 hover:bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.25)]' :
                           notifLevel === 'warning' ? 'bg-amber-600 hover:bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.25)]' :
-                          'bg-indigo-600 hover:bg-indigo-500 shadow-[0_0_15px_rgba(79,70,229,0.25)]'
+                          'bg-teal-600 hover:bg-teal-500 shadow-[0_0_15px_rgba(0,181,156,0.25)]'
                         } text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 uppercase tracking-widest`}
                       >
                         <Send size={12} /> Disparar para Todos os Pesquisadores
@@ -530,7 +530,7 @@ export default function OrganizationDashboard() {
                       {/* Left: Project Details & Technical opinion */}
                       <div className="space-y-4">
                         <div className="p-4 bg-slate-950/50 rounded-2xl border border-slate-850 space-y-3">
-                          <span className="text-[9px] font-black text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded uppercase">Projeto Pendente</span>
+                          <span className="text-[9px] font-black text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2 py-0.5 rounded uppercase">Projeto Pendente</span>
                           <h4 className="font-bold text-white text-sm mt-1">{modalData.title}</h4>
                           <div className="flex justify-between items-center text-xs">
                             <span className="text-slate-450">Declarado pelo Inventor:</span>
@@ -550,7 +550,7 @@ export default function OrganizationDashboard() {
                             onChange={e => setValidateOpinion(e.target.value)}
                             placeholder="Descreva as evidências observadas no protótipo que sustentam este nível de maturidade..."
                             rows={4}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all resize-none"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all resize-none"
                           />
                         </div>
 
@@ -602,7 +602,7 @@ export default function OrganizationDashboard() {
                                   className={`p-3 rounded-xl border flex flex-col items-center justify-center transition-all ${
                                     isSelected 
                                       ? lvl <= 3 ? 'bg-blue-600/15 border-blue-500 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.15)]' :
-                                        lvl <= 6 ? 'bg-fuchsia-600/15 border-fuchsia-500 text-fuchsia-300 shadow-[0_0_15px_rgba(217,70,239,0.15)]' :
+                                        lvl <= 6 ? 'bg-teal-600/15 border-teal-500 text-teal-300 shadow-[0_0_15px_rgba(0,181,156,0.15)]' :
                                         'bg-emerald-600/15 border-emerald-500 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.15)]'
                                       : 'bg-slate-950 border-slate-850 hover:border-slate-800 text-slate-400 hover:text-slate-200'
                                   }`}
@@ -621,7 +621,7 @@ export default function OrganizationDashboard() {
                             <span className="text-slate-450">Definição TRL {selectedTRL}:</span>
                             <span className={
                               selectedTRL <= 3 ? 'text-blue-400' :
-                              selectedTRL <= 6 ? 'text-fuchsia-400' :
+                              selectedTRL <= 6 ? 'text-teal-400' :
                               'text-emerald-400'
                             }>
                               {selectedTRL <= 3 ? 'Fase Científica' : selectedTRL <= 6 ? 'Fase Protótipo' : 'Fase Industrial'}
@@ -643,7 +643,7 @@ export default function OrganizationDashboard() {
                         <button 
                           onClick={handleValidateTRLConfirm}
                           disabled={validateOpinion.length < 5}
-                          className="w-full py-3.5 bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(217,70,239,0.25)] flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-55 disabled:cursor-not-allowed"
+                          className="w-full py-3.5 bg-gradient-to-r from-teal-650 to-emerald-600 hover:from-teal-550 hover:to-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,181,156,0.25)] flex items-center justify-center gap-2 uppercase tracking-widest disabled:opacity-55 disabled:cursor-not-allowed"
                         >
                           <Award size={14} /> Confirmar Validação & Conceder Selo
                         </button>
@@ -673,7 +673,7 @@ export default function OrganizationDashboard() {
                           <select 
                             value={selectedProject}
                             onChange={e => setSelectedProject(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                           >
                             {recentProjects.map(p => (
                               <option key={p.id} value={p.id}>{p.title} (TRL {p.validatedTRL || p.declaredTRL})</option>
@@ -689,7 +689,7 @@ export default function OrganizationDashboard() {
                             value={proposedBudget}
                             onChange={e => setProposedBudget(e.target.value)}
                             placeholder="Ex: 1200000"
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                           />
                         </div>
 
@@ -701,7 +701,7 @@ export default function OrganizationDashboard() {
                             onChange={e => setProposalScope(e.target.value)}
                             placeholder="Descreva o papel do Inatel no co-desenvolvimento tecnológico do projeto frente ao edital..."
                             rows={3}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all resize-none"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all resize-none"
                           />
                         </div>
                       </div>
@@ -737,11 +737,11 @@ export default function OrganizationDashboard() {
                                   {/* Embrapii Subsidy */}
                                   <div className="space-y-1">
                                     <div className="flex justify-between text-[11px] font-bold">
-                                      <span className="text-indigo-300">EMBRAPII Subsídio (50%)</span>
+                                      <span className="text-teal-300">EMBRAPII Subsídio (50%)</span>
                                       <span className="text-slate-200">{formatCurrency(subEmbrapii)}</span>
                                     </div>
                                     <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-900">
-                                      <div className="bg-indigo-500 h-full rounded-full" style={{ width: '50%' }} />
+                                      <div className="bg-teal-500 h-full rounded-full" style={{ width: '50%' }} />
                                     </div>
                                   </div>
 
@@ -778,7 +778,7 @@ export default function OrganizationDashboard() {
 
                         <button 
                           type="submit"
-                          className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(79,70,229,0.25)] flex items-center justify-center gap-2 uppercase tracking-widest"
+                          className="w-full py-3.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,181,156,0.25)] flex items-center justify-center gap-2 uppercase tracking-widest"
                         >
                           <Send size={12} /> Submeter Candidatura de Inovação
                         </button>
@@ -799,7 +799,7 @@ export default function OrganizationDashboard() {
                             value={newLabName}
                             onChange={e => setNewLabName(e.target.value)}
                             placeholder="Ex: Laboratório de Biofotônica e RF Avançado"
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                           />
                         </div>
 
@@ -811,7 +811,7 @@ export default function OrganizationDashboard() {
                             value={newLabArea}
                             onChange={e => setNewLabArea(e.target.value)}
                             placeholder="Ex: Biotecnologia / Telecom"
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                           />
                         </div>
 
@@ -822,7 +822,7 @@ export default function OrganizationDashboard() {
                             onChange={e => setNewLabEquip(e.target.value)}
                             placeholder="Ex: Analisador vetorial de redes ópticas, Cluster de processamento de borda Nvidia..."
                             rows={3}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all resize-none"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all resize-none"
                           />
                         </div>
                       </div>
@@ -839,7 +839,7 @@ export default function OrganizationDashboard() {
                             <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl space-y-4 shadow-lg">
                               <div className="space-y-1">
                                 <h5 className="font-extrabold text-sm text-white truncate">{newLabName || "Nome do Laboratório"}</h5>
-                                <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider">{newLabArea || "Área de Concentração"}</p>
+                                <p className="text-[10px] text-teal-400 font-bold uppercase tracking-wider">{newLabArea || "Área de Concentração"}</p>
                               </div>
 
                               <div className="space-y-1.5">
@@ -881,7 +881,7 @@ export default function OrganizationDashboard() {
                           <img src={modalData.image || "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80"} alt={modalData.name} className="w-14 h-14 rounded-xl object-cover border border-slate-800 shadow shrink-0" />
                           <div className="min-w-0">
                             <h4 className="font-extrabold text-white text-sm truncate">{modalData.name}</h4>
-                            <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-wider truncate mt-0.5">{modalData.title}</p>
+                            <p className="text-[10px] text-teal-400 font-bold uppercase tracking-wider truncate mt-0.5">{modalData.title}</p>
                             <div className="flex items-center gap-3 mt-2">
                               <span className="text-[8px] bg-slate-950 px-2 py-0.5 rounded border border-slate-800 font-mono text-slate-400">H-Index: {modalData.hIndex || 34}</span>
                               <span className="text-[8px] bg-slate-950 px-2 py-0.5 rounded border border-slate-800 font-mono text-slate-400">Patentes: {modalData.patents || 8}</span>
@@ -894,7 +894,7 @@ export default function OrganizationDashboard() {
                           <select 
                             value={selectedProject}
                             onChange={e => setSelectedProject(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                           >
                             {recentProjects.map(p => (
                               <option key={p.id} value={p.id}>{p.title}</option>
@@ -908,7 +908,7 @@ export default function OrganizationDashboard() {
                             <select 
                               value={allocationHours}
                               onChange={e => setAllocationHours(e.target.value)}
-                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                             >
                               <option value="10">10h / semana</option>
                               <option value="20">20h / semana</option>
@@ -920,7 +920,7 @@ export default function OrganizationDashboard() {
                             <select 
                               value={allocationRole}
                               onChange={e => setAllocationRole(e.target.value)}
-                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                             >
                               <option value="coordinator">Coordenador do Projeto</option>
                               <option value="researcher">Pesquisador Principal</option>
@@ -935,7 +935,7 @@ export default function OrganizationDashboard() {
                         <div className="p-5 bg-slate-950/60 border border-slate-850 rounded-3xl space-y-4 flex-1">
                           <div className="flex justify-between items-center border-b border-slate-900 pb-3">
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Análise de Carga Horária</span>
-                            <span className="text-[8px] bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded font-black uppercase">Simulação</span>
+                            <span className="text-[8px] bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded font-black uppercase">Simulação</span>
                           </div>
 
                           {(() => {
@@ -952,7 +952,7 @@ export default function OrganizationDashboard() {
                                     <span className="text-white font-mono">{currentOcc}%</span>
                                   </div>
                                   <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-900">
-                                    <div className="bg-indigo-500 h-full rounded-full animate-pulse" style={{ width: `${currentOcc}%` }} />
+                                    <div className="bg-teal-500 h-full rounded-full animate-pulse" style={{ width: `${currentOcc}%` }} />
                                   </div>
                                 </div>
 
@@ -984,7 +984,7 @@ export default function OrganizationDashboard() {
 
                         <button 
                           type="submit"
-                          className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(79,70,229,0.25)] flex items-center justify-center gap-1.5 uppercase tracking-widest"
+                          className="w-full py-3.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,181,156,0.25)] flex items-center justify-center gap-1.5 uppercase tracking-widest"
                         >
                           <GraduationCap size={14} /> Confirmar Alocação Técnica
                         </button>
@@ -1023,7 +1023,7 @@ export default function OrganizationDashboard() {
                           <select 
                             value={fiscalYear}
                             onChange={e => setFiscalYear(e.target.value)}
-                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-400 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-400 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
                           >
                             <option value="2025">Ano Fiscal 2025</option>
                             <option value="2026">Ano Fiscal 2026 (Corrente)</option>
@@ -1042,12 +1042,12 @@ export default function OrganizationDashboard() {
                         <div className="p-5 bg-slate-950/60 border border-slate-850 rounded-3xl space-y-4 flex-1 shadow">
                           <div className="flex justify-between items-center border-b border-slate-900 pb-3">
                             <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Consumo da Linha de Fomento</span>
-                            <span className="text-indigo-400 font-mono font-bold text-xs">65%</span>
+                            <span className="text-teal-400 font-mono font-bold text-xs">65%</span>
                           </div>
 
                           <div className="space-y-3">
                             <div className="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-850">
-                              <div className="bg-gradient-to-r from-emerald-500 to-indigo-500 h-full rounded-full" style={{ width: '65%' }} />
+                              <div className="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full" style={{ width: '65%' }} />
                             </div>
 
                             <div className="grid grid-cols-2 gap-2 text-center text-[10px] text-slate-400">
@@ -1064,7 +1064,7 @@ export default function OrganizationDashboard() {
 
                           {/* Signature stamp preview */}
                           <div className="p-3 bg-slate-950/70 border border-dashed border-slate-800 rounded-xl space-y-2">
-                            <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-indigo-400 tracking-wider">
+                            <div className="flex items-center gap-1.5 text-[9px] font-black uppercase text-teal-400 tracking-wider">
                               <Fingerprint size={13} /> Assinatura Eletrônica NIT
                             </div>
                             <div className="text-[9px] font-mono text-slate-500 space-y-0.5 leading-snug">
@@ -1095,7 +1095,7 @@ export default function OrganizationDashboard() {
                           value={inventorQuery}
                           onChange={e => setInventorQuery(e.target.value)}
                           placeholder="Buscar pesquisador por nome, lattes ou linha de pesquisa..."
-                          className="w-full bg-slate-950 border border-slate-850 rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all shadow-inner"
+                          className="w-full bg-slate-950 border border-slate-850 rounded-2xl pl-10 pr-4 py-3 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all shadow-inner"
                         />
                       </div>
 
@@ -1104,12 +1104,12 @@ export default function OrganizationDashboard() {
                           {researchers
                             .filter(i => i.name.toLowerCase().includes(inventorQuery.toLowerCase()) || i.expertise.toLowerCase().includes(inventorQuery.toLowerCase()))
                             .map((inv, idx) => (
-                              <div key={idx} className="p-5 bg-slate-950/60 border border-slate-850 rounded-2xl flex flex-col justify-between hover:border-indigo-500/30 hover:bg-slate-900/15 transition-all group shadow-md">
+                              <div key={idx} className="p-5 bg-slate-950/60 border border-slate-850 rounded-2xl flex flex-col justify-between hover:border-teal-500/30 hover:bg-slate-900/15 transition-all group shadow-md">
                                 <div className="space-y-4">
                                   <div className="flex items-center gap-3.5">
                                     <img src={inv.image} alt={inv.name} className="w-12 h-12 rounded-2xl object-cover border border-slate-800 shadow-lg group-hover:scale-105 transition-transform" />
                                     <div className="min-w-0">
-                                      <h4 className="font-extrabold text-white text-xs truncate group-hover:text-indigo-400 transition-colors">{inv.name}</h4>
+                                      <h4 className="font-extrabold text-white text-xs truncate group-hover:text-teal-400 transition-colors">{inv.name}</h4>
                                       <p className="text-[9px] text-slate-500 font-semibold truncate mt-0.5">{inv.title}</p>
                                     </div>
                                   </div>
@@ -1118,7 +1118,7 @@ export default function OrganizationDashboard() {
                                   <div className="grid grid-cols-2 gap-2 bg-slate-950 p-2.5 rounded-xl border border-slate-900/80 shadow-inner">
                                     <div className="text-center">
                                       <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider block">H-Index</span>
-                                      <span className="text-xs font-black text-indigo-400">{inv.hIndex}</span>
+                                      <span className="text-xs font-black text-teal-400">{inv.hIndex}</span>
                                     </div>
                                     <div className="text-center border-l border-slate-900">
                                       <span className="text-[8px] text-slate-500 font-black uppercase tracking-wider block">Patentes</span>
@@ -1135,7 +1135,7 @@ export default function OrganizationDashboard() {
                                   <button
                                     type="button"
                                     onClick={() => openModal('allocate_researcher', inv)}
-                                    className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-[9px] font-extrabold transition-all uppercase tracking-wider text-center shadow-[0_0_12px_rgba(79,70,229,0.15)]"
+                                    className="flex-1 py-2.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-[9px] font-extrabold transition-all uppercase tracking-wider text-center shadow-[0_0_12px_rgba(0,181,156,0.15)]"
                                   >
                                     Alocar
                                   </button>

@@ -201,7 +201,7 @@ export function CreateProjectICT() {
           <div 
             key={s} 
             className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-              i <= currentIndex ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-slate-800'
+              i <= currentIndex ? 'bg-teal-500 shadow-[0_0_10px_rgba(0,181,156,0.5)]' : 'bg-slate-800'
             }`} 
           />
         ))}
@@ -219,7 +219,7 @@ export function CreateProjectICT() {
       {renderProgressBar()}
 
       <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-1000" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 blur-[100px] pointer-events-none group-hover:bg-teal-500/10 transition-all duration-1000" />
         
         {error && (
           <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-in fade-in zoom-in-95">
@@ -245,7 +245,7 @@ export function CreateProjectICT() {
                   onClick={() => updateField('segment', chamber)}
                   className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
                     formData.segment === chamber 
-                      ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
+                      ? 'bg-teal-500/20 border-teal-500 text-teal-300' 
                       : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
@@ -259,7 +259,7 @@ export function CreateProjectICT() {
               <button 
                 onClick={() => nextStep('ICT_RESEARCH')} 
                 disabled={!formData.segment}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -300,7 +300,7 @@ export function CreateProjectICT() {
               <button 
                 onClick={() => nextStep('ICT_INFRA')} 
                 disabled={formData.researchLines.length === 0}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -340,7 +340,7 @@ export function CreateProjectICT() {
               <button 
                 onClick={() => nextStep('ICT_FOMENTO')} 
                 disabled={formData.infrastructure.length === 0}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -379,7 +379,7 @@ export function CreateProjectICT() {
               <button 
                 onClick={() => nextStep('ICT_PI')} 
                 disabled={formData.fomentoAccess.length === 0}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -405,7 +405,7 @@ export function CreateProjectICT() {
                   onClick={() => updateField('piPolicy', opt.id)}
                   className={`p-5 rounded-2xl text-left transition-all border ${
                     formData.piPolicy === opt.id
-                      ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300'
+                      ? 'bg-teal-500/10 border-teal-500 text-teal-300'
                       : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
@@ -420,7 +420,7 @@ export function CreateProjectICT() {
               <button 
                 onClick={() => nextStep('LOCATION')} 
                 disabled={!formData.piPolicy}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -440,7 +440,7 @@ export function CreateProjectICT() {
                   key={region}
                   onClick={() => updateField('location', { region })}
                   className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                    formData.location.region === region ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                    formData.location.region === region ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
                   <MapPin size={20} />
@@ -458,7 +458,7 @@ export function CreateProjectICT() {
               </button>
               <button 
                 onClick={() => nextStep('REVIEW')} 
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
               >Próximo</button>
             </div>
           </div>
@@ -522,7 +522,7 @@ export function CreateProjectICT() {
               <button 
                 onClick={handleSubmit} 
                 disabled={loading}
-                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-white font-black text-lg shadow-[0_0_30px_rgba(79,70,229,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white font-black text-lg shadow-[0_0_30px_rgba(0,181,156,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="animate-spin" size={24} /> : <>{ "Finalizar e Gerar Matches" } <Rocket size={24} /></>}
               </button>

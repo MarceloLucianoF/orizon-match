@@ -248,7 +248,7 @@ export function CreateProject() {
           <div 
             key={s} 
             className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-              i <= currentIndex ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-slate-800'
+              i <= currentIndex ? 'bg-teal-500 shadow-[0_0_10px_rgba(0,181,156,0.5)]' : 'bg-slate-800'
             }`} 
           />
         ))}
@@ -266,7 +266,7 @@ export function CreateProject() {
       {renderProgressBar()}
 
       <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-1000" />
+        <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 blur-[100px] pointer-events-none group-hover:bg-teal-500/10 transition-all duration-1000" />
         
         {error && (
           <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-in fade-in zoom-in-95">
@@ -288,21 +288,21 @@ export function CreateProject() {
             <div className="grid gap-4">
               <button
                 onClick={() => { updateField('role', 'idea'); nextStep('SEGMENT'); }}
-                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 hover:bg-slate-800 transition-all group/btn"
+                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 hover:bg-slate-800 transition-all group/btn"
               >
-                <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center group-hover/btn:scale-110 transition-transform">
+                <div className="w-16 h-16 rounded-2xl bg-teal-500/10 flex items-center justify-center group-hover/btn:scale-110 transition-transform">
                   <Lightbulb className="text-amber-400" size={32} />
                 </div>
                 <div className="text-left">
                   <h3 className="text-lg font-bold text-white">Tenho uma Ideia</h3>
                   <p className="text-sm text-slate-400">Desejo transformar uma ideia em inovação real.</p>
                 </div>
-                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-indigo-400 group-hover/btn:translate-x-1 transition-all" />
+                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-teal-400 group-hover/btn:translate-x-1 transition-all" />
               </button>
 
               <button
                 onClick={() => { updateField('role', 'ict'); nextStep('SEGMENT'); }}
-                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 hover:bg-slate-800 transition-all group/btn"
+                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 hover:bg-slate-800 transition-all group/btn"
               >
                 <div className="w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center group-hover/btn:scale-110 transition-transform">
                   <GraduationCap className="text-blue-400" size={32} />
@@ -311,12 +311,12 @@ export function CreateProject() {
                   <h3 className="text-lg font-bold text-white">Sou um ICT / Universidade</h3>
                   <p className="text-sm text-slate-400">Ofereço infraestrutura e linhas de pesquisa.</p>
                 </div>
-                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-indigo-400 group-hover/btn:translate-x-1 transition-all" />
+                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-teal-400 group-hover/btn:translate-x-1 transition-all" />
               </button>
 
               <button
                 onClick={() => { updateField('role', 'provider'); nextStep('SEGMENT'); }}
-                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 hover:bg-slate-800 transition-all group/btn"
+                className="flex items-center gap-6 p-6 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 hover:bg-slate-800 transition-all group/btn"
               >
                 <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 flex items-center justify-center group-hover/btn:scale-110 transition-transform">
                   <Factory className="text-emerald-400" size={32} />
@@ -325,7 +325,7 @@ export function CreateProject() {
                   <h3 className="text-lg font-bold text-white">Sou Empresa / Prestador</h3>
                   <p className="text-sm text-slate-400">Ofereço capacidade produtiva ou serviços técnicos.</p>
                 </div>
-                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-indigo-400 group-hover/btn:translate-x-1 transition-all" />
+                <ArrowRight className="ml-auto text-slate-600 group-hover/btn:text-teal-400 group-hover/btn:translate-x-1 transition-all" />
               </button>
             </div>
           </div>
@@ -346,7 +346,7 @@ export function CreateProject() {
                   onClick={() => updateField('segment', chamber)}
                   className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
                     formData.segment === chamber 
-                      ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
+                      ? 'bg-teal-500/20 border-teal-500 text-teal-300' 
                       : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
@@ -364,7 +364,7 @@ export function CreateProject() {
                   else nextStep('PROTECTION');
                 }} 
                 disabled={!formData.segment}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -405,7 +405,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('ICT_INFRA')} 
                 disabled={formData.researchLines.length === 0}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -445,7 +445,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('ICT_FOMENTO')} 
                 disabled={formData.infrastructure.length === 0}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -484,7 +484,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('ICT_PI')} 
                 disabled={formData.fomentoAccess.length === 0}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -510,7 +510,7 @@ export function CreateProject() {
                   onClick={() => updateField('piPolicy', opt.id)}
                   className={`p-5 rounded-2xl text-left transition-all border ${
                     formData.piPolicy === opt.id
-                      ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300'
+                      ? 'bg-teal-500/10 border-teal-500 text-teal-300'
                       : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
@@ -525,7 +525,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('LOCATION')} 
                 disabled={!formData.piPolicy}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -566,7 +566,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('PROVIDER_CAPACITY')} 
                 disabled={formData.services.length === 0}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -607,7 +607,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('PROVIDER_THESIS')} 
                 disabled={!formData.productionCapacity}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -626,12 +626,12 @@ export function CreateProject() {
                 value={formData.innovationThesis}
                 onChange={(e) => updateField('innovationThesis', e.target.value)}
                 placeholder="Ex: Buscamos soluções de eficiência energética e novos materiais para o setor automotivo..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm text-slate-200 focus:border-indigo-500 outline-none h-48 transition-all resize-none"
+                className="w-full bg-slate-950 border border-slate-800 rounded-2xl p-6 text-sm text-slate-200 focus:border-teal-500 outline-none h-48 transition-all resize-none"
               />
-              <div className="p-4 bg-indigo-500/5 rounded-xl border border-indigo-500/20 flex gap-3 items-start">
-                <Zap size={20} className="text-indigo-400 mt-1" />
+              <div className="p-4 bg-teal-500/5 rounded-xl border border-teal-500/20 flex gap-3 items-start">
+                <Zap size={20} className="text-teal-400 mt-1" />
                 <p className="text-[11px] text-slate-400 leading-relaxed">
-                  <strong>Dica Orizon:</strong> Descreva seus desafios atuais. Nossa IA usará este texto para encontrar inventores que tenham a solução exata para você.
+                  <strong>Dica InovaHelix:</strong> Descreva seus desafios atuais. Nossa IA usará este texto para encontrar inventores que tenham a solução exata para você.
                 </p>
               </div>
             </div>
@@ -641,7 +641,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('PROVIDER_MODEL')} 
                 disabled={!formData.innovationThesis}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -681,7 +681,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('LOCATION')} 
                 disabled={formData.partnershipModel.length === 0}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -699,7 +699,7 @@ export function CreateProject() {
               <button
                 onClick={() => updateField('isProtected', 'sim')}
                 className={`flex flex-col items-center gap-4 p-8 rounded-2xl border transition-all ${
-                  formData.isProtected === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.isProtected === 'sim' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <ShieldCheck size={40} />
@@ -708,7 +708,7 @@ export function CreateProject() {
               <button
                 onClick={() => updateField('isProtected', 'nao')}
                 className={`flex flex-col items-center gap-4 p-8 rounded-2xl border transition-all ${
-                  formData.isProtected === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.isProtected === 'nao' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <HelpCircle size={40} />
@@ -725,7 +725,7 @@ export function CreateProject() {
                       type="text"
                       value={formData.registration.idNumber}
                       onChange={(e) => updateRegistration('idNumber', e.target.value)}
-                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:border-indigo-500 outline-none"
+                      className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:border-teal-500 outline-none"
                       placeholder="00.000.000/0001-00"
                     />
                   </div>
@@ -768,7 +768,7 @@ export function CreateProject() {
                     type="text"
                     value={formData.patentNumber}
                     onChange={(e) => updateField('patentNumber', e.target.value)}
-                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:border-indigo-500 outline-none"
+                    className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-slate-200 focus:border-teal-500 outline-none"
                     placeholder="BR 10 202X XXXXXX-X"
                   />
                 </div>
@@ -782,17 +782,17 @@ export function CreateProject() {
                 <div>
                   <label className="block text-sm font-medium text-slate-400 mb-2">Já possui o certificado de concessão?</label>
                   <div className="flex gap-4">
-                    <button onClick={() => updateField('isGranted', 'sim')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'sim' ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-700 text-slate-400'}`}>Sim</button>
-                    <button onClick={() => updateField('isGranted', 'nao')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'nao' ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-700 text-slate-400'}`}>Não</button>
+                    <button onClick={() => updateField('isGranted', 'sim')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'sim' ? 'bg-teal-500 border-teal-500 text-white' : 'border-slate-700 text-slate-400'}`}>Sim</button>
+                    <button onClick={() => updateField('isGranted', 'nao')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'nao' ? 'bg-teal-500 border-teal-500 text-white' : 'border-slate-700 text-slate-400'}`}>Não</button>
                   </div>
                 </div>
               </div>
             )}
 
             {formData.isProtected === 'nao' && (
-              <div className="p-6 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 space-y-4 animate-in zoom-in-95">
+              <div className="p-6 rounded-2xl bg-teal-500/10 border border-teal-500/20 space-y-4 animate-in zoom-in-95">
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 shrink-0">
                     <Info size={24} />
                   </div>
                   <div className="space-y-2">
@@ -802,7 +802,7 @@ export function CreateProject() {
                     </p>
                   </div>
                 </div>
-                <button className="w-full py-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 font-bold flex items-center justify-center gap-2 transition border border-indigo-500/20">
+                <button className="w-full py-3 rounded-xl bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 font-bold flex items-center justify-center gap-2 transition border border-teal-500/20">
                   <Video size={18} /> Assistir Vídeo Explicativo
                 </button>
               </div>
@@ -816,7 +816,7 @@ export function CreateProject() {
                   else nextStep('RESEARCH');
                 }} 
                 disabled={!formData.isProtected}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -848,7 +848,7 @@ export function CreateProject() {
                 >Pular Vínculo</button>
                 <button 
                   onClick={() => nextStep('RESEARCH')} 
-                  className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                  className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
                 >Próximo</button>
               </div>
             </div>
@@ -867,13 +867,13 @@ export function CreateProject() {
               <button
                 onClick={() => updateField('needsResearch', 'sim')}
                 className={`p-8 rounded-2xl border transition-all font-bold ${
-                  formData.needsResearch === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.needsResearch === 'sim' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >Sim</button>
               <button
                 onClick={() => updateField('needsResearch', 'nao')}
                 className={`p-8 rounded-2xl border transition-all font-bold ${
-                  formData.needsResearch === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.needsResearch === 'nao' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >Não</button>
             </div>
@@ -883,7 +883,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('INNOVATION_TYPE')} 
                 disabled={!formData.needsResearch}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -901,7 +901,7 @@ export function CreateProject() {
               <button
                 onClick={() => updateField('innovationType', 'melhoria')}
                 className={`p-8 rounded-2xl border transition-all text-center space-y-2 ${
-                  formData.innovationType === 'melhoria' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.innovationType === 'melhoria' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="font-bold text-lg">Melhoria Incremental</div>
@@ -910,7 +910,7 @@ export function CreateProject() {
               <button
                 onClick={() => updateField('innovationType', 'inovacao')}
                 className={`p-8 rounded-2xl border transition-all text-center space-y-2 ${
-                  formData.innovationType === 'inovacao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.innovationType === 'inovacao' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="font-bold text-lg">Inovação Radical</div>
@@ -923,7 +923,7 @@ export function CreateProject() {
               <button 
                 onClick={() => nextStep('LOCATION')} 
                 disabled={!formData.innovationType}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -943,7 +943,7 @@ export function CreateProject() {
                   key={region}
                   onClick={() => updateField('location', { region })}
                   className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                    formData.location.region === region ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                    formData.location.region === region ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
                   <MapPin size={20} />
@@ -968,7 +968,7 @@ export function CreateProject() {
                   if (formData.role === 'idea') nextStep('MATURITY');
                   else nextStep('CADASTRO');
                 }} 
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
               >Próximo</button>
             </div>
           </div>
@@ -1005,7 +1005,7 @@ export function CreateProject() {
                 >Pular por enquanto</button>
                 <button 
                   onClick={() => nextStep('SUMMARY_METHOD')} 
-                  className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                  className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
                 >Confirmar e Prosseguir</button>
               </div>
             </div>
@@ -1023,9 +1023,9 @@ export function CreateProject() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button
                 onClick={() => { updateField('summaryMethod', 'questions'); nextStep('SUMMARY_CONTENT'); }}
-                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 transition-all space-y-4 group/card"
               >
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
+                <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
                   <HelpCircle size={28} />
                 </div>
                 <div className="text-center md:text-left">
@@ -1036,7 +1036,7 @@ export function CreateProject() {
 
               <button
                 onClick={() => { updateField('summaryMethod', 'text'); nextStep('SUMMARY_CONTENT'); }}
-                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 transition-all space-y-4 group/card"
               >
                 <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
                   <MessageSquare size={28} />
@@ -1049,7 +1049,7 @@ export function CreateProject() {
 
               <button
                 onClick={() => { updateField('summaryMethod', 'document'); nextStep('SUMMARY_UPLOAD'); }}
-                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 transition-all space-y-4 group/card"
               >
                 <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
                   <UploadCloud size={28} />
@@ -1120,7 +1120,7 @@ export function CreateProject() {
                       { agency: "INPI", number: "BR 10 2026 000123-4", country: "BR", conceded: true },
                       { agency: "ANVISA", number: "REG-80123456789", country: "BR", conceded: true }
                     ],
-                    owners: ["UFSC (Universidade Federal de Santa Catarina)", "Orizon Match Co."],
+                    owners: ["UFSC (Universidade Federal de Santa Catarina)", "InovaHelix Co."],
                     hasCoOwnership: true,
                     licensingRestrictions: "Direito de preferência concedido ao co-titular industrial."
                   },
@@ -1144,7 +1144,7 @@ export function CreateProject() {
                     { id: "1", name: "Patente_Concedida_BR102026.pdf", category: "legal", url: "#", uploadedAt: Date.now(), sizeBytes: 1450000, mimeType: "application/pdf" },
                     { id: "2", name: "Relatorio_Ensaios_Clinicos_Fase_I.pdf", category: "regulatory", url: "#", uploadedAt: Date.now(), sizeBytes: 3200000, mimeType: "application/pdf" },
                     { id: "3", name: "Esquematico_Estrutura_Celular_3D.step", category: "technical", url: "#", uploadedAt: Date.now(), sizeBytes: 15400000, mimeType: "application/octet-stream" },
-                    { id: "4", name: "Pitch_Deck_Comercial_Orizon.pdf", category: "commercial", url: "#", uploadedAt: Date.now(), sizeBytes: 2450000, mimeType: "application/pdf" }
+                    { id: "4", name: "Pitch_Deck_Comercial_InovaHelix.pdf", category: "commercial", url: "#", uploadedAt: Date.now(), sizeBytes: 2450000, mimeType: "application/pdf" }
                   ]
                 }
               }));
@@ -1165,7 +1165,7 @@ export function CreateProject() {
                   <textarea
                     value={formData.summaryQuestions.problem}
                     onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-teal-500 outline-none h-24"
                     placeholder="Descreva a dor do mercado..."
                   />
                 </div>
@@ -1174,7 +1174,7 @@ export function CreateProject() {
                   <textarea
                     value={formData.summaryQuestions.solution}
                     onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-teal-500 outline-none h-24"
                     placeholder="Como sua ideia funciona..."
                   />
                 </div>
@@ -1183,7 +1183,7 @@ export function CreateProject() {
                   <textarea
                     value={formData.summaryQuestions.difference}
                     onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-24"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-teal-500 outline-none h-24"
                     placeholder="Por que você é melhor que a concorrência..."
                   />
                 </div>
@@ -1295,7 +1295,7 @@ export function CreateProject() {
                       }
                     }}
                     disabled={isAiProcessing}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-teal-600 hover:from-purple-500 hover:to-teal-500 text-white font-bold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isAiProcessing ? <Loader2 className="animate-spin" size={20} /> : <><Zap size={18} /> Lapidar Pitch com IA</>}
                   </button>
@@ -1308,7 +1308,7 @@ export function CreateProject() {
                 <textarea
                   value={formData.summary}
                   onChange={(e) => updateField('summary', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 outline-none h-64"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-teal-500 outline-none h-64"
                   placeholder="Escreva aqui o resumo da sua patente ou ideia de negócio..."
                 />
               </div>
@@ -1326,7 +1326,7 @@ export function CreateProject() {
               </button>
               <button 
                 onClick={() => nextStep('CADASTRO')} 
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
               >Próximo</button>
             </div>
           </div>
@@ -1347,7 +1347,7 @@ export function CreateProject() {
                   type="text"
                   value={formData.registration.name}
                   onChange={(e) => { updateRegistration('name', e.target.value); setFieldErrors(prev => ({ ...prev, name: '' })); }}
-                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none transition ${fieldErrors.name ? 'border-red-500' : 'border-slate-800'}`}
+                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-teal-500 outline-none transition ${fieldErrors.name ? 'border-red-500' : 'border-slate-800'}`}
                   placeholder="Nome completo ou razão social"
                 />
                 {fieldErrors.name && <p className="text-red-400 text-xs mt-1">{fieldErrors.name}</p>}
@@ -1358,7 +1358,7 @@ export function CreateProject() {
                   type="text"
                   value={formData.registration.idNumber}
                   onChange={(e) => { updateRegistration('idNumber', maskCpfCnpj(e.target.value)); setFieldErrors(prev => ({ ...prev, idNumber: '' })); }}
-                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none transition ${fieldErrors.idNumber ? 'border-red-500' : 'border-slate-800'}`}
+                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-teal-500 outline-none transition ${fieldErrors.idNumber ? 'border-red-500' : 'border-slate-800'}`}
                   placeholder="000.000.000-00"
                 />
                 {fieldErrors.idNumber && <p className="text-red-400 text-xs mt-1">{fieldErrors.idNumber}</p>}
@@ -1369,7 +1369,7 @@ export function CreateProject() {
                   type="text"
                   value={formData.registration.phone}
                   onChange={(e) => { updateRegistration('phone', maskPhone(e.target.value)); setFieldErrors(prev => ({ ...prev, phone: '' })); }}
-                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none transition ${fieldErrors.phone ? 'border-red-500' : 'border-slate-800'}`}
+                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-teal-500 outline-none transition ${fieldErrors.phone ? 'border-red-500' : 'border-slate-800'}`}
                   placeholder="(00) 00000-0000"
                 />
                 {fieldErrors.phone && <p className="text-red-400 text-xs mt-1">{fieldErrors.phone}</p>}
@@ -1380,7 +1380,7 @@ export function CreateProject() {
                   type="email"
                   value={formData.registration.email}
                   onChange={(e) => { updateRegistration('email', e.target.value); setFieldErrors(prev => ({ ...prev, email: '' })); }}
-                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none transition ${fieldErrors.email ? 'border-red-500' : 'border-slate-800'}`}
+                  className={`w-full bg-slate-950 border rounded-lg px-4 py-2.5 text-slate-200 focus:border-teal-500 outline-none transition ${fieldErrors.email ? 'border-red-500' : 'border-slate-800'}`}
                   placeholder="seu@email.com"
                 />
                 {fieldErrors.email && <p className="text-red-400 text-xs mt-1">{fieldErrors.email}</p>}
@@ -1393,7 +1393,7 @@ export function CreateProject() {
                       type="password"
                       value={formData.registration.password}
                       onChange={(e) => updateRegistration('password', e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-teal-500 outline-none"
                       placeholder="Min. 6 caracteres"
                     />
                   </div>
@@ -1403,7 +1403,7 @@ export function CreateProject() {
                       type="password"
                       value={formData.registration.confirmPassword}
                       onChange={(e) => updateRegistration('confirmPassword', e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-indigo-500 outline-none"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2.5 text-slate-200 focus:border-teal-500 outline-none"
                       placeholder="Repita a senha"
                     />
                   </div>
@@ -1427,7 +1427,7 @@ export function CreateProject() {
                   setFieldErrors(errors);
                   if (Object.keys(errors).length === 0) nextStep('REVIEW');
                 }} 
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
               >Próximo</button>
             </div>
           </div>
@@ -1440,25 +1440,25 @@ export function CreateProject() {
               // Beautiful Digital Twin Preview
               <div className="space-y-8 text-left">
                 <div className="text-center space-y-1">
-                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-bold uppercase tracking-wider mb-2">
                     <Zap size={12} className="animate-pulse" /> Gêmeo Digital de Ativo
                   </div>
                   <h2 className="text-2xl font-black text-white">{(formData as any).title}</h2>
-                  <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider">Câmara FIESC: {formData.segment}</p>
+                  <p className="text-xs text-teal-400 font-bold uppercase tracking-wider">Câmara FIESC: {formData.segment}</p>
                 </div>
 
                 {/* Overall Score Banner */}
-                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900/90 to-indigo-950/20 border border-indigo-500/10 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px]" />
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900/90 to-teal-950/20 border border-teal-500/10 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 blur-[50px]" />
                   <div className="relative flex items-center justify-center w-20 h-20 shrink-0">
-                    <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur animate-pulse" />
-                    <div className="absolute w-18 h-18 border-2 border-indigo-500/20 rounded-full" />
+                    <div className="absolute inset-0 bg-teal-500/10 rounded-full blur animate-pulse" />
+                    <div className="absolute w-18 h-18 border-2 border-teal-500/20 rounded-full" />
                     <span className="text-2xl font-black text-white">{(formData as any).readinessScores.overall}%</span>
                   </div>
                   <div className="text-center md:text-left space-y-1">
                     <h4 className="text-white font-bold text-base">Transfer Readiness Score</h4>
                     <p className="text-xs text-slate-400">
-                      Pontuação geral ponderada para a indústria de <strong className="text-indigo-300">{(formData as any).technologyDNA.industry.join(", ")}</strong>.
+                      Pontuação geral ponderada para a indústria de <strong className="text-teal-300">{(formData as any).technologyDNA.industry.join(", ")}</strong>.
                     </p>
                   </div>
                 </div>
@@ -1486,10 +1486,10 @@ export function CreateProject() {
                       <div key={item.label} className="p-4 rounded-2xl bg-slate-950/30 border border-slate-900 space-y-2">
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-slate-300 font-bold">{item.label}</span>
-                          <span className="text-indigo-400 font-extrabold">{item.score}%</span>
+                          <span className="text-teal-400 font-extrabold">{item.score}%</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${item.score}%` }} />
+                          <div className="h-full bg-teal-500 rounded-full" style={{ width: `${item.score}%` }} />
                         </div>
                         <p className="text-[10px] text-slate-500">{item.desc}</p>
                       </div>
@@ -1506,7 +1506,7 @@ export function CreateProject() {
                         <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Palavras-chave</span>
                         <div className="flex flex-wrap gap-1.5 mt-1.5">
                           {(formData as any).technologyDNA.keywords.map((kw: string) => (
-                            <span key={kw} className="px-2.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-300 font-semibold">{kw}</span>
+                            <span key={kw} className="px-2.5 py-0.5 rounded-md bg-teal-500/10 border border-teal-500/20 text-[11px] text-teal-300 font-semibold">{kw}</span>
                           ))}
                         </div>
                       </div>
@@ -1536,7 +1536,7 @@ export function CreateProject() {
                       <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-900 text-xs space-y-3">
                         <div className="flex justify-between">
                           <span className="text-slate-500 font-medium">Situação da PI</span>
-                          <span className="text-white font-bold bg-indigo-600/30 px-2 py-0.5 rounded border border-indigo-500/30 uppercase tracking-wide">{(formData as any).technologyProtection.status === 'granted' ? 'Concedida' : (formData as any).technologyProtection.status}</span>
+                          <span className="text-white font-bold bg-teal-600/30 px-2 py-0.5 rounded border border-teal-500/30 uppercase tracking-wide">{(formData as any).technologyProtection.status === 'granted' ? 'Concedida' : (formData as any).technologyProtection.status}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-500 font-medium">Patente (INPI)</span>
@@ -1564,11 +1564,11 @@ export function CreateProject() {
                           <p className="text-[10px] text-slate-500">{(formData as any).team.laboratoryName}</p>
                         </div>
                         <div className="flex gap-2.5 pt-1">
-                          <a href={(formData as any).team.lattesUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">Lattes</a>
+                          <a href={(formData as any).team.lattesUrl} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">Lattes</a>
                           <span className="text-slate-800">|</span>
-                          <a href={(formData as any).team.orcid} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">ORCID</a>
+                          <a href={(formData as any).team.orcid} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">ORCID</a>
                           <span className="text-slate-800">|</span>
-                          <a href={(formData as any).team.linkedinUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">LinkedIn</a>
+                          <a href={(formData as any).team.linkedinUrl} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">LinkedIn</a>
                         </div>
                       </div>
                     </div>
@@ -1581,7 +1581,7 @@ export function CreateProject() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {(formData as any).vdrAssets.map((asset: any) => (
                       <div key={asset.id} className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex items-center gap-4 hover:border-slate-800 transition">
-                        <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-400 shrink-0">
                           <FileText size={20} />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1654,7 +1654,7 @@ export function CreateProject() {
               <button 
                 onClick={handleSubmit} 
                 disabled={loading}
-                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-white font-black text-lg shadow-[0_0_30px_rgba(79,70,229,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white font-black text-lg shadow-[0_0_30px_rgba(0,181,156,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="animate-spin" size={24} /> : <>{ "Finalizar e Gerar Matches" } <Rocket size={24} /></>}
               </button>
@@ -1667,19 +1667,19 @@ export function CreateProject() {
       {/* IA Processing Overlay */}
       {isAiProcessing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-slate-900 border border-indigo-500/30 p-8 rounded-3xl shadow-[0_0_50px_rgba(79,70,229,0.2)] max-w-sm w-full text-center space-y-6">
+          <div className="bg-slate-900 border border-teal-500/30 p-8 rounded-3xl shadow-[0_0_50px_rgba(0,181,156,0.2)] max-w-sm w-full text-center space-y-6">
             <div className="relative w-20 h-20 mx-auto">
-              <div className="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping" />
-              <div className="relative bg-indigo-600 w-20 h-20 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(79,70,229,0.5)]">
+              <div className="absolute inset-0 bg-teal-500/20 rounded-full animate-ping" />
+              <div className="relative bg-teal-600 w-20 h-20 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(0,181,156,0.5)]">
                 <Zap size={40} className="animate-pulse" />
               </div>
             </div>
             <div className="space-y-2">
               <h3 className="text-xl font-bold text-white">IA Refinando seu Pitch</h3>
-              <p className="text-indigo-400 text-sm font-medium animate-pulse">{aiStatus}</p>
+              <p className="text-teal-400 text-sm font-medium animate-pulse">{aiStatus}</p>
             </div>
             <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-               <div className="bg-indigo-500 h-full w-1/2 animate-[shimmer_2s_infinite] rounded-full" />
+               <div className="bg-teal-500 h-full w-1/2 animate-[shimmer_2s_infinite] rounded-full" />
             </div>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Aguarde alguns segundos...</p>
           </div>

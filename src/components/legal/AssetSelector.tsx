@@ -46,7 +46,7 @@ export function AssetSelector({ selectedIds, onToggle }: AssetSelectorProps) {
   const getIcon = (type: string) => {
     switch (type) {
       case 'patent': return <Briefcase className="text-amber-400" size={16} />;
-      case 'trademark': return <ShieldCheck className="text-indigo-400" size={16} />;
+      case 'trademark': return <ShieldCheck className="text-teal-400" size={16} />;
       case 'software': return <Code className="text-emerald-400" size={16} />;
       default: return <FileText className="text-slate-400" size={16} />;
     }
@@ -55,7 +55,7 @@ export function AssetSelector({ selectedIds, onToggle }: AssetSelectorProps) {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-10 space-y-3">
-        <Loader2 className="animate-spin text-indigo-500" />
+        <Loader2 className="animate-spin text-teal-500" />
         <span className="text-xs text-slate-500 uppercase font-black tracking-widest">Carregando seus ativos...</span>
       </div>
     );
@@ -74,7 +74,7 @@ export function AssetSelector({ selectedIds, onToggle }: AssetSelectorProps) {
         <Link 
           to="/assets" 
           target="_blank"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded-lg text-xs font-bold hover:bg-indigo-600/30 transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600/20 text-teal-400 border border-teal-500/30 rounded-lg text-xs font-bold hover:bg-teal-600/30 transition-all"
         >
           <Plus size={14} /> Registrar Ativo Agora
         </Link>
@@ -93,11 +93,11 @@ export function AssetSelector({ selectedIds, onToggle }: AssetSelectorProps) {
             onClick={() => onToggle(asset.id)}
             className={`flex items-center gap-4 p-4 rounded-xl border transition-all text-left ${
               isSelected 
-                ? 'bg-indigo-500/10 border-indigo-500 ring-1 ring-indigo-500' 
+                ? 'bg-teal-500/10 border-teal-500 ring-1 ring-teal-500' 
                 : 'bg-slate-950/50 border-slate-800 hover:border-slate-700'
             }`}
           >
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-indigo-500/20' : 'bg-slate-900'}`}>
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${isSelected ? 'bg-teal-500/20' : 'bg-slate-900'}`}>
               {getIcon(asset.type)}
             </div>
             <div className="flex-1 min-w-0">
@@ -105,7 +105,7 @@ export function AssetSelector({ selectedIds, onToggle }: AssetSelectorProps) {
               <p className="text-[10px] text-slate-500 font-mono uppercase tracking-tight">{asset.inpiNumber || 'Sem número INPI'}</p>
             </div>
             {isSelected ? (
-              <CheckCircle size={20} className="text-indigo-400" />
+              <CheckCircle size={20} className="text-teal-400" />
             ) : (
               <div className="w-5 h-5 rounded-full border-2 border-slate-800" />
             )}

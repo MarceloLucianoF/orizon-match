@@ -8,7 +8,7 @@ export function CreateProjectWrapper() {
   const { userProfile, loading } = useAuth();
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-indigo-500">Carregando...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-teal-500">Carregando...</div>;
   }
 
   if (!userProfile) {

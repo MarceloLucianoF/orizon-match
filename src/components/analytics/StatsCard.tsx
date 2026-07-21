@@ -6,11 +6,12 @@ interface StatsCardProps {
   trend?: number; // percentual de mudança
   icon: any;
   description?: string;
-  color?: "indigo" | "emerald" | "amber" | "rose" | "cyan";
+  color?: "teal" | "indigo" | "emerald" | "amber" | "rose" | "cyan";
 }
 
-export function StatsCard({ label, value, trend, icon: Icon, description, color = "indigo" }: StatsCardProps) {
+export function StatsCard({ label, value, trend, icon: Icon, description, color = "teal" }: StatsCardProps) {
   const colorClasses = {
+    teal: "from-teal-500/20 text-teal-400 border-teal-500/20",
     indigo: "from-indigo-500/20 text-indigo-400 border-indigo-500/20",
     emerald: "from-emerald-500/20 text-emerald-400 border-emerald-500/20",
     amber: "from-amber-500/20 text-amber-400 border-amber-500/20",

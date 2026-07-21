@@ -68,7 +68,7 @@ export function ProcessingLoader({ onComplete }: ProcessingLoaderProps) {
     <div className="space-y-10 py-10 flex flex-col items-center justify-center animate-in fade-in">
       <div className="relative flex items-center justify-center w-28 h-28">
         {/* Glow behind loader */}
-        <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur-2xl animate-pulse" />
+        <div className="absolute inset-0 bg-teal-500/10 rounded-full blur-2xl animate-pulse" />
         
         {/* Inner rotating ring */}
         <div className="absolute w-24 h-24 border-4 border-slate-800 rounded-full" />
@@ -76,7 +76,7 @@ export function ProcessingLoader({ onComplete }: ProcessingLoaderProps) {
         {/* Outer active spinner */}
         <Loader2 
           size={96} 
-          className="text-indigo-500 animate-spin absolute" 
+          className="text-teal-500 animate-spin absolute" 
           style={{ strokeWidth: 1.5 }}
         />
         
@@ -95,7 +95,7 @@ export function ProcessingLoader({ onComplete }: ProcessingLoaderProps) {
       {/* Progress Bar */}
       <div className="w-full max-w-md h-2 bg-slate-950 rounded-full border border-slate-900 overflow-hidden relative shadow-[inset_0_2px_4px_rgba(0,0,0,0.6)]">
         <div 
-          className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full transition-all duration-75 shadow-[0_0_12px_rgba(99,102,241,0.5)]"
+          className="h-full bg-gradient-to-r from-purple-500 to-teal-500 rounded-full transition-all duration-75 shadow-[0_0_12px_rgba(0,181,156,0.5)]"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -121,7 +121,7 @@ export function ProcessingLoader({ onComplete }: ProcessingLoaderProps) {
                 {isCompleted ? (
                   <CheckCircle2 size={18} className="fill-emerald-500/10 text-emerald-400" />
                 ) : isActive ? (
-                  <Loader2 size={18} className="text-indigo-400 animate-spin" />
+                  <Loader2 size={18} className="text-teal-400 animate-spin" />
                 ) : (
                   <Circle size={18} />
                 )}

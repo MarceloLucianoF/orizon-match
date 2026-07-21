@@ -61,7 +61,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 onClick={() => window.location.reload()}
-                className="flex-1 bg-indigo-650 hover:bg-indigo-600 text-white py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border border-indigo-500/30 shadow-[0_0_15px_rgba(79,70,229,0.2)]"
+                className="flex-1 bg-teal-650 hover:bg-teal-600 text-white py-3 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 border border-teal-500/30 shadow-[0_0_15px_rgba(0,181,156,0.2)]"
               >
                 <RotateCw size={14} /> Recarregar App
               </button>

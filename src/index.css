@@ -17,6 +17,7 @@
   --color-slate-355: #a3b1c6;
   --color-slate-405: #7d8b9e;
   --color-slate-505: #56657a;
+  --color-slate-450: #738294;
   --color-slate-650: #3b485a;
   --color-slate-750: #293547;
   --color-slate-800: #1e293b;
@@ -25,9 +26,18 @@
   --color-slate-855: #020617;
   --color-slate-900: #0f172a;
   --color-slate-950: #020617;
-  --color-indigo-500: #6366f1;
-  --color-indigo-600: #4f46e5;
-  --color-indigo-650: #4338ca;
+  --color-indigo-50: #e0f2f1;
+  --color-indigo-100: #b2dfdb;
+  --color-indigo-200: #80cbc4;
+  --color-indigo-300: #4db6ac;
+  --color-indigo-400: #00d2b4;
+  --color-indigo-500: #00b59c;
+  --color-indigo-600: #00897b;
+  --color-indigo-650: #00796b;
+  --color-indigo-700: #00796b;
+  --color-indigo-800: #00695c;
+  --color-indigo-900: #004d40;
+  --color-indigo-950: #00251a;
 
   --font-sans: "Sora", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
@@ -245,9 +255,9 @@ code {
   font-size: 1.45rem;
   margin-top: 2.5rem;
   margin-bottom: 1rem;
-  border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+  border-bottom: 1px solid rgba(0, 181, 156, 0.2);
   padding-bottom: 0.5rem;
-  background: linear-gradient(to right, #ffffff, #c7d2fe);
+  background: linear-gradient(to right, #ffffff, #80cbc4);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -257,7 +267,7 @@ code {
   font-size: 1.2rem;
   margin-top: 1.85rem;
   margin-bottom: 0.75rem;
-  color: rgb(165, 180, 252); /* indigo-300 */
+  color: rgb(128, 203, 196); /* teal-300 */
 }
 
 .prose p {
@@ -268,7 +278,7 @@ code {
 
 .prose strong {
   font-weight: 700;
-  color: rgb(129, 140, 248); /* indigo-400 */
+  color: rgb(38, 166, 154); /* teal-400 */
 }
 
 .prose ul {
@@ -294,7 +304,7 @@ code {
 
 .prose blockquote {
   font-style: italic;
-  border-left: 4px solid rgb(99, 102, 241);
+  border-left: 4px solid rgb(0, 181, 156);
   padding-left: 1.25rem;
   margin: 1.75rem 0;
   color: rgb(148, 163, 184);

@@ -4,6 +4,7 @@ import {
   Loader2, Star, Lock, Zap, Rocket, Info, GraduationCap
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Logo } from "../../components/ui/Logo";
 
 import { maskPhone } from "../../lib/validators";
 import { useAuth } from '../../hooks/useAuth';
@@ -215,14 +216,17 @@ export default function PublicOnboarding() {
   return (
     <div className="min-h-screen bg-[#020617] text-slate-200 flex items-center justify-center p-6 relative overflow-hidden">
       <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-teal-500/10 blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
       </div>
 
       <div className="max-w-xl w-full bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 md:p-12 shadow-2xl relative z-10">
         
         <div className="flex justify-between items-center mb-10">
-          <Link to="/" className="font-black text-2xl text-white tracking-tighter uppercase">ORIZON<span className="text-indigo-500">MATCH</span></Link>
+          <Link to="/" className="font-black text-2xl text-white tracking-tight flex items-center gap-2.5">
+            <Logo className="w-7 h-7 text-teal-400" />
+            InovaHelix
+          </Link>
           <Link to="/login" className="text-slate-400 hover:text-white transition text-xs font-bold uppercase tracking-widest">Login</Link>
         </div>
 
@@ -243,20 +247,20 @@ export default function PublicOnboarding() {
             <div className="grid gap-3">
               {[
                 { id: 'idea', label: 'Inventor / Pesquisador', desc: 'Tenho uma ideia ou patente', icon: <Lightbulb className="text-amber-400"/> },
-                { id: 'ict', label: 'Sou uma ICT / Universidade', desc: 'Ofereço infraestrutura e pesquisa', icon: <GraduationCap className="text-indigo-400"/> },
+                { id: 'ict', label: 'Sou uma ICT / Universidade', desc: 'Ofereço infraestrutura e pesquisa', icon: <GraduationCap className="text-teal-400"/> },
                 { id: 'provider', label: 'Empresa / Investidor', desc: 'Busco inovações ou ofereço serviços', icon: <Factory className="text-emerald-400"/> }
               ].map((opt) => (
                 <button
                   key={opt.id}
                   onClick={() => { updateField('role', opt.id); nextStep('SEGMENT'); }}
-                  className="flex items-center gap-4 p-5 rounded-2xl border border-slate-800 bg-slate-800/40 hover:border-indigo-500 hover:bg-slate-800 transition-all text-left group"
+                  className="flex items-center gap-4 p-5 rounded-2xl border border-slate-800 bg-slate-800/40 hover:border-teal-500 hover:bg-slate-800 transition-all text-left group"
                 >
                   <div className="p-3 bg-slate-950 rounded-xl group-hover:scale-110 transition-transform">{opt.icon}</div>
                   <div className="flex-1">
                     <div className="font-bold text-white text-sm">{opt.label}</div>
                     <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-0.5">{opt.desc}</div>
                   </div>
-                  <ArrowRight size={18} className="text-slate-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all" />
+                  <ArrowRight size={18} className="text-slate-700 group-hover:text-teal-400 group-hover:translate-x-1 transition-all" />
                 </button>
               ))}
             </div>
@@ -275,7 +279,7 @@ export default function PublicOnboarding() {
                 <button
                   key={chamber}
                   onClick={() => { updateField('segment', chamber); nextStep('PITCH'); }}
-                  className="p-3 rounded-xl border border-slate-800 bg-slate-950/50 text-slate-400 text-xs font-medium hover:border-indigo-500 hover:text-white transition-all text-left"
+                  className="p-3 rounded-xl border border-slate-800 bg-slate-950/50 text-slate-400 text-xs font-medium hover:border-teal-500 hover:text-white transition-all text-left"
                 >
                   {chamber}
                 </button>
@@ -306,19 +310,19 @@ export default function PublicOnboarding() {
                     value={formData.summaryQuestions.problem}
                     onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
                     placeholder="Qual o problema que você resolve?"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-teal-500 outline-none h-20 transition"
                   />
                   <textarea
                     value={formData.summaryQuestions.solution}
                     onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
                     placeholder="Como sua solução funciona?"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-teal-500 outline-none h-20 transition"
                   />
                   <textarea
                     value={formData.summaryQuestions.difference}
                     onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
                     placeholder="Qual o seu grande diferencial?"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-teal-500 outline-none h-20 transition"
                   />
                 </>
               ) : formData.role === 'ict' ? (
@@ -327,13 +331,13 @@ export default function PublicOnboarding() {
                     value={formData.summaryQuestions.problem}
                     onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
                     placeholder="Quais suas principais linhas de pesquisa?"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-teal-500 outline-none h-20 transition"
                   />
                   <textarea
                     value={formData.summaryQuestions.solution}
                     onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
                     placeholder="Descreva sua infraestrutura e laboratórios..."
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-teal-500 outline-none h-20 transition"
                   />
                 </>
               ) : (
@@ -342,13 +346,13 @@ export default function PublicOnboarding() {
                     value={formData.summaryQuestions.problem}
                     onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
                     placeholder="O que sua empresa busca resolver (Tese de Inovação)?"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-teal-500 outline-none h-20 transition"
                   />
                   <textarea
                     value={formData.summaryQuestions.solution}
                     onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
                     placeholder="Quais capacidades produtivas ou serviços você oferece?"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-indigo-500 outline-none h-20 transition"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-sm text-slate-200 focus:border-teal-500 outline-none h-20 transition"
                   />
                 </>
               )}
@@ -357,7 +361,7 @@ export default function PublicOnboarding() {
             <button 
               onClick={handleGeneratePreview}
               disabled={loading || !formData.summaryQuestions.problem || !formData.summaryQuestions.solution}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-600 to-cyan-600 text-white font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(0,181,156,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 disabled:opacity-50"
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : <><Zap size={18} /> Ver Matches Agora</>}
             </button>
@@ -379,7 +383,7 @@ export default function PublicOnboarding() {
             <div className="space-y-3">
               {previewResult?.topMatches.slice(0, 3).map((match: any, idx: number) => (
                 <div key={idx} className="bg-slate-950/80 border border-slate-800 p-4 rounded-2xl flex items-center gap-4 group">
-                  <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center font-black text-indigo-400 group-hover:border-indigo-500 transition-colors">
+                  <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-700 flex items-center justify-center font-black text-teal-400 group-hover:border-teal-500 transition-colors">
                     {match.score}%
                   </div>
                   <div className="flex-1">
@@ -419,31 +423,31 @@ export default function PublicOnboarding() {
               <input 
                 type="text" value={formData.name} onChange={(e) => updateField('name', e.target.value)}
                 placeholder="Seu Nome Completo" 
-                className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+                className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-teal-500 transition text-sm"
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input 
                   type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)}
                   placeholder="E-mail" 
-                  className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+                  className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-teal-500 transition text-sm"
                 />
                 <input 
                   type="text" value={formData.phone} onChange={(e) => updateField('phone', maskPhone(e.target.value))}
                   placeholder="Telefone" 
-                  className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+                  className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-teal-500 transition text-sm"
                 />
               </div>
               <input 
                 type="password" value={formData.password} onChange={(e) => updateField('password', e.target.value)}
                 placeholder="Senha (min. 6 chars)" 
-                className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+                className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 outline-none focus:border-teal-500 transition text-sm"
               />
             </div>
 
             <button 
               onClick={handleFinalRegister}
               disabled={loading || !formData.email || !formData.password}
-              className="w-full py-4 rounded-xl bg-indigo-600 text-white font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-4 rounded-xl bg-teal-600 text-white font-black text-sm uppercase tracking-widest shadow-[0_0_20px_rgba(0,181,156,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
             >
               {loading ? <Loader2 className="animate-spin" size={20} /> : <><Rocket size={18} /> Finalizar e Entrar</>}
             </button>
@@ -457,13 +461,13 @@ export default function PublicOnboarding() {
             </div>
             <div className="space-y-2">
               <h2 className="text-3xl font-bold text-white tracking-tight">Conta Criada!</h2>
-              <p className="text-slate-400">Você já está autenticado no Orizon Match.</p>
+              <p className="text-slate-400">Você já está autenticado no InovaHelix.</p>
             </div>
 
             <div className="space-y-4 pt-4">
               <button 
                 onClick={() => navigate('/projects/new')}
-                className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-500 hover:to-cyan-500 transition-all font-black text-white shadow-[0_0_20px_rgba(79,70,229,0.3)] flex items-center justify-center gap-2"
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 transition-all font-black text-white shadow-[0_0_20px_rgba(20,184,166,0.3)] flex items-center justify-center gap-2"
               >
                 Completar Meu Projeto <ArrowRight size={20} />
               </button>

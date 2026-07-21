@@ -30,7 +30,7 @@ export function OverviewTab({
           { label: "Capital Fomentado", val: "R$ 4.5M", desc: "Alocados via EMBRAPII", icon: <Coins className="text-emerald-400" />, color: "border-emerald-500/10" },
           { label: "Projetos no Portfólio", val: `${stats.totalProjects} Projetos`, desc: "Inovações de Hard Tech", icon: <FileText className="text-blue-400" />, color: "border-blue-500/10" },
           { label: "Deal Flows Ativos", val: `${stats.activeMatches} Matches`, desc: "Negociações abertas", icon: <Zap className="text-amber-400" />, color: "border-amber-500/10" },
-          { label: "Auditorias Pendentes", val: `${pendingAudits.length} Projetos`, desc: "Validação técnica pendente", icon: <AlertTriangle className="text-indigo-400" />, color: "border-indigo-500/10" },
+          { label: "Auditorias Pendentes", val: `${pendingAudits.length} Projetos`, desc: "Validação técnica pendente", icon: <AlertTriangle className="text-teal-400" />, color: "border-teal-500/10" },
         ].map((stat, i) => (
           <div key={i} className={`bg-slate-900/40 border ${stat.color} p-6 rounded-3xl hover:border-slate-700 transition-all group relative overflow-hidden`}>
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-[40px] rounded-full -mr-12 -mt-12 group-hover:bg-white/10 transition-all" />
@@ -57,9 +57,9 @@ export function OverviewTab({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <ShieldCheck className="text-fuchsia-400" size={22} /> Pipeline de Validação Técnica (TRL)
+                <ShieldCheck className="text-teal-400" size={22} /> Pipeline de Validação Técnica (TRL)
               </h2>
-              <span className="text-[9px] bg-fuchsia-500/10 text-fuchsia-400 px-2 py-1 rounded border border-fuchsia-500/20 font-bold uppercase">
+              <span className="text-[9px] bg-teal-500/10 text-teal-400 px-2 py-1 rounded border border-teal-500/20 font-bold uppercase">
                 Homologação ICT
               </span>
             </div>
@@ -89,7 +89,7 @@ export function OverviewTab({
                     </div>
                     <button
                       onClick={() => openModal('validate_trl', proj)}
-                      className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/30 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap self-start sm:self-auto flex items-center gap-1.5"
+                      className="bg-teal-600/10 hover:bg-teal-600/20 text-teal-400 border border-teal-500/20 hover:border-teal-500/30 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap self-start sm:self-auto flex items-center gap-1.5"
                     >
                       <Award size={14} /> Conceder Selo "ICT Verified"
                     </button>
@@ -120,8 +120,8 @@ export function OverviewTab({
                   <div key={proj.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-slate-700 transition-all group">
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-white text-sm group-hover:text-indigo-400 transition-colors">{proj.title}</h4>
-                        <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[9px] px-2 py-0.5 rounded font-black uppercase">
+                        <h4 className="font-bold text-white text-sm group-hover:text-teal-400 transition-colors">{proj.title}</h4>
+                        <span className="bg-teal-500/10 text-teal-400 border border-teal-500/20 text-[9px] px-2 py-0.5 rounded font-black uppercase">
                           TRL {proj.validatedTRL || proj.declaredTRL || 5} Validado
                         </span>
                         {proj.vdrStatus && (
@@ -143,7 +143,7 @@ export function OverviewTab({
                     </div>
                     <div className="flex items-center gap-4 self-end sm:self-auto">
                       <div className="text-right">
-                        <span className="text-xs font-bold text-indigo-400 block">{proj.matchesCount || 0} Matches</span>
+                        <span className="text-xs font-bold text-teal-400 block">{proj.matchesCount || 0} Matches</span>
                         <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Inteligência Ativa</span>
                       </div>
                     </div>
@@ -157,29 +157,29 @@ export function OverviewTab({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Briefcase className="text-indigo-400" size={22} /> Desafios Tecnológicos (Demandas de Indústrias)
+                <Briefcase className="text-teal-400" size={22} /> Desafios Tecnológicos (Demandas de Indústrias)
               </h2>
               <span className="text-xs text-slate-500">Oportunidades de co-desenvolvimento</span>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {challenges.map(chall => (
-                <div key={chall.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between hover:border-indigo-500/20 transition-all group min-h-[200px]">
+                <div key={chall.id} className="bg-slate-900/40 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between hover:border-teal-500/20 transition-all group min-h-[200px]">
                   <div>
                     <div className="flex justify-between items-start gap-2">
-                      <span className="text-[9px] font-black uppercase text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded">
+                      <span className="text-[9px] font-black uppercase text-teal-400 bg-teal-500/10 border border-teal-500/20 px-2 py-0.5 rounded">
                         {chall.companyName}
                       </span>
                       <span className="text-emerald-400 font-mono text-xs font-bold">
                         R$ {(chall.budget / 1000).toFixed(0)}k
                       </span>
                     </div>
-                    <h4 className="font-bold text-white text-xs mt-3 leading-snug group-hover:text-indigo-300 transition-colors">{chall.title}</h4>
+                    <h4 className="font-bold text-white text-xs mt-3 leading-snug group-hover:text-teal-300 transition-colors">{chall.title}</h4>
                     <p className="text-[11px] text-slate-400 mt-2 line-clamp-3 leading-relaxed">{chall.description}</p>
                   </div>
                   <div className="flex justify-between items-center text-[9px] text-slate-500 mt-4 border-t border-slate-800/80 pt-2">
                     <span>Prazo: <strong className="text-slate-400">{chall.deadline}</strong></span>
-                    <span className="text-indigo-400 hover:underline cursor-pointer font-bold uppercase tracking-wider">Ver Match</span>
+                    <span className="text-teal-400 hover:underline cursor-pointer font-bold uppercase tracking-wider">Ver Match</span>
                   </div>
                 </div>
               ))}
@@ -192,18 +192,18 @@ export function OverviewTab({
         <div className="space-y-8">
           
           {/* Card de Insights do Polo */}
-          <div className="bg-gradient-to-br from-indigo-600/20 via-slate-900 to-violet-600/15 p-6 rounded-3xl shadow-xl shadow-indigo-600/10 space-y-4 relative overflow-hidden group border border-slate-800/80">
+          <div className="bg-gradient-to-br from-teal-600/20 via-slate-900 to-violet-600/15 p-6 rounded-3xl shadow-xl shadow-teal-600/10 space-y-4 relative overflow-hidden group border border-slate-800/80">
             <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 blur-[30px] rounded-full -mr-16 -mt-16 group-hover:bg-white/10 transition-all duration-500" />
-            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-200">
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-teal-200">
               <Zap size={14} className="animate-pulse" /> Insight de Alta Conversão
             </div>
             <h3 className="font-extrabold text-white text-base leading-tight">Match de Alta Conversão Detectado</h3>
-            <p className="text-indigo-100/80 text-xs leading-relaxed">
+            <p className="text-teal-100/80 text-xs leading-relaxed">
               Há 5 grandes empresas buscando por "Conectividade 5G e IoT" este mês. Seu polo possui 2 projetos compatíveis em TRL 6/7.
             </p>
             <button 
               onClick={() => openModal('mass_notification')}
-              className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl font-semibold text-[10px] uppercase tracking-[0.12em] leading-none transition-all shadow-[0_0_18px_rgba(79,70,229,0.25)]"
+              className="w-full py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-2xl font-semibold text-[10px] uppercase tracking-[0.12em] leading-none transition-all shadow-[0_0_18px_rgba(0,181,156,0.25)]"
             >
               Enviar Aviso Geral
             </button>
@@ -213,7 +213,7 @@ export function OverviewTab({
           <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Orçamento Alocado por Linha</span>
-              <span className="text-[9px] bg-slate-950 text-indigo-400 px-2 py-0.5 rounded border border-slate-850 font-bold">Consumo 2026</span>
+              <span className="text-[9px] bg-slate-950 text-teal-400 px-2 py-0.5 rounded border border-slate-850 font-bold">Consumo 2026</span>
             </div>
             <div className="space-y-4">
               {[
@@ -242,7 +242,7 @@ export function OverviewTab({
               </h2>
               <button 
                 onClick={() => openModal('add_lab')}
-                className="bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 hover:border-indigo-500/30 px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 hover:scale-105 active:scale-95 animate-in fade-in"
+                className="bg-teal-600/10 hover:bg-teal-600/20 text-teal-400 border border-teal-500/20 hover:border-teal-500/30 px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1 hover:scale-105 active:scale-95 animate-in fade-in"
               >
                 <Plus size={12} /> Homologar
               </button>
@@ -281,7 +281,7 @@ export function OverviewTab({
             <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
               <div className="space-y-3">
                 {[
-                  { label: "Telecom / 5G / 6G", percent: 45, color: "bg-indigo-500" },
+                  { label: "Telecom / 5G / 6G", percent: 45, color: "bg-teal-500" },
                   { label: "Internet das Coisas (IoT)", percent: 35, color: "bg-emerald-500" },
                   { label: "Inteligência Artificial", percent: 20, color: "bg-amber-500" }
                 ].map(bar => (

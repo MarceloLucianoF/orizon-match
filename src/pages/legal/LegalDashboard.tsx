@@ -53,7 +53,7 @@ export function LegalDashboard() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="animate-spin text-indigo-500" size={48} />
+        <Loader2 className="animate-spin text-teal-500" size={48} />
       </div>
     );
   }
@@ -63,12 +63,12 @@ export function LegalDashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-slate-100 flex items-center gap-3">
-            <Gavel className="text-indigo-400" size={24} /> {t("dashboard.legal.title")}
+            <Gavel className="text-teal-400" size={24} /> {t("dashboard.legal.title")}
           </h1>
           <p className="text-slate-400 mt-1 text-sm">{t("dashboard.legal.subtitle")}</p>
         </div>
         <div className="flex gap-3">
-          <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 md:px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] flex items-center gap-2 text-xs md:text-sm">
+          <button className="bg-teal-600 hover:bg-teal-500 text-white px-4 md:px-5 py-2.5 rounded-xl font-medium transition-all shadow-[0_0_15px_rgba(0,181,156,0.3)] flex items-center gap-2 text-xs md:text-sm">
             <Search size={16} /> {t("dashboard.legal.monitorInpiBtn")}
           </button>
         </div>
@@ -92,7 +92,7 @@ export function LegalDashboard() {
                     
                     <div className="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
                       {columnAssets.map(asset => (
-                        <div key={asset.id} className="bg-slate-900 border border-slate-700/80 rounded-xl p-3 md:p-4 hover:border-indigo-500/50 transition-all shadow-lg">
+                        <div key={asset.id} className="bg-slate-900 border border-slate-700/80 rounded-xl p-3 md:p-4 hover:border-teal-500/50 transition-all shadow-lg">
                           <h4 className="font-bold text-slate-100 text-sm mb-1">{asset.projectName}</h4>
                           <p className="text-[11px] text-slate-500 mb-3">{t("dashboard.legal.clientLabel", { name: asset.clientName })}</p>
                           
@@ -107,7 +107,7 @@ export function LegalDashboard() {
                                <Clock size={10} /> {formatLastUpdate(asset.lastUpdate)}
                              </span>
                              <select 
-                                className="bg-slate-950 border border-slate-700 text-[10px] text-slate-400 rounded p-1 outline-none focus:border-indigo-400 min-w-0"
+                                className="bg-slate-950 border border-slate-700 text-[10px] text-slate-400 rounded p-1 outline-none focus:border-teal-400 min-w-0"
                                 value={asset.status}
                                 onChange={(e) => moveAsset(asset.id, e.target.value as IPStatus)}
                              >
@@ -142,7 +142,7 @@ export function LegalDashboard() {
             <div className="space-y-3">
               <div className="p-3 bg-slate-950 rounded-xl border border-slate-800">
                 <div className="flex justify-between items-start mb-1">
-                  <span className="text-[10px] font-bold text-indigo-400">PUBLICACAO</span>
+                  <span className="text-[10px] font-bold text-teal-400">PUBLICACAO</span>
                   <span className="text-[10px] text-slate-600">{t("dashboard.legal.today")}</span>
                 </div>
                 <p className="text-xs text-slate-300">{t("dashboard.legal.updateExame")}</p>
@@ -160,14 +160,14 @@ export function LegalDashboard() {
             </button>
           </div>
 
-          <div className="bg-gradient-to-br from-indigo-900/20 to-slate-900 border border-indigo-500/20 rounded-2xl p-4 md:p-6">
-            <h3 className="text-sm font-bold text-indigo-300 mb-2 flex items-center gap-2">
+          <div className="bg-gradient-to-br from-teal-900/20 to-slate-900 border border-teal-500/20 rounded-2xl p-4 md:p-6">
+            <h3 className="text-sm font-bold text-teal-300 mb-2 flex items-center gap-2">
               <FileCheck size={16} /> {t("dashboard.legal.curatorOpportunities")}
             </h3>
             <p className="text-xs text-slate-400 leading-relaxed mb-4">
               {t("dashboard.legal.opportunitiesDesc", { count: 4, sector: "Agroindústria" })}
             </p>
-            <button className="w-full bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 py-2.5 rounded-lg text-xs font-bold transition">
+            <button className="w-full bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 py-2.5 rounded-lg text-xs font-bold transition">
               {t("dashboard.legal.proposeConsultancy")}
             </button>
           </div>

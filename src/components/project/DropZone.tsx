@@ -89,7 +89,7 @@ export function DropZone({ onFileAccepted, onBack }: DropZoneProps) {
         onClick={file ? undefined : onButtonClick}
         className={`w-full border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center transition-all cursor-pointer relative overflow-hidden backdrop-blur-md ${
           dragActive
-            ? "border-indigo-500 bg-indigo-500/10 shadow-[0_0_30px_rgba(99,102,241,0.2)]"
+            ? "border-teal-500 bg-teal-500/10 shadow-[0_0_30px_rgba(0,181,156,0.2)]"
             : file
             ? "border-emerald-500/50 bg-emerald-500/5"
             : "border-slate-800 bg-slate-950/40 hover:border-slate-700 hover:bg-slate-950/60"
@@ -103,7 +103,7 @@ export function DropZone({ onFileAccepted, onBack }: DropZoneProps) {
           onChange={handleChange}
         />
 
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent animate-pulse" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-teal-500/20 to-transparent animate-pulse" />
 
         {file ? (
           <div className="space-y-4 text-center animate-in zoom-in-95">
@@ -128,7 +128,7 @@ export function DropZone({ onFileAccepted, onBack }: DropZoneProps) {
           <div className="space-y-4 text-center">
             <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mx-auto transition-all ${
               dragActive 
-                ? "bg-indigo-500/20 text-indigo-400 scale-110" 
+                ? "bg-teal-500/20 text-teal-400 scale-110" 
                 : "bg-slate-900 text-slate-400 group-hover:scale-105"
             }`}>
               <UploadCloud size={32} className={dragActive ? "animate-bounce" : ""} />
@@ -166,7 +166,7 @@ export function DropZone({ onFileAccepted, onBack }: DropZoneProps) {
         {file && (
           <button
             onClick={handleConfirm}
-            className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition flex items-center gap-2 shadow-[0_0_20px_rgba(99,102,241,0.3)] animate-in fade-in zoom-in-95"
+            className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition flex items-center gap-2 shadow-[0_0_20px_rgba(0,181,156,0.3)] animate-in fade-in zoom-in-95"
           >
             Analisar Ativo <ArrowRight size={18} />
           </button>

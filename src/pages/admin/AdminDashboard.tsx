@@ -138,7 +138,7 @@ export function AdminDashboard() {
   };
 
   if (loading) {
-    return <div className="flex justify-center items-center h-full"><Loader2 className="animate-spin text-fuchsia-500" size={48} /></div>;
+    return <div className="flex justify-center items-center h-full"><Loader2 className="animate-spin text-teal-500" size={48} /></div>;
   }
 
   if (!metrics) {
@@ -154,7 +154,7 @@ export function AdminDashboard() {
   const renderOverview = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard label={t("dashboard.admin.totalUsers")} value={metrics.totalUsers} icon={Users} trend={12} color="indigo" description={t("dashboard.admin.totalUsersDesc", { icts: metrics.breakdownUsers.icts, companies: metrics.breakdownUsers.companies })} />
+        <StatsCard label={t("dashboard.admin.totalUsers")} value={metrics.totalUsers} icon={Users} trend={12} color="teal" description={t("dashboard.admin.totalUsersDesc", { icts: metrics.breakdownUsers.icts, companies: metrics.breakdownUsers.companies })} />
         <StatsCard label={t("dashboard.admin.activeProjects")} value={metrics.totalProjects} icon={FolderKanban} trend={8} color="cyan" />
         <StatsCard label={t("dashboard.admin.matchesGenerated")} value={metrics.totalMatchesGenerated} icon={Network} trend={24} color="emerald" />
         <StatsCard label={t("dashboard.admin.dealFlows")} value={metrics.totalActiveDeals} icon={Zap} trend={5} color="amber" />
@@ -163,7 +163,7 @@ export function AdminDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className={`${surfaceClass} p-6 md:p-8 space-y-6`}>
           <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2 mb-6">
-            <PieChart className="text-indigo-400" size={20} /> {t("dashboard.admin.trlDistribution")}
+            <PieChart className="text-teal-400" size={20} /> {t("dashboard.admin.trlDistribution")}
           </h2>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -171,7 +171,7 @@ export function AdminDashboard() {
               <span className="text-sm font-bold text-slate-100">{metrics?.trlDistribution?.idea || 0}</span>
             </div>
             <div className="w-full bg-slate-900 h-2 rounded-full overflow-hidden">
-              <div className="bg-indigo-500 h-full transition-all duration-1000" style={{ width: `${(metrics?.trlDistribution?.idea / metrics?.totalProjects) * 100 || 0}%` }} />
+              <div className="bg-teal-500 h-full transition-all duration-1000" style={{ width: `${(metrics?.trlDistribution?.idea / metrics?.totalProjects) * 100 || 0}%` }} />
             </div>
             
             <div className="flex items-center justify-between">
@@ -209,7 +209,7 @@ export function AdminDashboard() {
           <p className="text-[10px] text-slate-600 mt-2 max-w-[200px] mb-4">{t("dashboard.admin.vdrCompletenessDesc")}</p>
           <button 
             onClick={() => alert("Campanha de Nudge disparada com sucesso! 42 inventores com VDR incompleto (< 70%) foram notificados por e-mail e push.")}
-            className="w-full py-2 bg-indigo-650/20 hover:bg-indigo-600/30 text-indigo-400 border border-indigo-500/20 rounded-xl font-bold text-xs transition-all shadow-[0_0_15px_rgba(99,102,241,0.05)]"
+            className="w-full py-2 bg-teal-650/20 hover:bg-teal-600/30 text-teal-400 border border-teal-500/20 rounded-xl font-bold text-xs transition-all shadow-[0_0_15px_rgba(0,181,156,0.05)]"
           >
             {t("dashboard.admin.nudgeVdrBtn")}
           </button>
@@ -220,9 +220,9 @@ export function AdminDashboard() {
       <div className={surfaceClass + " p-6 space-y-4"}>
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest flex items-center gap-2">
-            <ShieldAlert className="text-fuchsia-500 animate-pulse" size={18} /> {t("dashboard.admin.activeAudit.title")}
+            <ShieldAlert className="text-teal-500 animate-pulse" size={18} /> {t("dashboard.admin.activeAudit.title")}
           </h3>
-          <span className="text-[9px] bg-fuchsia-500/10 text-fuchsia-400 px-2 py-0.5 rounded border border-fuchsia-500/20 font-bold uppercase tracking-wider">{t("dashboard.admin.activeAudit.realtime")}</span>
+          <span className="text-[9px] bg-teal-500/10 text-teal-400 px-2 py-0.5 rounded border border-teal-500/20 font-bold uppercase tracking-wider">{t("dashboard.admin.activeAudit.realtime")}</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {logs && logs.length > 0 ? (
@@ -330,7 +330,7 @@ export function AdminDashboard() {
             <h3 className="text-sm font-bold text-slate-200 uppercase tracking-widest mb-6">{t("dashboard.admin.regionalActivity")}</h3>
             <div className="space-y-4">
                {[
-                 { region: 'Santa Rita do Sapucaí / Vale da Eletrônica', activity: 95, color: 'bg-indigo-500' },
+                 { region: 'Santa Rita do Sapucaí / Vale da Eletrônica', activity: 95, color: 'bg-teal-500' },
                  { region: 'Belo Horizonte / Região Metropolitana', activity: 88, color: 'bg-emerald-500' },
                  { region: 'Uberlândia / Triângulo Mineiro', activity: 64, color: 'bg-amber-500' },
                  { region: 'Juiz de Fora / Zona da Mata', activity: 48, color: 'bg-cyan-500' },
@@ -370,13 +370,13 @@ export function AdminDashboard() {
       <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
         <div className="flex items-center gap-4">
           <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-            <Users className="text-indigo-500" size={20} /> {t("dashboard.admin.userControl")}
+            <Users className="text-teal-500" size={20} /> {t("dashboard.admin.userControl")}
           </h2>
           <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5"><ServerCog size={14}/> {t("dashboard.admin.lastUsers")}</span>
         </div>
         <button 
           onClick={() => setShowCreateModal(true)}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+          className="bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold px-4 py-2 rounded-lg transition-colors shadow-[0_0_15px_rgba(0,181,156,0.3)]"
         >
           {t("dashboard.admin.createUser")}
         </button>
@@ -408,7 +408,7 @@ export function AdminDashboard() {
                     <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${
                       u.role === 'industry' ? 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20' :
                       u.role === 'investor' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
-                      u.role === 'ict' ? 'bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20' :
+                      u.role === 'ict' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' :
                       'bg-amber-500/10 text-amber-400 border-amber-500/20'
                     }`}>
                       {u.role}
@@ -422,7 +422,7 @@ export function AdminDashboard() {
                          <span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">{t("dashboard.admin.notVerified")}</span>
                       )}
                       <span className={`w-fit px-2 py-0.5 rounded-full text-[9px] font-black uppercase border ${
-                        u.subscriptionStatus === 'premium' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' : 'bg-slate-800 text-slate-500 border-slate-700'
+                        u.subscriptionStatus === 'premium' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' : 'bg-slate-800 text-slate-500 border-slate-700'
                       }`}>
                         {u.subscriptionStatus || 'free'}
                       </span>
@@ -433,10 +433,10 @@ export function AdminDashboard() {
                       <button onClick={() => handleToggleVerification(u.id, u.verified)} className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${u.verified ? 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white' : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20'}`}>
                         {u.verified ? t("dashboard.admin.actions.unverify") : t("dashboard.admin.actions.verify")}
                       </button>
-                      <button onClick={() => handleUpdateSubscription(u.id, u.subscriptionStatus)} className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${u.subscriptionStatus === 'premium' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/20'}`}>
+                      <button onClick={() => handleUpdateSubscription(u.id, u.subscriptionStatus)} className={`px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border cursor-pointer ${u.subscriptionStatus === 'premium' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20 hover:bg-amber-500/20' : 'bg-teal-500/10 text-teal-400 border-teal-500/20 hover:bg-teal-500/20'}`}>
                         {u.subscriptionStatus === 'premium' ? t("dashboard.admin.actions.downgrade") : t("dashboard.admin.actions.premium")}
                       </button>
-                      <button onClick={() => { setImpersonatedUid(u.id); navigate('/dashboard'); }} className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20 hover:bg-fuchsia-500/20 cursor-pointer">
+                      <button onClick={() => { setImpersonatedUid(u.id); navigate('/dashboard'); }} className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border bg-teal-500/10 text-teal-400 border-teal-500/20 hover:bg-teal-500/20 cursor-pointer">
                         {t("dashboard.admin.actions.simulate")}
                       </button>
                       <button onClick={() => handleDeleteUser(u.id)} className="px-2.5 py-1.5 rounded-lg text-[10px] font-bold transition-all border bg-red-500/10 text-red-400 border-red-500/20 hover:bg-red-500/20 cursor-pointer">
@@ -457,7 +457,7 @@ export function AdminDashboard() {
     <div className={surfaceClass + " animate-in fade-in slide-in-from-bottom-4 duration-500"}>
       <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
         <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-          <Activity className="text-fuchsia-500" size={20} /> {t("dashboard.admin.liveTracker")}
+          <Activity className="text-teal-500" size={20} /> {t("dashboard.admin.liveTracker")}
         </h2>
         <span className="text-xs text-slate-500 font-medium flex items-center gap-1.5"><ServerCog size={14}/> {t("dashboard.admin.lastDeals")}</span>
       </div>
@@ -487,7 +487,7 @@ export function AdminDashboard() {
                     <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${
                       deal.stage === 'contrato' || deal.stage === 'encerrado' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
                       deal.stage === 'negociacao' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
-                      deal.stage === 'avaliacao' ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20' :
+                      deal.stage === 'avaliacao' ? 'bg-teal-500/10 text-teal-400 border-teal-500/20' :
                       deal.stage === 'nda' ? 'bg-pink-500/10 text-pink-400 border-pink-500/20' :
                       'bg-slate-800 text-slate-400 border-slate-700'
                     }`}>
@@ -641,7 +641,7 @@ export function AdminDashboard() {
     <div className={surfaceClass + " p-6 space-y-6 max-w-2xl mx-auto animate-in fade-in duration-500"}>
       <div>
         <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-          <ServerCog className="text-fuchsia-500 animate-spin" size={22} /> Simulador de Match ("Demo Maker")
+          <ServerCog className="text-teal-500 animate-spin" size={22} /> Simulador de Match ("Demo Maker")
         </h2>
         <p className="text-xs text-slate-400 mt-1">Gere matches e fluxos de negociação (CRM/Chat) fictícios para testar a plataforma instantaneamente.</p>
       </div>
@@ -651,9 +651,9 @@ export function AdminDashboard() {
         <div className="space-y-2">
           <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">1. Selecionar Projeto (Inventor/ICT)</label>
           <select
-            value={simProject}
-            onChange={e => setSimProject(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-fuchsia-500"
+             value={simProject}
+             onChange={e => setSimProject(e.target.value)}
+             className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-teal-500"
           >
             <option value="">-- Escolha um Projeto --</option>
             {projects.map(p => (
@@ -668,9 +668,9 @@ export function AdminDashboard() {
         <div className="space-y-2">
           <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">2. Selecionar Empresa / Vendedor (Destino)</label>
           <select
-            value={simUser}
-            onChange={e => setSimUser(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-fuchsia-500"
+             value={simUser}
+             onChange={e => setSimUser(e.target.value)}
+             className="w-full bg-slate-950 border border-slate-700 rounded-xl p-3 text-sm text-slate-200 outline-none focus:border-teal-500"
           >
             <option value="">-- Escolha uma Empresa/Investidor --</option>
             {users
@@ -687,7 +687,7 @@ export function AdminDashboard() {
         <div className="space-y-2">
           <div className="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-wider">
             <span>3. Afinidade (Match Score)</span>
-            <span className="text-fuchsia-400">{simScore}% FIT</span>
+            <span className="text-teal-400">{simScore}% FIT</span>
           </div>
           <input
             type="range"
@@ -696,7 +696,7 @@ export function AdminDashboard() {
             step="1"
             value={simScore}
             onChange={e => setSimScore(Number(e.target.value))}
-            className="w-full accent-fuchsia-500"
+            className="w-full accent-teal-500"
           />
         </div>
 
@@ -707,7 +707,7 @@ export function AdminDashboard() {
             id="simFullFlow"
             checked={simFullFlow}
             onChange={e => setSimFullFlow(e.target.checked)}
-            className="w-5 h-5 text-fuchsia-500 rounded border-slate-700 focus:ring-fuchsia-500 bg-slate-900"
+            className="w-5 h-5 text-teal-500 rounded border-slate-700 focus:ring-teal-500 bg-slate-900"
           />
           <label htmlFor="simFullFlow" className="text-xs font-bold text-slate-300 cursor-pointer select-none">
             Simular Fluxo Completo (Criar Chat & Conversas no CRM)
@@ -717,7 +717,7 @@ export function AdminDashboard() {
         <button
           onClick={handleCreateSimulation}
           disabled={simulating}
-          className="w-full py-4 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl font-bold text-sm uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(217,70,239,0.3)] flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-4 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-bold text-sm uppercase tracking-wider transition-all shadow-[0_0_20px_rgba(0,181,156,0.3)] flex items-center justify-center gap-2 cursor-pointer"
         >
           {simulating ? (
             <Loader2 className="animate-spin" size={20} />
@@ -766,7 +766,7 @@ export function AdminDashboard() {
                 value={filterAction}
                 onChange={e => setFilterAction(e.target.value)}
                 placeholder="Ex: project.due_diligence.toggle, deal.created"
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-teal-500 transition-all"
               />
             </div>
             <div className="space-y-1">
@@ -776,7 +776,7 @@ export function AdminDashboard() {
                 value={filterActor}
                 onChange={e => setFilterActor(e.target.value)}
                 placeholder="Buscar ator..."
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all"
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none focus:border-teal-500 transition-all"
               />
             </div>
           </div>
@@ -785,7 +785,7 @@ export function AdminDashboard() {
         <div className={surfaceClass}>
           {loadingCompliance ? (
             <div className="flex justify-center items-center py-20">
-              <Loader2 className="animate-spin text-indigo-500" size={36} />
+              <Loader2 className="animate-spin text-teal-500" size={36} />
             </div>
           ) : filteredLogs.length === 0 ? (
             <div className="p-12 text-center text-slate-500 italic">
@@ -814,7 +814,7 @@ export function AdminDashboard() {
                         <span className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold uppercase tracking-wider border ${
                           log.action?.includes("toggle") ? "bg-amber-500/10 text-amber-400 border-amber-500/20" :
                           log.action?.includes("create") ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
-                          log.action?.includes("update") ? "bg-indigo-500/10 text-indigo-400 border-indigo-500/20" :
+                          log.action?.includes("update") ? "bg-teal-500/10 text-teal-400 border-teal-500/20" :
                           "bg-slate-800 text-slate-400 border-slate-700"
                         }`}>
                           {log.action}
@@ -841,7 +841,7 @@ export function AdminDashboard() {
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-1">
                             <span className="text-slate-400">IP:</span>
-                            <span className="font-mono text-indigo-400">{log.ipAddress || "127.0.0.1"}</span>
+                            <span className="font-mono text-teal-400">{log.ipAddress || "127.0.0.1"}</span>
                           </div>
                           {log.sessionId && (
                             <div className="flex items-center gap-1">
@@ -913,14 +913,14 @@ export function AdminDashboard() {
       {/* HEADER PRINCIPAL */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-6">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-fuchsia-500/10 rounded-2xl flex items-center justify-center border border-fuchsia-500/20 shadow-[0_0_30px_rgba(217,70,239,0.15)]">
-            <ShieldAlert size={28} className="text-fuchsia-500" />
+          <div className="w-14 h-14 bg-teal-500/10 rounded-2xl flex items-center justify-center border border-teal-500/20 shadow-[0_0_30px_rgba(0,181,156,0.15)]">
+            <ShieldAlert size={28} className="text-teal-500" />
           </div>
           <div>
             <h1 className="text-3xl font-black text-slate-100 uppercase tracking-tight flex items-center gap-3">
-              Admin Workspace <span className="bg-fuchsia-500 text-white text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-bold">{t("dashboard.admin.godMode")}</span>
+              Admin Workspace <span className="bg-teal-500 text-white text-[10px] px-2 py-0.5 rounded-full uppercase tracking-widest font-bold">{t("dashboard.admin.godMode")}</span>
             </h1>
-            <p className="text-fuchsia-400/70 text-sm font-medium mt-1">{t("dashboard.admin.centralControl")}</p>
+            <p className="text-teal-400/70 text-sm font-medium mt-1">{t("dashboard.admin.centralControl")}</p>
           </div>
         </div>
 
@@ -956,7 +956,7 @@ export function AdminDashboard() {
             onClick={() => handleTabChange(tab.id)}
             className={`flex items-center gap-2 px-4 py-3 border-b-2 font-bold text-sm transition-all whitespace-nowrap ${
               activeTab === tab.id
-                ? 'border-fuchsia-500 text-fuchsia-400 bg-fuchsia-500/5'
+                ? 'border-teal-500 text-teal-400 bg-teal-500/5'
                 : 'border-transparent text-slate-400 hover:text-slate-200 hover:bg-slate-800/30'
             }`}
           >

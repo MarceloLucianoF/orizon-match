@@ -154,7 +154,7 @@ const getStepCoaching = (step: Step) => {
     default:
       return {
         title: "Estruturação Tecnológica",
-        subtitle: "Orizon Matchmaker",
+        subtitle: "InovaHelix Engine",
         desc: "Estamos estruturando a ficha técnica do seu projeto para mitigar riscos regulatórios, técnicos e de mercado, aumentando drasticamente a percepção de valor.",
         tips: [
           "Dados confidenciais sob NDA digital",
@@ -466,7 +466,7 @@ export function CreateProjectInventor() {
           <div 
             key={s} 
             className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
-              i <= currentIndex ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]' : 'bg-slate-800'
+              i <= currentIndex ? 'bg-teal-500 shadow-[0_0_10px_rgba(0,181,156,0.5)]' : 'bg-slate-800'
             }`} 
           />
         ))}
@@ -489,7 +489,7 @@ export function CreateProjectInventor() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
         {/* LEFT COLUMN: WIZARD FORM */}
         <div className="lg:col-span-2 bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] pointer-events-none group-hover:bg-indigo-500/10 transition-all duration-1000" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/5 blur-[100px] pointer-events-none group-hover:bg-teal-500/10 transition-all duration-1000" />
         
         {error && (
           <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm flex items-center gap-3 animate-in fade-in zoom-in-95">
@@ -515,7 +515,7 @@ export function CreateProjectInventor() {
                   onClick={() => updateField('segment', chamber)}
                   className={`p-4 rounded-xl text-left text-sm font-medium transition-all border ${
                     formData.segment === chamber 
-                      ? 'bg-indigo-500/20 border-indigo-500 text-indigo-300' 
+                      ? 'bg-teal-500/20 border-teal-500 text-teal-300' 
                       : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
@@ -529,7 +529,7 @@ export function CreateProjectInventor() {
               <button 
                 onClick={() => nextStep('PROTECTION')} 
                 disabled={!formData.segment}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -547,7 +547,7 @@ export function CreateProjectInventor() {
               <button
                 onClick={() => updateField('isProtected', 'sim')}
                 className={`flex flex-col items-center gap-4 p-8 rounded-2xl border transition-all ${
-                  formData.isProtected === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.isProtected === 'sim' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <ShieldCheck size={40} />
@@ -556,7 +556,7 @@ export function CreateProjectInventor() {
               <button
                 onClick={() => updateField('isProtected', 'nao')}
                 className={`flex flex-col items-center gap-4 p-8 rounded-2xl border transition-all ${
-                  formData.isProtected === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.isProtected === 'nao' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <HelpCircle size={40} />
@@ -574,7 +574,7 @@ export function CreateProjectInventor() {
                       value={formData.registration.idNumber}
                       onChange={(e) => updateRegistration('idNumber', e.target.value)}
                       disabled={!!userProfile?.idNumber}
-                      className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                      className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                       placeholder="00.000.000/0001-00"
                     />
                   </div>
@@ -617,7 +617,7 @@ export function CreateProjectInventor() {
                     type="text"
                     value={formData.patentNumber}
                     onChange={(e) => updateField('patentNumber', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none transition-all"
+                    className="w-full bg-slate-950 border border-slate-850 rounded-xl px-4 py-3 text-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 outline-none transition-all"
                     placeholder="BR 10 202X XXXXXX-X"
                   />
                 </div>
@@ -631,17 +631,17 @@ export function CreateProjectInventor() {
                 <div>
                   <label className="block text-sm font-medium text-slate-400 mb-2">Já possui o certificado de concessão?</label>
                   <div className="flex gap-4">
-                    <button onClick={() => updateField('isGranted', 'sim')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'sim' ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-700 text-slate-400'}`}>Sim</button>
-                    <button onClick={() => updateField('isGranted', 'nao')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'nao' ? 'bg-indigo-500 border-indigo-500 text-white' : 'border-slate-700 text-slate-400'}`}>Não</button>
+                    <button onClick={() => updateField('isGranted', 'sim')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'sim' ? 'bg-teal-500 border-teal-500 text-white' : 'border-slate-700 text-slate-400'}`}>Sim</button>
+                    <button onClick={() => updateField('isGranted', 'nao')} className={`flex-1 py-2 rounded-lg border transition ${formData.isGranted === 'nao' ? 'bg-teal-500 border-teal-500 text-white' : 'border-slate-700 text-slate-400'}`}>Não</button>
                   </div>
                 </div>
               </div>
             )}
 
             {formData.isProtected === 'nao' && (
-              <div className="p-6 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 space-y-4 animate-in zoom-in-95">
+              <div className="p-6 rounded-2xl bg-teal-500/10 border border-teal-500/20 space-y-4 animate-in zoom-in-95">
                 <div className="flex gap-4">
-                  <div className="w-12 h-12 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-teal-500/20 flex items-center justify-center text-teal-400 shrink-0">
                     <Info size={24} />
                   </div>
                   <div className="space-y-2">
@@ -651,7 +651,7 @@ export function CreateProjectInventor() {
                     </p>
                   </div>
                 </div>
-                <button className="w-full py-3 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 font-bold flex items-center justify-center gap-2 transition border border-indigo-500/20">
+                <button className="w-full py-3 rounded-xl bg-teal-600/20 hover:bg-teal-600/30 text-teal-300 font-bold flex items-center justify-center gap-2 transition border border-teal-500/20">
                   <Video size={18} /> Assistir Vídeo Explicativo
                 </button>
               </div>
@@ -665,7 +665,7 @@ export function CreateProjectInventor() {
                   else nextStep('RESEARCH');
                 }} 
                 disabled={!formData.isProtected}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -697,7 +697,7 @@ export function CreateProjectInventor() {
                 >Pular Vínculo</button>
                 <button 
                   onClick={() => nextStep('RESEARCH')} 
-                  className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                  className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
                 >Próximo</button>
               </div>
             </div>
@@ -716,13 +716,13 @@ export function CreateProjectInventor() {
               <button
                 onClick={() => updateField('needsResearch', 'sim')}
                 className={`p-8 rounded-2xl border transition-all font-bold ${
-                  formData.needsResearch === 'sim' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.needsResearch === 'sim' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >Sim</button>
               <button
                 onClick={() => updateField('needsResearch', 'nao')}
                 className={`p-8 rounded-2xl border transition-all font-bold ${
-                  formData.needsResearch === 'nao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.needsResearch === 'nao' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >Não</button>
             </div>
@@ -732,7 +732,7 @@ export function CreateProjectInventor() {
               <button 
                 onClick={() => nextStep('INNOVATION_TYPE')} 
                 disabled={!formData.needsResearch}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -750,7 +750,7 @@ export function CreateProjectInventor() {
               <button
                 onClick={() => updateField('innovationType', 'melhoria')}
                 className={`p-8 rounded-2xl border transition-all text-center space-y-2 ${
-                  formData.innovationType === 'melhoria' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.innovationType === 'melhoria' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="font-bold text-lg">Melhoria Incremental</div>
@@ -759,7 +759,7 @@ export function CreateProjectInventor() {
               <button
                 onClick={() => updateField('innovationType', 'inovacao')}
                 className={`p-8 rounded-2xl border transition-all text-center space-y-2 ${
-                  formData.innovationType === 'inovacao' ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                  formData.innovationType === 'inovacao' ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className="font-bold text-lg">Inovação Radical</div>
@@ -772,7 +772,7 @@ export function CreateProjectInventor() {
               <button 
                 onClick={() => nextStep('LOCATION')} 
                 disabled={!formData.innovationType}
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition disabled:opacity-50"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition disabled:opacity-50"
               >Próximo</button>
             </div>
           </div>
@@ -792,7 +792,7 @@ export function CreateProjectInventor() {
                   key={region}
                   onClick={() => updateField('location', { region })}
                   className={`p-4 rounded-xl border transition-all flex flex-col items-center gap-2 ${
-                    formData.location.region === region ? 'bg-indigo-500/10 border-indigo-500 text-indigo-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
+                    formData.location.region === region ? 'bg-teal-500/10 border-teal-500 text-teal-300' : 'bg-slate-950/50 border-slate-800 text-slate-400 hover:border-slate-700'
                   }`}
                 >
                   <MapPin size={20} />
@@ -816,7 +816,7 @@ export function CreateProjectInventor() {
                 onClick={() => {
                   nextStep('MATURITY');
                 }} 
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
               >Próximo</button>
             </div>
           </div>
@@ -853,7 +853,7 @@ export function CreateProjectInventor() {
                 >Pular por enquanto</button>
                 <button 
                   onClick={() => nextStep('SUMMARY_METHOD')} 
-                  className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                  className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
                 >Confirmar e Prosseguir</button>
               </div>
             </div>
@@ -871,9 +871,9 @@ export function CreateProjectInventor() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button
                 onClick={() => { updateField('summaryMethod', 'questions'); nextStep('SUMMARY_CONTENT'); }}
-                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 transition-all space-y-4 group/card"
               >
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
+                <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
                   <HelpCircle size={28} />
                 </div>
                 <div className="text-center md:text-left">
@@ -884,7 +884,7 @@ export function CreateProjectInventor() {
 
               <button
                 onClick={() => { updateField('summaryMethod', 'text'); nextStep('SUMMARY_CONTENT'); }}
-                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 transition-all space-y-4 group/card"
               >
                 <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
                   <MessageSquare size={28} />
@@ -897,7 +897,7 @@ export function CreateProjectInventor() {
 
               <button
                 onClick={() => { updateField('summaryMethod', 'document'); nextStep('SUMMARY_UPLOAD'); }}
-                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-indigo-500 transition-all space-y-4 group/card"
+                className="p-8 rounded-2xl bg-slate-800/40 border border-slate-700 hover:border-teal-500 transition-all space-y-4 group/card"
               >
                 <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover/card:scale-110 transition-transform mx-auto md:mx-0">
                   <UploadCloud size={28} />
@@ -945,7 +945,7 @@ export function CreateProjectInventor() {
                   <textarea
                     value={formData.summaryQuestions.problem}
                     onChange={(e) => updateSummaryQuestions('problem', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none h-24 transition-all"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 outline-none h-24 transition-all"
                     placeholder="Descreva a dor do mercado..."
                   />
                 </div>
@@ -954,7 +954,7 @@ export function CreateProjectInventor() {
                   <textarea
                     value={formData.summaryQuestions.solution}
                     onChange={(e) => updateSummaryQuestions('solution', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none h-24 transition-all"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 outline-none h-24 transition-all"
                     placeholder="Como sua ideia funciona..."
                   />
                 </div>
@@ -963,7 +963,7 @@ export function CreateProjectInventor() {
                   <textarea
                     value={formData.summaryQuestions.difference}
                     onChange={(e) => updateSummaryQuestions('difference', e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none h-24 transition-all"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 outline-none h-24 transition-all"
                     placeholder="Por que você é melhor que a concorrência..."
                   />
                 </div>
@@ -1073,7 +1073,7 @@ export function CreateProjectInventor() {
                       }
                     }}
                     disabled={isAiProcessing}
-                    className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full py-4 rounded-xl bg-gradient-to-r from-purple-600 to-teal-600 hover:from-purple-500 hover:to-teal-500 text-white font-bold transition-all shadow-[0_0_20px_rgba(124,58,237,0.3)] flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isAiProcessing ? <Loader2 className="animate-spin" size={20} /> : <><Zap size={18} /> Lapidar Pitch com IA</>}
                   </button>
@@ -1086,7 +1086,7 @@ export function CreateProjectInventor() {
                 <textarea
                   value={formData.summary}
                   onChange={(e) => updateField('summary', e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 outline-none h-64 transition-all"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-4 text-slate-200 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 outline-none h-64 transition-all"
                   placeholder="Escreva aqui o resumo da sua patente ou ideia de negócio..."
                 />
               </div>
@@ -1104,7 +1104,7 @@ export function CreateProjectInventor() {
               </button>
               <button 
                 onClick={() => nextStep('REVIEW')} 
-                className="px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition"
+                className="px-8 py-3 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold transition"
               >Próximo</button>
             </div>
           </div>
@@ -1117,25 +1117,25 @@ export function CreateProjectInventor() {
               // Beautiful Digital Twin Preview
               <div className="space-y-8 text-left">
                 <div className="text-center space-y-1">
-                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
+                  <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-xs font-bold uppercase tracking-wider mb-2">
                     <Zap size={12} className="animate-pulse" /> Gêmeo Digital de Ativo
                   </div>
                   <h2 className="text-2xl font-black text-white">{(formData as any).title}</h2>
-                  <p className="text-xs text-indigo-400 font-bold uppercase tracking-wider">Câmara FIESC: {formData.segment}</p>
+                  <p className="text-xs text-teal-400 font-bold uppercase tracking-wider">Câmara FIESC: {formData.segment}</p>
                 </div>
 
                 {/* Overall Score Banner */}
-                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900/90 to-indigo-950/20 border border-indigo-500/10 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[50px]" />
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-slate-900/90 to-teal-950/20 border border-teal-500/10 flex flex-col md:flex-row items-center gap-6 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 blur-[50px]" />
                   <div className="relative flex items-center justify-center w-20 h-20 shrink-0">
-                    <div className="absolute inset-0 bg-indigo-500/10 rounded-full blur animate-pulse" />
-                    <div className="absolute w-18 h-18 border-2 border-indigo-500/20 rounded-full" />
+                    <div className="absolute inset-0 bg-teal-500/10 rounded-full blur animate-pulse" />
+                    <div className="absolute w-18 h-18 border-2 border-teal-500/20 rounded-full" />
                     <span className="text-2xl font-black text-white">{(formData as any).readinessScores.overall}%</span>
                   </div>
                   <div className="text-center md:text-left space-y-1">
                     <h4 className="text-white font-bold text-base">Transfer Readiness Score</h4>
                     <p className="text-xs text-slate-400">
-                      Pontuação geral ponderada para a indústria de <strong className="text-indigo-300">{(formData as any).technologyDNA.industry.join(", ")}</strong>.
+                      Pontuação geral ponderada para a indústria de <strong className="text-teal-300">{(formData as any).technologyDNA.industry.join(", ")}</strong>.
                     </p>
                   </div>
                 </div>
@@ -1163,10 +1163,10 @@ export function CreateProjectInventor() {
                       <div key={item.label} className="p-4 rounded-2xl bg-slate-950/30 border border-slate-900 space-y-2">
                         <div className="flex justify-between items-center text-xs">
                           <span className="text-slate-300 font-bold">{item.label}</span>
-                          <span className="text-indigo-400 font-extrabold">{item.score}%</span>
+                          <span className="text-teal-400 font-extrabold">{item.score}%</span>
                         </div>
                         <div className="w-full h-1.5 bg-slate-900 rounded-full overflow-hidden">
-                          <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${item.score}%` }} />
+                          <div className="h-full bg-teal-500 rounded-full" style={{ width: `${item.score}%` }} />
                         </div>
                         <p className="text-[10px] text-slate-500">{item.desc}</p>
                       </div>
@@ -1183,7 +1183,7 @@ export function CreateProjectInventor() {
                         <span className="text-[10px] uppercase text-slate-500 font-bold tracking-wider">Palavras-chave</span>
                         <div className="flex flex-wrap gap-1.5 mt-1.5">
                           {(formData as any).technologyDNA.keywords.map((kw: string) => (
-                            <span key={kw} className="px-2.5 py-0.5 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[11px] text-indigo-300 font-semibold">{kw}</span>
+                            <span key={kw} className="px-2.5 py-0.5 rounded-md bg-teal-500/10 border border-teal-500/20 text-[11px] text-teal-300 font-semibold">{kw}</span>
                           ))}
                         </div>
                       </div>
@@ -1213,7 +1213,7 @@ export function CreateProjectInventor() {
                       <div className="p-5 rounded-2xl bg-slate-950/40 border border-slate-900 text-xs space-y-3">
                         <div className="flex justify-between">
                           <span className="text-slate-500 font-medium">Situação da PI</span>
-                          <span className="text-white font-bold bg-indigo-600/30 px-2 py-0.5 rounded border border-indigo-500/30 uppercase tracking-wide">{(formData as any).technologyProtection.status === 'granted' ? 'Concedida' : (formData as any).technologyProtection.status}</span>
+                          <span className="text-white font-bold bg-teal-600/30 px-2 py-0.5 rounded border border-teal-500/30 uppercase tracking-wide">{(formData as any).technologyProtection.status === 'granted' ? 'Concedida' : (formData as any).technologyProtection.status}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-slate-500 font-medium">Patente (INPI)</span>
@@ -1241,11 +1241,11 @@ export function CreateProjectInventor() {
                           <p className="text-[10px] text-slate-500">{(formData as any).team.laboratoryName}</p>
                         </div>
                         <div className="flex gap-2.5 pt-1">
-                          <a href={(formData as any).team.lattesUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">Lattes</a>
+                          <a href={(formData as any).team.lattesUrl} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">Lattes</a>
                           <span className="text-slate-800">|</span>
-                          <a href={(formData as any).team.orcid} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">ORCID</a>
+                          <a href={(formData as any).team.orcid} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">ORCID</a>
                           <span className="text-slate-800">|</span>
-                          <a href={(formData as any).team.linkedinUrl} target="_blank" rel="noreferrer" className="text-indigo-400 hover:text-indigo-300 underline font-semibold">LinkedIn</a>
+                          <a href={(formData as any).team.linkedinUrl} target="_blank" rel="noreferrer" className="text-teal-400 hover:text-teal-300 underline font-semibold">LinkedIn</a>
                         </div>
                       </div>
                     </div>
@@ -1258,7 +1258,7 @@ export function CreateProjectInventor() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {(formData as any).vdrAssets.map((asset: any) => (
                       <div key={asset.id} className="p-4 rounded-xl bg-slate-950/40 border border-slate-900 flex items-center gap-4 hover:border-slate-800 transition">
-                        <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0">
+                        <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center text-teal-400 shrink-0">
                           <FileText size={20} />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -1331,7 +1331,7 @@ export function CreateProjectInventor() {
               <button 
                 onClick={handleSubmit} 
                 disabled={loading}
-                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-500 hover:from-indigo-400 hover:to-cyan-400 text-white font-black text-lg shadow-[0_0_30px_rgba(79,70,229,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="px-10 py-4 rounded-2xl bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white font-black text-lg shadow-[0_0_30px_rgba(0,181,156,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {loading ? <Loader2 className="animate-spin" size={24} /> : <>{ "Finalizar e Gerar Matches" } <Rocket size={24} /></>}
               </button>
@@ -1344,10 +1344,10 @@ export function CreateProjectInventor() {
         {/* RIGHT COLUMN: COACHING SIDEBAR */}
         <div className="lg:col-span-1 lg:sticky lg:top-24 space-y-6">
           <div className="bg-slate-900/60 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-[80px] pointer-events-none" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 blur-[80px] pointer-events-none" />
             
             <div className="space-y-1 mb-6">
-              <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">{getStepCoaching(step).subtitle}</span>
+              <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest">{getStepCoaching(step).subtitle}</span>
               <h3 className="text-lg font-bold text-white tracking-tight">{getStepCoaching(step).title}</h3>
             </div>
             
@@ -1361,15 +1361,15 @@ export function CreateProjectInventor() {
               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-2">Diretriz de Estruturação</h4>
               {getStepCoaching(step).tips.map((tip, idx) => (
                 <div key={idx} className="flex gap-2.5 items-start text-xs text-slate-350">
-                  <CheckCircle2 className="text-indigo-400 shrink-0 mt-0.5" size={14} />
+                  <CheckCircle2 className="text-teal-400 shrink-0 mt-0.5" size={14} />
                   <span>{tip}</span>
                 </div>
               ))}
             </div>
           </div>
           
-          <div className="bg-indigo-950/10 border border-indigo-550/20 rounded-2xl p-5 flex items-center gap-3 text-slate-500 text-xs backdrop-blur-sm">
-            <ShieldCheck size={18} className="text-indigo-400/80 shrink-0" />
+          <div className="bg-teal-950/10 border border-teal-550/20 rounded-2xl p-5 flex items-center gap-3 text-slate-500 text-xs backdrop-blur-sm">
+            <ShieldCheck size={18} className="text-teal-400/80 shrink-0" />
             <p className="leading-relaxed">
               Ficha de qualificação em conformidade com a Lei nº 10.973/04 (Lei de Inovação). Dados e patentes protegidos no VDR.
             </p>
@@ -1380,19 +1380,19 @@ export function CreateProjectInventor() {
       {/* IA Processing Overlay */}
       {isAiProcessing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-300">
-          <div className="bg-slate-900 border border-indigo-500/30 p-8 rounded-3xl shadow-[0_0_50px_rgba(79,70,229,0.2)] max-w-sm w-full text-center space-y-6">
+          <div className="bg-slate-900 border border-teal-500/30 p-8 rounded-3xl shadow-[0_0_50px_rgba(0,181,156,0.2)] max-w-sm w-full text-center space-y-6">
             <div className="relative w-20 h-20 mx-auto">
-              <div className="absolute inset-0 bg-indigo-500/20 rounded-full animate-ping" />
-              <div className="relative bg-indigo-600 w-20 h-20 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(79,70,229,0.5)]">
+              <div className="absolute inset-0 bg-teal-500/20 rounded-full animate-ping" />
+              <div className="relative bg-teal-600 w-20 h-20 rounded-full flex items-center justify-center text-white shadow-[0_0_20px_rgba(0,181,156,0.5)]">
                 <Zap size={40} className="animate-pulse" />
               </div>
             </div>
             <div className="space-y-2">
               <h3 className="text-xl font-bold text-white">IA Refinando seu Pitch</h3>
-              <p className="text-indigo-400 text-sm font-medium animate-pulse">{aiStatus}</p>
+              <p className="text-teal-400 text-sm font-medium animate-pulse">{aiStatus}</p>
             </div>
             <div className="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-               <div className="bg-indigo-500 h-full w-1/2 animate-[shimmer_2s_infinite] rounded-full" />
+               <div className="bg-teal-500 h-full w-1/2 animate-[shimmer_2s_infinite] rounded-full" />
             </div>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">Aguarde alguns segundos...</p>
           </div>

@@ -27,7 +27,7 @@ export function IpBalcaoTab({
       {/* Patents Portfolio */}
       <div className="lg:col-span-2 space-y-6">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
-          <Scale className="text-indigo-400" size={22} /> {t("dashboard.organization.ip_balcao.patentsPortfolio")}
+          <Scale className="text-teal-400" size={22} /> {t("dashboard.organization.ip_balcao.patentsPortfolio")}
         </h2>
         <div className="space-y-4">
           {activePatents.map(pat => (
@@ -56,14 +56,14 @@ export function IpBalcaoTab({
       <div>
         <div className="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl space-y-6">
           <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <Settings className="text-indigo-400" size={20} /> {t("dashboard.organization.ip_balcao.title")}
+            <Settings className="text-teal-400" size={20} /> {t("dashboard.organization.ip_balcao.title")}
           </h3>
           <div className="space-y-5">
             {/* Royalty slider */}
             <div className="space-y-2">
               <div className="flex justify-between text-xs font-bold">
                 <span className="text-slate-400">{t("dashboard.organization.ip_balcao.royaltyRate")}</span>
-                <span className="text-indigo-400 font-mono">{royaltyRate}%</span>
+                <span className="text-teal-400 font-mono">{royaltyRate}%</span>
               </div>
               <input 
                 type="range" 
@@ -72,7 +72,7 @@ export function IpBalcaoTab({
                 step="0.5" 
                 value={royaltyRate}
                 onChange={e => setRoyaltyRate(Number(e.target.value))}
-                className="w-full accent-indigo-500 bg-slate-950 border border-slate-800 rounded-lg h-2"
+                className="w-full accent-teal-500 bg-slate-950 border border-slate-800 rounded-lg h-2"
               />
               <div className="flex justify-between text-[9px] text-slate-500 font-bold uppercase tracking-wider">
                 <span>1.0% Min</span>
@@ -89,7 +89,7 @@ export function IpBalcaoTab({
                 onClick={() => setAllowExclusive(!allowExclusive)}
                 className={`w-11 h-6 rounded-full transition-all relative outline-none border ${
                   allowExclusive 
-                    ? 'bg-indigo-600 border-indigo-500' 
+                    ? 'bg-teal-600 border-teal-500' 
                     : 'bg-slate-950 border-slate-800'
                 }`}
               >
@@ -102,7 +102,7 @@ export function IpBalcaoTab({
             <button 
               onClick={handleSaveConfig}
               disabled={isConfigSaving}
-              className="w-full mt-4 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)] flex items-center justify-center gap-2"
+              className="w-full mt-4 py-3 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,181,156,0.2)] flex items-center justify-center gap-2"
             >
               {isConfigSaving ? "..." : t("dashboard.organization.ip_balcao.saveConfig")}
             </button>

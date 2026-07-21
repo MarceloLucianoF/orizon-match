@@ -23,7 +23,7 @@ export function FomentoTab({ fundingCalls, openModal }: FomentoTabProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {fundingCalls.map(call => (
           <div key={call.id} className="bg-slate-900/40 border border-slate-800/80 p-6 rounded-3xl hover:border-slate-700 transition-all flex flex-col justify-between h-[230px] relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-500/5 blur-[30px] rounded-full group-hover:bg-indigo-500/10 transition-all" />
+            <div className="absolute top-0 right-0 w-20 h-20 bg-teal-500/5 blur-[30px] rounded-full group-hover:bg-teal-500/10 transition-all" />
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-[10px] font-black uppercase tracking-wider text-amber-400 px-2 py-1 bg-amber-400/10 rounded-lg border border-amber-400/20">

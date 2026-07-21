@@ -145,7 +145,7 @@ export function InventorDashboard() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="animate-spin text-indigo-500" size={48} />
+        <Loader2 className="animate-spin text-teal-500" size={48} />
       </div>
     );
   }
@@ -162,7 +162,7 @@ export function InventorDashboard() {
             onClick={() => setActiveTab('overview')}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${
               activeTab === 'overview' 
-                ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.35)]' 
+                ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-[0_0_15px_rgba(0,181,156,0.35)]' 
                 : 'text-slate-500 hover:text-slate-350'
             }`}
           >
@@ -172,7 +172,7 @@ export function InventorDashboard() {
             onClick={() => setActiveTab('vdr')}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${
               activeTab === 'vdr' 
-                ? 'bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.35)]' 
+                ? 'bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-[0_0_15px_rgba(0,181,156,0.35)]' 
                 : 'text-slate-500 hover:text-slate-350'
             }`}
           >
@@ -197,16 +197,16 @@ export function InventorDashboard() {
               projectTitle={primaryProject?.title} 
             />
             
-            <div className="bg-gradient-to-br from-indigo-950/20 to-slate-900/40 border border-indigo-500/20 hover:border-indigo-500/30 rounded-2xl md:rounded-3xl p-6 shadow-xl transition-all duration-300 hover:scale-[1.01]">
-              <h3 className="text-sm font-bold text-indigo-300 mb-2 flex items-center gap-2">
-                <Gavel size={16} className="text-indigo-400" /> {t("dashboard.inventor.legalCurator")}
+            <div className="bg-gradient-to-br from-teal-950/20 to-slate-900/40 border border-teal-500/20 hover:border-teal-500/30 rounded-2xl md:rounded-3xl p-6 shadow-xl transition-all duration-300 hover:scale-[1.01]">
+              <h3 className="text-sm font-bold text-teal-300 mb-2 flex items-center gap-2">
+                <Gavel size={16} className="text-teal-400" /> {t("dashboard.inventor.legalCurator")}
               </h3>
               <p className="text-xs text-slate-400 leading-relaxed mb-4">
                 {t("dashboard.inventor.legalCuratorDesc")}
               </p>
               <button 
                 onClick={() => setShowInviteModal(true)}
-                className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white py-3 rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(79,70,229,0.3)] hover:shadow-[0_0_20px_rgba(79,70,229,0.5)] flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white py-3 rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,181,156,0.3)] hover:shadow-[0_0_20px_rgba(0,181,156,0.5)] flex items-center justify-center gap-2"
               >
                 <Send size={14} /> {t("dashboard.inventor.inviteLegalBtn")}
               </button>
@@ -222,7 +222,7 @@ export function InventorDashboard() {
               value={stats.views} 
               icon={Eye} 
               trend={12} 
-              color="indigo"
+              color="teal"
             />
             <StatsCard 
               label={t("dashboard.inventor.saves")} 
@@ -253,7 +253,7 @@ export function InventorDashboard() {
                   <Star className="text-amber-400 fill-amber-400/20" size={18} /> {t("dashboard.inventor.featuredMatches")}
                 </h2>
                 {stats.projects > 0 && (
-                  <Link to="/matches" className="text-xs md:text-sm text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 transition-colors duration-200">
+                  <Link to="/matches" className="text-xs md:text-sm text-teal-400 hover:text-teal-300 font-semibold flex items-center gap-1 transition-colors duration-200">
                     {t("dashboard.inventor.viewAll")} <ChevronRight size={14} />
                   </Link>
                 )}
@@ -266,7 +266,7 @@ export function InventorDashboard() {
                   </div>
                   <p className="text-slate-400 font-medium text-sm">{t("dashboard.inventor.noMatches")}</p>
                   <p className="text-xs text-slate-500 mt-1">{t("dashboard.inventor.noMatchesDesc")}</p>
-                  <Link to="/projects/new" className="inline-block mt-4 text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg font-medium transition">
+                  <Link to="/projects/new" className="inline-block mt-4 text-xs bg-teal-600 hover:bg-teal-500 text-white px-4 py-2 rounded-lg font-medium transition">
                     {t("dashboard.inventor.registerProject")}
                   </Link>
                 </div>
@@ -286,8 +286,8 @@ export function InventorDashboard() {
                     const explanation = isFomoLocked ? "••••••••••••••••••••••••••••••••••••••••••••" : explainMatch(match.breakdown);
                     
                     return (
-                      <div key={match.id} className="bg-slate-950/50 border border-slate-850/80 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-5 hover:border-indigo-500/25 hover:shadow-[0_12px_24px_-8px_rgba(99,102,241,0.06)] hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden backdrop-blur-sm">
-                        <div className={`w-12 h-12 rounded-full border border-slate-800/80 bg-slate-950 flex items-center justify-center flex-shrink-0 shadow-sm ${isFomoLocked ? 'text-slate-600' : scoreColor}`} style={{ boxShadow: !isFomoLocked ? '0 0 10px rgba(99,102,241,0.1)' : 'none' }}>
+                      <div key={match.id} className="bg-slate-950/50 border border-slate-850/80 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-5 hover:border-teal-500/25 hover:shadow-[0_12px_24px_-8px_rgba(0,181,156,0.06)] hover:-translate-y-0.5 transition-all duration-300 relative overflow-hidden backdrop-blur-sm">
+                        <div className={`w-12 h-12 rounded-full border border-slate-800/80 bg-slate-950 flex items-center justify-center flex-shrink-0 shadow-sm ${isFomoLocked ? 'text-slate-600' : scoreColor}`} style={{ boxShadow: !isFomoLocked ? '0 0 10px rgba(0,181,156,0.1)' : 'none' }}>
                           {isFomoLocked ? <Lock size={16} className="text-slate-600" /> : <span className="font-black text-sm drop-shadow-[0_0_6px_currentColor]">{match.score}%</span>}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -329,14 +329,14 @@ export function InventorDashboard() {
               <MarketTrendsChart title={t("dashboard.inventor.marketTrends")} />
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-950/30 to-cyan-950/20 border border-indigo-500/20 hover:border-indigo-500/35 rounded-2xl p-6 md:p-8 relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 shadow-xl">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-indigo-500/20 rounded-full blur-2xl" />
+            <div className="bg-gradient-to-br from-teal-950/30 to-cyan-950/20 border border-teal-500/20 hover:border-teal-500/35 rounded-2xl p-6 md:p-8 relative overflow-hidden transition-all duration-300 hover:-translate-y-0.5 shadow-xl">
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-teal-500/20 rounded-full blur-2xl" />
               <div className="absolute right-6 top-6 flex items-center justify-center h-6 w-6">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-20"></span>
                 <span className="animate-pulse absolute inline-flex h-3 w-3 rounded-full bg-emerald-400 opacity-40"></span>
                 <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400"></span>
               </div>
-              <h3 className="text-xs font-black text-indigo-300 uppercase tracking-widest mb-3.5 flex items-center gap-2">
+              <h3 className="text-xs font-black text-teal-300 uppercase tracking-widest mb-3.5 flex items-center gap-2">
                 <Activity size={16} className="text-emerald-400 animate-pulse" /> {t("dashboard.inventor.radarInovaHelix")}
               </h3>
               {radarCount === null ? (
@@ -355,13 +355,13 @@ export function InventorDashboard() {
               )}
             </div>
 
-            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-card transition-all duration-300 hover:border-indigo-500/20 hover:-translate-y-0.5">
+            <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 md:p-8 shadow-card transition-all duration-300 hover:border-teal-500/20 hover:-translate-y-0.5">
               <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest mb-5">{t("dashboard.inventor.marketReadiness")}</h3>
               <div className="flex flex-col items-center mb-5">
                 <div className="relative w-28 h-28 md:w-32 md:h-32 flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                     <path className="text-slate-800" strokeWidth="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    <path className="text-indigo-500 transition-all duration-1000 ease-out" strokeWidth="3" strokeDasharray={`${completionScore}, 100`} strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    <path className="text-teal-500 transition-all duration-1000 ease-out" strokeWidth="3" strokeDasharray={`${completionScore}, 100`} strokeLinecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                   </svg>
                   <div className="absolute flex flex-col items-center justify-center">
                     <span className="text-2xl md:text-3xl font-bold text-slate-100">{completionScore}%</span>
@@ -379,7 +379,7 @@ export function InventorDashboard() {
                   <div className="grid grid-cols-2 gap-2 md:gap-3">
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
                       <span className="block text-[10px] font-bold text-slate-500 uppercase">{t("dashboard.inventor.currentTrl")}</span>
-                      <span className="text-lg md:text-xl font-black text-indigo-400">{primaryProject.maturity || 1}</span>
+                      <span className="text-lg md:text-xl font-black text-teal-400">{primaryProject.maturity || 1}</span>
                     </div>
                     <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 text-center">
                       <span className="block text-[10px] font-bold text-slate-500 uppercase">{t("dashboard.inventor.irlScore")}</span>
@@ -389,7 +389,7 @@ export function InventorDashboard() {
 
                   <button 
                     onClick={() => setShowTRLModal(true)}
-                    className="w-full py-3 rounded-xl bg-indigo-650/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+                    className="w-full py-3 rounded-xl bg-teal-650/20 hover:bg-teal-600/30 text-teal-300 border border-teal-500/30 font-bold text-xs transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
                   >
                     <ShieldCheck size={16} /> {t("dashboard.inventor.certifyMaturity")}
                   </button>
@@ -399,7 +399,7 @@ export function InventorDashboard() {
 
             {/* Checklist de Readiness */}
             {primaryProject && (
-              <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 md:p-8 space-y-5 shadow-card transition-all duration-300 hover:border-indigo-500/20 hover:-translate-y-0.5">
+              <div className="bg-slate-900/40 backdrop-blur-md border border-slate-800/80 rounded-2xl p-6 md:p-8 space-y-5 shadow-card transition-all duration-300 hover:border-teal-500/20 hover:-translate-y-0.5">
                 <h3 className="text-xs font-black text-slate-300 uppercase tracking-widest">
                   {t("dashboard.inventor.readinessChecklist.title")}
                 </h3>
@@ -411,7 +411,7 @@ export function InventorDashboard() {
                         {t("dashboard.inventor.readinessChecklist.titleCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-extrabold">+20%</span>
+                    <span className="text-[10px] text-teal-400 font-extrabold">+20%</span>
                   </div>
                   <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
@@ -420,7 +420,7 @@ export function InventorDashboard() {
                         {t("dashboard.inventor.readinessChecklist.segmentCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-extrabold">+20%</span>
+                    <span className="text-[10px] text-teal-400 font-extrabold">+20%</span>
                   </div>
                   <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
@@ -429,7 +429,7 @@ export function InventorDashboard() {
                         {t("dashboard.inventor.readinessChecklist.trlCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-extrabold">+10%</span>
+                    <span className="text-[10px] text-teal-400 font-extrabold">+10%</span>
                   </div>
                   <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
@@ -438,7 +438,7 @@ export function InventorDashboard() {
                         {t("dashboard.inventor.readinessChecklist.needsCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-extrabold">+20%</span>
+                    <span className="text-[10px] text-teal-400 font-extrabold">+20%</span>
                   </div>
                   <div className="flex items-center justify-between text-xs p-3.5 bg-slate-950/50 rounded-xl border border-slate-850/80 shadow-inner">
                     <div className="flex items-center gap-2.5">
@@ -447,7 +447,7 @@ export function InventorDashboard() {
                         {t("dashboard.inventor.readinessChecklist.vdrCheck")}
                       </span>
                     </div>
-                    <span className="text-[10px] text-indigo-400 font-extrabold">+20%</span>
+                    <span className="text-[10px] text-teal-400 font-extrabold">+20%</span>
                   </div>
                 </div>
               </div>
@@ -572,7 +572,7 @@ export function InventorDashboard() {
                     setLoading(false);
                   }
                 }}
-                className="px-6 md:px-8 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-500/20 transition-all text-sm"
+                className="px-6 md:px-8 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold shadow-lg shadow-teal-500/20 transition-all text-sm"
               >
                 {t("dashboard.inventor.saveCertification")}
               </button>
@@ -587,7 +587,7 @@ export function InventorDashboard() {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
             <div className="p-5 border-b border-slate-800 flex justify-between items-center">
               <h3 className="font-bold text-slate-100 flex items-center gap-2 text-base">
-                <Gavel className="text-indigo-400" size={20} /> {t("dashboard.inventor.inviteModalTitle")}
+                <Gavel className="text-teal-400" size={20} /> {t("dashboard.inventor.inviteModalTitle")}
               </h3>
               <button 
                 onClick={() => { setShowInviteModal(false); setInviteSent(false); }}
@@ -614,7 +614,7 @@ export function InventorDashboard() {
                       value={inviteEmail}
                       onChange={e => setInviteEmail(e.target.value)}
                       placeholder={t("dashboard.inventor.inviteEmailPlaceholder")}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition text-sm"
+                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-teal-500 transition text-sm"
                     />
                   </div>
                 </div>
@@ -626,12 +626,12 @@ export function InventorDashboard() {
                     onChange={e => setInviteMessage(e.target.value)}
                     placeholder={t("dashboard.inventor.inviteMsgPlaceholder")}
                     rows={3}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition resize-none text-sm"
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-slate-200 outline-none focus:border-teal-500 transition resize-none text-sm"
                   />
                 </div>
 
-                <div className="bg-indigo-500/10 border border-indigo-500/20 p-3 rounded-xl">
-                  <p className="text-[11px] text-indigo-300 leading-relaxed">
+                <div className="bg-teal-500/10 border border-teal-500/20 p-3 rounded-xl">
+                  <p className="text-[11px] text-teal-300 leading-relaxed">
                     {t("dashboard.inventor.inviteNotice")}
                   </p>
                 </div>
@@ -639,7 +639,7 @@ export function InventorDashboard() {
                 <button 
                   onClick={handleSendInvite}
                   disabled={!inviteEmail || inviteSending}
-                  className="w-full bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition text-sm shadow-[0_0_15px_rgba(79,70,229,0.3)]"
+                  className="w-full bg-teal-600 hover:bg-teal-500 disabled:opacity-50 text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition text-sm shadow-[0_0_15px_rgba(0,181,156,0.3)]"
                 >
                   {inviteSending ? <Loader2 className="animate-spin" size={16} /> : <Send size={16} />}
                   {inviteSending ? t("dashboard.inventor.sending") : t("dashboard.inventor.sendInvite")}

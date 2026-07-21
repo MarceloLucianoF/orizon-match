@@ -27,9 +27,9 @@ export function MainLayout() {
 
       <div className="flex flex-col flex-1 min-w-0">
         {simulatedRole && (
-          <div className="bg-fuchsia-600 text-white px-4 py-2 flex items-center justify-center gap-3 text-xs font-bold shadow-md z-50 animate-in slide-in-from-top">
+          <div className="bg-teal-650 text-white px-4 py-2 flex items-center justify-center gap-3 text-xs font-bold shadow-md z-50 animate-in slide-in-from-top">
             <ServerCog size={16} className="animate-spin" />
-            <span>Visualização active como: <span className="uppercase font-black text-fuchsia-100">{simulatedRole}</span> (Modo de Teste Admin)</span>
+            <span>Visualização active como: <span className="uppercase font-black text-teal-100">{simulatedRole}</span> (Modo de Teste Admin)</span>
             <button 
               onClick={() => { setSimulatedRole(null); navigate("/admin"); }}
               className="ml-4 px-3 py-1 bg-slate-950/40 hover:bg-slate-950/70 border border-white/20 text-white rounded-md text-[10px] uppercase font-bold transition-colors cursor-pointer"

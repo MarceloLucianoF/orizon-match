@@ -31,7 +31,7 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
         projectId: project.id,
         projectTitle: project.title,
         inventorId: project.userId,
-        inventorName: project.ownerName || "Inventor Orizon",
+        inventorName: project.ownerName || "Inventor InovaHelix",
         linkedAssets: linkedAssets.map(a => ({
           id: a.id,
           title: a.title,
@@ -49,12 +49,12 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-slate-900 border border-slate-800 rounded-[2rem] w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-indigo-500/20">
+      <div className="bg-slate-900 border border-slate-800 rounded-[2rem] w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col shadow-2xl shadow-teal-500/20">
         {/* Header */}
         <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900/50">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
-              <ShieldCheck className="text-indigo-400" size={20} />
+            <div className="p-2.5 bg-teal-500/10 rounded-xl border border-teal-500/20">
+              <ShieldCheck className="text-teal-400" size={20} />
             </div>
             <div>
               <h3 className="text-lg font-bold text-white tracking-tight">Smart Clickwrap NDA</h3>
@@ -80,12 +80,12 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
               { id: "archived", label: "Arquivado", desc: "Imutabilidade garantida", status: "pending" }
             ].map((step, idx, arr) => {
               let circleStyle = "bg-slate-900 border-slate-800 text-slate-500";
-              let lineStyle = idx < 2 ? "bg-indigo-500" : "bg-slate-800";
+              let lineStyle = idx < 2 ? "bg-teal-500" : "bg-slate-800";
               
               if (step.status === "complete") {
-                circleStyle = "bg-indigo-600 border-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.3)]";
+                circleStyle = "bg-teal-600 border-teal-500 text-white shadow-[0_0_15px_rgba(0,181,156,0.3)]";
               } else if (step.status === "active") {
-                circleStyle = "bg-slate-900 border-indigo-500 text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)] animate-pulse";
+                circleStyle = "bg-slate-900 border-teal-500 text-teal-400 shadow-[0_0_15px_rgba(0,181,156,0.2)] animate-pulse";
               }
 
               return (
@@ -95,7 +95,7 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
                     <div className={`absolute top-4 right-1/2 left-0 h-0.5 ${lineStyle} -z-10`} />
                   )}
                   {idx < arr.length - 1 && (
-                    <div className={`absolute top-4 left-1/2 right-0 h-0.5 ${step.status === "complete" ? "bg-indigo-500" : "bg-slate-800"} -z-10`} />
+                    <div className={`absolute top-4 left-1/2 right-0 h-0.5 ${step.status === "complete" ? "bg-teal-500" : "bg-slate-800"} -z-10`} />
                   )}
 
                   {/* Node Circle */}
@@ -104,7 +104,7 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
                   </div>
                   
                   {/* Labels */}
-                  <span className={`text-[10px] font-bold mt-2 tracking-wide uppercase ${step.status === "active" ? "text-indigo-400" : step.status === "complete" ? "text-slate-300" : "text-slate-500"}`}>
+                  <span className={`text-[10px] font-bold mt-2 tracking-wide uppercase ${step.status === "active" ? "text-teal-400" : step.status === "complete" ? "text-slate-300" : "text-slate-500"}`}>
                     {step.label}
                   </span>
                   <span className="text-[8px] text-slate-600 hidden sm:block mt-0.5 max-w-[80px] leading-tight font-sans">
@@ -119,7 +119,7 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
           <div className="bg-slate-950/50 border border-slate-800 rounded-2xl p-6 md:p-10 text-slate-300 text-sm leading-relaxed font-serif space-y-6">
-            <h4 className="text-center font-bold text-white text-base underline decoration-indigo-500 underline-offset-8 mb-8">
+            <h4 className="text-center font-bold text-white text-base underline decoration-teal-500 underline-offset-8 mb-8">
               ACORDO DE NÃO-DIVULGAÇÃO E SIGILO
             </h4>
 
@@ -131,7 +131,7 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
               <p>
                 **1. OBJETO:** O presente acordo visa proteger as informações confidenciais relativas à tecnologia e modelo de negócio do projeto, incluindo, mas não se limitando aos seguintes ativos de Propriedade Intelectual:
               </p>
-              <div className="pl-6 space-y-2 border-l-2 border-indigo-500/30 py-1">
+              <div className="pl-6 space-y-2 border-l-2 border-teal-500/30 py-1">
                 {linkedAssets.length > 0 ? linkedAssets.map((asset, i) => (
                   <p key={asset.id} className="text-slate-200">
                     {i+1}. {asset.title} {asset.inpiNumber ? `(Nº Processo: ${asset.inpiNumber})` : '(Documentação em fase de depósito)'}
@@ -151,7 +151,7 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
             </p>
 
             <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 flex gap-4 items-start font-sans">
-               <Lock className="text-indigo-400 shrink-0" size={18} />
+               <Lock className="text-teal-400 shrink-0" size={18} />
                <p className="text-[10px] text-slate-500 leading-tight">
                  Este documento é gerado dinamicamente e assinado eletronicamente via Smart Clickwrap. O registro desta transação (IP, Timestamp e Snapshot de Ativos) é armazenado em banco de dados imutável para fins de auditoria jurídica.
                </p>
@@ -170,7 +170,7 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
                   checked={accepted}
                   onChange={() => setAccepted(!accepted)}
                 />
-                <div className="w-6 h-6 rounded-lg border-2 border-slate-700 bg-slate-950 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-all flex items-center justify-center">
+                <div className="w-6 h-6 rounded-lg border-2 border-slate-700 bg-slate-950 peer-checked:bg-teal-600 peer-checked:border-teal-600 transition-all flex items-center justify-center">
                    <CheckCircle className={`text-white transition-all ${accepted ? 'scale-100 opacity-100' : 'scale-0 opacity-0'}`} size={16} />
                 </div>
               </div>
@@ -182,7 +182,7 @@ export function SmartNDAModal({ isOpen, onClose, onSigned, project, linkedAssets
             <button 
               onClick={handleSign}
               disabled={!accepted || loading}
-              className="w-full md:w-auto ml-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(79,70,229,0.3)] transition-all disabled:opacity-30 disabled:grayscale"
+              className="w-full md:w-auto ml-auto px-8 py-3.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(0,181,156,0.3)] transition-all disabled:opacity-30 disabled:grayscale"
             >
               {loading ? (
                 <Loader2 className="animate-spin" size={18} />

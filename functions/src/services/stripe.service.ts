@@ -22,8 +22,8 @@ export async function createCheckoutSession(userId: string, email: string, price
       },
     ],
     mode: 'subscription',
-    success_url: `https://inovahelix-match.web.app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `https://inovahelix-match.web.app/pricing`,
+    success_url: `https://inovahelix.web.app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `https://inovahelix.web.app/pricing`,
     customer_email: email,
     metadata: {
       userId,
@@ -47,7 +47,7 @@ export async function createPortalSession(userId: string) {
 
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
-    return_url: 'https://inovahelix-match.web.app/billing',
+    return_url: 'https://inovahelix.web.app/billing',
   });
 
   return { url: session.url };

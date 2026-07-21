@@ -113,7 +113,7 @@ export function Matches() {
             onClick={() => setActiveFilter("all")}
             className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all duration-300 ${
               activeFilter === "all" 
-                ? "bg-gradient-to-r from-indigo-600 to-indigo-500 text-white shadow-[0_0_15px_rgba(79,70,229,0.35)]" 
+                ? "bg-gradient-to-r from-teal-600 to-teal-500 text-white shadow-[0_0_15px_rgba(0,181,156,0.35)]" 
                 : "text-slate-500 hover:text-slate-350"
             }`}
           >
@@ -135,22 +135,22 @@ export function Matches() {
       {/* Filtros Avancados */}
       <div className="bg-slate-900/40 backdrop-blur-md border border-slate-850 rounded-2xl p-5 flex flex-wrap gap-6 items-center shadow-xl">
         <div className="flex items-center gap-2.5 text-slate-400">
-          <Filter size={16} className="text-indigo-400" />
+          <Filter size={16} className="text-teal-400" />
           <span className="text-sm font-semibold">{t("matches.minScore")}</span>
-          <span className="text-indigo-400 font-extrabold">{minScore}%</span>
+          <span className="text-teal-400 font-extrabold">{minScore}%</span>
         </div>
         <input 
           type="range" 
           min="50" max="95" step="5"
           value={minScore}
           onChange={(e) => setMinScore(Number(e.target.value))}
-          className="w-48 accent-indigo-500 cursor-pointer"
+          className="w-48 accent-teal-500 cursor-pointer"
         />
       </div>
 
       {loading ? (
         <div className="flex justify-center p-12">
-          <Loader2 className="animate-spin text-indigo-500" size={32} />
+          <Loader2 className="animate-spin text-teal-500" size={32} />
         </div>
       ) : filteredMatches.length === 0 ? (
         <div className="bg-slate-900/40 backdrop-blur-xl border border-slate-850 rounded-[2rem]">
@@ -168,13 +168,13 @@ export function Matches() {
             const isSaved = match.savedBy?.includes(user?.uid);
 
             return (
-            <div key={match.id} className="bg-slate-950/40 backdrop-blur-xl border border-slate-850 rounded-2xl p-6 hover:border-indigo-500/35 hover:shadow-[0_4px_25px_rgba(99,102,241,0.05)] hover:scale-[1.01] transition-all duration-300 flex flex-col md:flex-row md:items-center gap-6 relative overflow-hidden">
+            <div key={match.id} className="bg-slate-950/40 backdrop-blur-xl border border-slate-850 rounded-2xl p-6 hover:border-teal-500/35 hover:shadow-[0_4px_25px_rgba(0,181,156,0.05)] hover:scale-[1.01] transition-all duration-300 flex flex-col md:flex-row md:items-center gap-6 relative overflow-hidden">
               
               {/* Highlight bar para os salvos */}
               {isSaved && <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-pink-500"></div>}
 
-              <div className="flex-shrink-0 flex flex-col items-center justify-center w-20 h-20 rounded-full border border-indigo-500/30 relative bg-slate-950 shadow-[0_0_15px_rgba(99,102,241,0.15)]">
-                <span className="text-xl font-black text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]">{match.score}%</span>
+              <div className="flex-shrink-0 flex flex-col items-center justify-center w-20 h-20 rounded-full border border-teal-500/30 relative bg-slate-950 shadow-[0_0_15px_rgba(0,181,156,0.15)]">
+                <span className="text-xl font-black text-teal-400 drop-shadow-[0_0_8px_rgba(0,181,156,0.6)]">{match.score}%</span>
                 {index === 0 && activeFilter === "all" && (
                   <div className="absolute -top-3 bg-gradient-to-r from-amber-500 to-amber-400 text-slate-950 text-[9px] font-black tracking-wider px-2 py-0.5 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.4)]">
                     TOP 1
@@ -195,7 +195,7 @@ export function Matches() {
                     </span>
                   )}
                   {match.targetStats && match.targetStats.ndaRequests > 0 && (
-                    <span className="bg-indigo-500/10 text-indigo-400 text-[10px] px-2 py-0.5 rounded-full border border-indigo-500/25 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span className="bg-teal-500/10 text-teal-400 text-[10px] px-2 py-0.5 rounded-full border border-teal-500/25 font-bold uppercase tracking-wider flex items-center gap-1">
                       <Lock size={11} /> {t("matches.ndaRequested", { count: match.targetStats.ndaRequests })}
                     </span>
                   )}
@@ -214,26 +214,26 @@ export function Matches() {
                 </div>
                 
                 <div className="w-full bg-slate-900 border border-slate-850 rounded-full h-1.5 mb-4 max-w-sm overflow-hidden">
-                  <div className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full" style={{ width: `${match.score}%` }}></div>
+                  <div className="bg-gradient-to-r from-teal-500 to-cyan-400 h-full rounded-full" style={{ width: `${match.score}%` }}></div>
                 </div>
 
                 {match.breakdown && (
                   <div className="flex flex-wrap gap-2 text-[10px] uppercase font-bold tracking-wider mb-4">
                     <span className="bg-slate-900/80 border border-slate-800 px-3 py-1 rounded-full text-slate-400">
-                      {t("matches.segment")}: <span className="text-indigo-400 ml-1">{match.breakdown.segment || 0} {t("matches.pts")}</span>
+                      {t("matches.segment")}: <span className="text-teal-400 ml-1">{match.breakdown.segment || 0} {t("matches.pts")}</span>
                     </span>
                     <span className="bg-slate-900/80 border border-slate-800 px-3 py-1 rounded-full text-slate-400">
-                      {t("matches.maturity")}: <span className="text-indigo-400 ml-1">{match.breakdown.maturity || 0} {t("matches.pts")}</span>
+                      {t("matches.maturity")}: <span className="text-teal-400 ml-1">{match.breakdown.maturity || 0} {t("matches.pts")}</span>
                     </span>
                     <span className="bg-slate-900/80 border border-slate-800 px-3 py-1 rounded-full text-slate-400">
-                      {t("matches.readiness")}: <span className="text-indigo-400 ml-1">{match.breakdown.readiness || 0} {t("matches.pts")}</span>
+                      {t("matches.readiness")}: <span className="text-teal-400 ml-1">{match.breakdown.readiness || 0} {t("matches.pts")}</span>
                     </span>
                     <span className="bg-slate-900/80 border border-slate-800 px-3 py-1 rounded-full text-slate-400">
-                      {t("matches.needs")}: <span className="text-indigo-400 ml-1">{match.breakdown.needs || 0} {t("matches.pts")}</span>
+                      {t("matches.needs")}: <span className="text-teal-400 ml-1">{match.breakdown.needs || 0} {t("matches.pts")}</span>
                     </span>
                     {match.breakdown.semanticScore !== undefined && (
                       <span className="bg-slate-900/80 border border-slate-800 px-3 py-1 rounded-full text-slate-400">
-                        {t("matches.semantic")}: <span className="text-indigo-400 ml-1">{match.breakdown.semanticScore || 0} {t("matches.pts")}</span>
+                        {t("matches.semantic")}: <span className="text-teal-400 ml-1">{match.breakdown.semanticScore || 0} {t("matches.pts")}</span>
                       </span>
                     )}
                   </div>
@@ -263,7 +263,7 @@ export function Matches() {
                       console.error("Erro ao iniciar conversa", err);
                     }
                   }}
-                  className="flex-1 md:flex-none bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.25)] hover:shadow-[0_0_20px_rgba(79,70,229,0.45)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-200"
+                  className="flex-1 md:flex-none bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,181,156,0.25)] hover:shadow-[0_0_20px_rgba(0,181,156,0.45)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 duration-200"
                 >
                   {t("matches.interested")} <ArrowRight size={14} />
                 </button>

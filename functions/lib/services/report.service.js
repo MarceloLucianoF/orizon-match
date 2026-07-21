@@ -56,7 +56,7 @@ async function generateIntelligenceReport(projectId) {
         baseURL: "https://integrate.api.nvidia.com/v1",
     });
     const prompt = `
-    Você é um Consultor de Inovação Estratégica Senior da Orizon Match.
+    Você é um Consultor de Inovação Estratégica Senior da InovaHelix.
     Sua tarefa é gerar um "Executive Briefing" de altíssimo nível para o projeto abaixo.
     O tom deve ser executivo, analítico e persuasivo.
 
@@ -99,7 +99,7 @@ async function generateIntelligenceReport(projectId) {
     - **Fase 3: Expansão de Mercado** - Detalhes...)
 
     ## Conclusão Consultiva
-    (Recomendação final e parecer da Orizon Match sobre o investimento/parceria.)
+    (Recomendação final e parecer da InovaHelix sobre o investimento/parceria.)
 
     > **[Risco]** (Escreva um aviso sobre o maior risco técnico, regulatório ou de mercado que precisa ser mitigado no curto prazo.)
 

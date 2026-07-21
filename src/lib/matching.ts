@@ -190,7 +190,7 @@ export function calculateMatch(project: any, target: any) {
  * Diferencia as explicações por nível de score para evitar textos genéricos repetidos.
  */
 export function explainMatch(breakdown: any): string {
-  if (!breakdown) return "Compatibilidade identificada pelo algoritmo Orizon";
+  if (!breakdown) return "Compatibilidade identificada pelo algoritmo InovaHelix";
 
   const reasons: string[] = [];
 
@@ -312,7 +312,7 @@ export function getMatchTier(score: number): { label: string; color: string; bgC
  */
 export function getScoreColor(score: number): string {
   if (score >= 80) return "text-emerald-400";
-  if (score >= 65) return "text-indigo-400";
+  if (score >= 65) return "text-teal-400";
   if (score >= 50) return "text-amber-400";
   return "text-slate-400";
 }

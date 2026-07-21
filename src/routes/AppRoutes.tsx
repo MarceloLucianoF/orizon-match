@@ -29,7 +29,7 @@ function PrivateRoute() {
 
   if (loading) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-indigo-500">
+      <div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-teal-500">
         <Loader2 className="animate-spin" size={48} />
       </div>
     );
@@ -51,7 +51,7 @@ export function AppRoutes() {
 
   if (loading) {
     return (
-      <div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-indigo-500">
+      <div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-teal-500">
         <Loader2 className="animate-spin" size={48} />
       </div>
     );
@@ -59,7 +59,7 @@ export function AppRoutes() {
 
   return (
     <Suspense fallback={
-      <div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-indigo-500">
+      <div className="h-screen w-screen flex items-center justify-center bg-[#020617] text-teal-500">
         <Loader2 className="animate-spin" size={48} />
       </div>
     }>

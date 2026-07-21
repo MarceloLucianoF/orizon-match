@@ -21,7 +21,7 @@ export function ResearchersTab({
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
         <div>
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <GraduationCap className="text-indigo-400" size={24} /> {t("dashboard.organization.researchers.title")}
+            <GraduationCap className="text-teal-400" size={24} /> {t("dashboard.organization.researchers.title")}
           </h2>
           <p className="text-slate-400 text-xs mt-1">{t("dashboard.organization.researchers.subtitle")}</p>
         </div>
@@ -32,7 +32,7 @@ export function ResearchersTab({
             value={researchersSearch}
             onChange={e => setResearchersSearch(e.target.value)}
             placeholder={t("dashboard.organization.researchers.searchPlaceholder")}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/15 transition-all"
+            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-200 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/15 transition-all"
           />
         </div>
       </div>
@@ -72,7 +72,7 @@ export function ResearchersTab({
 
             <button 
               onClick={() => openModal('allocate_researcher', r)}
-              className="w-full py-2.5 bg-indigo-600/10 hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/20 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all"
+              className="w-full py-2.5 bg-teal-600/10 hover:bg-teal-600/20 text-teal-400 border border-teal-500/20 rounded-xl text-[10px] uppercase tracking-widest font-black transition-all"
             >
               {t("dashboard.organization.researchers.assignBtn")}
             </button>

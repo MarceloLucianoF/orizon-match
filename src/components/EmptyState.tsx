@@ -21,7 +21,7 @@ export function EmptyState({ icon: Icon, title, description, ctaLabel, ctaLink, 
       {ctaLabel && ctaLink && (
         <Link
           to={ctaLink}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 md:px-6 py-2.5 rounded-xl text-sm font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)] flex items-center gap-2"
+          className="bg-teal-600 hover:bg-teal-500 text-white px-5 md:px-6 py-2.5 rounded-xl text-sm font-medium transition-all shadow-[0_0_15px_rgba(0,181,156,0.2)] flex items-center gap-2"
         >
           {ctaLabel}
         </Link>
@@ -29,7 +29,7 @@ export function EmptyState({ icon: Icon, title, description, ctaLabel, ctaLink, 
       {ctaLabel && onCtaClick && !ctaLink && (
         <button
           onClick={onCtaClick}
-          className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 md:px-6 py-2.5 rounded-xl text-sm font-medium transition-all shadow-[0_0_15px_rgba(79,70,229,0.2)]"
+          className="bg-teal-600 hover:bg-teal-500 text-white px-5 md:px-6 py-2.5 rounded-xl text-sm font-medium transition-all shadow-[0_0_15px_rgba(0,181,156,0.2)]"
         >
           {ctaLabel}
         </button>

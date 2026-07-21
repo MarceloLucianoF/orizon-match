@@ -36,7 +36,7 @@ export function Billing() {
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in duration-500">
       <div>
         <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
-          <CreditCard className="text-indigo-400" /> Assinatura e Faturamento
+          <CreditCard className="text-teal-400" /> Assinatura e Faturamento
         </h1>
         <p className="text-slate-400 mt-1 text-sm md:text-base">Gerencie seu plano, faturas e métodos de pagamento.</p>
       </div>
@@ -44,12 +44,12 @@ export function Billing() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Card do Plano Atual */}
         <div className="md:col-span-2 bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 relative overflow-hidden group shadow-card backdrop-blur-sm">
-          <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full blur-3xl opacity-20 transition-all duration-500 ${isPremium ? 'bg-indigo-500 group-hover:scale-150' : 'bg-slate-500'}`} />
+          <div className={`absolute top-0 right-0 w-32 h-32 -mr-16 -mt-16 rounded-full blur-3xl opacity-20 transition-all duration-500 ${isPremium ? 'bg-teal-500 group-hover:scale-150' : 'bg-slate-500'}`} />
           
           <div className="relative z-10 flex flex-col h-full">
             <div className="flex justify-between items-start">
               <div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400 bg-indigo-500/10 px-2 py-1 rounded border border-indigo-500/20">Seu Plano Atual</span>
+                <span className="text-[10px] font-black uppercase tracking-widest text-teal-400 bg-teal-500/10 px-2 py-1 rounded border border-teal-500/20">Seu Plano Atual</span>
                 <h2 className="text-3xl font-black text-white mt-4 tracking-tight">{planName}</h2>
               </div>
               {isPremium && (
@@ -78,7 +78,7 @@ export function Billing() {
               {!isPremium ? (
                 <Link 
                   to="/pricing"
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(79,70,229,0.3)]"
+                  className="bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-[0_0_20px_rgba(0,181,156,0.3)]"
                 >
                   <ArrowUpCircle size={18} /> Fazer Upgrade Agora
                 </Link>
@@ -120,7 +120,7 @@ export function Billing() {
       <div className="bg-slate-900/40 border border-slate-800/80 rounded-3xl overflow-hidden shadow-card backdrop-blur-sm">
         <div className="p-6 border-b border-slate-800 bg-slate-900/10 flex justify-between items-center">
           <h2 className="text-sm font-black uppercase tracking-widest text-slate-200 flex items-center gap-2">
-            <Receipt className="text-indigo-400" size={18} /> Histórico de Faturas
+            <Receipt className="text-teal-400" size={18} /> Histórico de Faturas
           </h2>
         </div>
         
@@ -155,7 +155,7 @@ export function Billing() {
                     <td className="p-4 text-xs text-slate-400">{inv.date}</td>
                     <td className="p-4 text-sm font-bold text-white">{inv.amount}</td>
                     <td className="p-4 text-right">
-                      <button className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-indigo-400 transition-all">
+                      <button className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-teal-400 transition-all">
                         <Download size={18} />
                       </button>
                     </td>

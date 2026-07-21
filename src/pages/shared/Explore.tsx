@@ -40,11 +40,11 @@ function FilterSelect({
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="peer w-full appearance-none bg-slate-950 border border-slate-700/80 text-sm text-slate-200 rounded-xl px-3.5 py-3 pr-10 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/10 transition-all shadow-inner shadow-black/10"
+        className="peer w-full appearance-none bg-slate-950 border border-slate-700/80 text-sm text-slate-200 rounded-xl px-3.5 py-3 pr-10 outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/10 transition-all shadow-inner shadow-black/10"
       >
         {children}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 peer-focus:text-indigo-400 transition-colors" size={16} />
+      <ChevronDown className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 peer-focus:text-teal-400 transition-colors" size={16} />
     </div>
   );
 }
@@ -328,7 +328,7 @@ export function Explore() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-slate-100 flex items-center gap-3">
-            <Compass className="text-indigo-400" size={24} /> {t("explore.title")}
+            <Compass className="text-teal-400" size={24} /> {t("explore.title")}
           </h1>
           <p className="text-slate-400 mt-1 text-sm">
             {t("explore.subtitle")}
@@ -354,12 +354,12 @@ export function Explore() {
               onChange={e => setFilters({ ...filters, search: e.target.value })}
               onKeyDown={e => e.key === "Enter" && handleSearch()}
               placeholder={t("explore.searchPlaceholder")}
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-indigo-500 transition-all text-sm"
+              className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-4 py-3 text-slate-200 outline-none focus:border-teal-500 transition-all text-sm"
             />
           </div>
           <button 
             onClick={handleSearch}
-            className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl font-medium transition-all text-sm flex items-center justify-center gap-2 shrink-0"
+            className="w-full md:w-auto bg-teal-600 hover:bg-teal-500 text-white px-5 py-3 rounded-xl font-medium transition-all text-sm flex items-center justify-center gap-2 shrink-0"
           >
             <Search size={16} /> {t("explore.search")}
           </button>
@@ -414,7 +414,7 @@ export function Explore() {
 
           <label
             htmlFor="ictFilter"
-            className="flex items-center justify-between gap-3 bg-slate-950/90 border border-slate-700/80 rounded-xl px-3.5 py-3 text-sm text-slate-200 cursor-pointer hover:border-indigo-500/70 hover:bg-slate-950 transition duration-200 md:col-span-2 xl:col-span-2 shadow-inner shadow-black/10"
+            className="flex items-center justify-between gap-3 bg-slate-950/90 border border-slate-700/80 rounded-xl px-3.5 py-3 text-sm text-slate-200 cursor-pointer hover:border-teal-500/70 hover:bg-slate-950 transition duration-200 md:col-span-2 xl:col-span-2 shadow-inner shadow-black/10"
           >
             <span className="flex items-center gap-2 min-w-0">
               <input 
@@ -422,7 +422,7 @@ export function Explore() {
                 id="ictFilter" 
                 checked={!!filters.onlyIctVerified}
                 onChange={e => setFilters({ ...filters, onlyIctVerified: e.target.checked })}
-                className="w-4 h-4 shrink-0 text-indigo-600 rounded border-slate-700 bg-slate-950 focus:ring-indigo-500 focus:ring-offset-0"
+                className="w-4 h-4 shrink-0 text-teal-600 rounded border-slate-700 bg-slate-950 focus:ring-teal-500 focus:ring-offset-0"
               />
               <span className="flex items-center gap-1.5 font-semibold truncate">
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -436,13 +436,13 @@ export function Explore() {
 
           <div className="flex items-center gap-2 text-sm text-slate-400 bg-slate-950 border border-slate-700/80 rounded-xl px-3.5 py-3 md:col-span-2 xl:col-span-2 shadow-inner shadow-black/10">
             <span className="text-[11px] uppercase tracking-[0.14em] text-slate-500">{t("explore.minScore")}</span>
-            <span className="font-bold text-indigo-400 tabular-nums">{filters.minScore || 50}%</span>
+            <span className="font-bold text-teal-400 tabular-nums">{filters.minScore || 50}%</span>
             <input 
               type="range" 
               min="0" max="90" step="10"
               value={filters.minScore || 50}
               onChange={e => setFilters({ ...filters, minScore: Number(e.target.value) })}
-              className="flex-1 accent-indigo-500"
+              className="flex-1 accent-teal-500"
             />
           </div>
         </div>
@@ -451,7 +451,7 @@ export function Explore() {
       {/* Results */}
       {loading ? (
         <div className="flex justify-center p-12">
-          <Loader2 className="animate-spin text-indigo-500" size={32} />
+          <Loader2 className="animate-spin text-teal-500" size={32} />
         </div>
       ) : results.length === 0 ? (
         <div className="bg-slate-900/50 border border-slate-800 rounded-2xl">
@@ -470,7 +470,7 @@ export function Explore() {
             const tier = getMatchTier(project.score);
             const scoreColor = getScoreColor(project.score);
             return (
-              <div key={project.id} className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 md:p-7 hover:border-indigo-500/25 shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_-15px_rgba(99,102,241,0.06)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col md:flex-row md:items-center gap-6 relative overflow-hidden backdrop-blur-sm">
+              <div key={project.id} className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-6 md:p-7 hover:border-teal-500/25 shadow-[0_8px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_-15px_rgba(0,181,156,0.06)] hover:-translate-y-0.5 transition-all duration-300 flex flex-col md:flex-row md:items-center gap-6 relative overflow-hidden backdrop-blur-sm">
                 {/* Score circle */}
                 <div className="flex-shrink-0 flex flex-col items-center justify-center w-18 h-18 md:w-22 md:h-22 rounded-full border-4 border-slate-800/60 relative bg-slate-950/80 mx-auto md:mx-0 shadow-inner">
                   <span className={`text-xl md:text-2xl font-extrabold ${scoreColor} tracking-tight`}>{project.score}%</span>
@@ -501,8 +501,8 @@ export function Explore() {
                     )}
 
                     {(project.isIctVerified || project.validatedMaturity) && (
-                      <span className="bg-indigo-500/5 text-indigo-400 text-[10px] px-2 py-0.5 rounded-md border border-indigo-500/15 font-bold flex items-center gap-1">
-                        <ShieldCheck size={11} className="text-indigo-400" /> {t("explore.ictVerified")}
+                      <span className="bg-teal-500/5 text-teal-400 text-[10px] px-2 py-0.5 rounded-md border border-teal-500/15 font-bold flex items-center gap-1">
+                        <ShieldCheck size={11} className="text-teal-400" /> {t("explore.ictVerified")}
                       </span>
                     )}
                   </div>
@@ -517,7 +517,7 @@ export function Explore() {
                     <span className="bg-emerald-500/5 text-emerald-400 border border-emerald-500/15 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm">
                       💰 Busca: {project.ticketRange === '50k' ? '< R$ 250k' : project.ticketRange === '250k' ? 'R$ 250k - R$ 1M' : project.ticketRange === '1m' ? '> R$ 1M' : 'Sob Consulta'}
                     </span>
-                    <span className="bg-indigo-500/5 text-indigo-400 border border-indigo-500/15 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm">
+                    <span className="bg-teal-500/5 text-teal-400 border border-teal-500/15 px-2.5 py-1 rounded-lg flex items-center gap-1.5 shadow-sm">
                       ⚙️ TRL {project.declaredTRL || project.maturity || 1}
                     </span>
                     {project.isIctVerified && (
@@ -535,20 +535,20 @@ export function Explore() {
                   {project.breakdown && (
                     <div className="flex flex-wrap gap-2 text-[9px] uppercase font-bold tracking-wider justify-center md:justify-start">
                       <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
-                        {t("matches.segment")}: <span className="text-indigo-400 ml-1">{project.breakdown.segment || 0} {t("matches.pts")}</span>
+                        {t("matches.segment")}: <span className="text-teal-400 ml-1">{project.breakdown.segment || 0} {t("matches.pts")}</span>
                       </span>
                       <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
-                        {t("matches.maturity")}: <span className="text-indigo-400 ml-1">{project.breakdown.maturity || 0} {t("matches.pts")}</span>
+                        {t("matches.maturity")}: <span className="text-teal-400 ml-1">{project.breakdown.maturity || 0} {t("matches.pts")}</span>
                       </span>
                       <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
-                        {t("matches.readiness")}: <span className="text-indigo-400 ml-1">{project.breakdown.readiness || 0} {t("matches.pts")}</span>
+                        {t("matches.readiness")}: <span className="text-teal-400 ml-1">{project.breakdown.readiness || 0} {t("matches.pts")}</span>
                       </span>
                       <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
-                        {t("matches.needs")}: <span className="text-indigo-400 ml-1">{project.breakdown.needs || 0} {t("matches.pts")}</span>
+                        {t("matches.needs")}: <span className="text-teal-400 ml-1">{project.breakdown.needs || 0} {t("matches.pts")}</span>
                       </span>
                       {project.breakdown.semanticScore !== undefined && (
                         <span className="bg-slate-950 border border-slate-800/80 px-2.5 py-0.5 rounded-md text-slate-400">
-                          {t("matches.semantic")}: <span className="text-indigo-400 ml-1">{project.breakdown.semanticScore || 0} {t("matches.pts")}</span>
+                          {t("matches.semantic")}: <span className="text-teal-400 ml-1">{project.breakdown.semanticScore || 0} {t("matches.pts")}</span>
                         </span>
                       )}
                     </div>
@@ -567,7 +567,7 @@ export function Explore() {
                         </div>
                         {/* Cadeado sobreposto */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="bg-indigo-650 hover:bg-indigo-650 text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 transition-all border border-indigo-500/30">
+                          <span className="bg-teal-650 hover:bg-teal-650 text-white text-[10px] font-black uppercase tracking-wider px-3.5 py-2 rounded-xl shadow-lg flex items-center gap-1.5 transition-all border border-teal-500/30">
                             🔒 Assine o Plano Corporate para ver a Patente
                           </span>
                         </div>
@@ -578,7 +578,7 @@ export function Explore() {
                         <p><strong className="text-slate-355">Pesquisador Principal:</strong> {project.researcher || "Prof. Rafael Silva"}</p>
                         <p>
                           <strong className="text-slate-355">Patente/Registro:</strong>{" "}
-                          <span className="text-indigo-400 font-bold hover:underline cursor-pointer">
+                          <span className="text-teal-400 font-bold hover:underline cursor-pointer">
                             {project.patentStatus || "Concedida (BR 10 2024)"}
                           </span>
                         </p>
@@ -592,7 +592,7 @@ export function Explore() {
                   <button 
                     onClick={() => handleConnect(project)}
                     disabled={connecting === project.id || userProjects.length === 0}
-                    className="bg-indigo-600 hover:bg-indigo-500 disabled:bg-slate-900/60 disabled:text-slate-500 disabled:border-slate-800/80 text-white px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/35 border border-indigo-500/20 flex items-center gap-2 w-full md:w-auto justify-center"
+                    className="bg-teal-600 hover:bg-teal-500 disabled:bg-slate-900/60 disabled:text-slate-500 disabled:border-slate-800/80 text-white px-5 py-3 rounded-xl text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/35 border border-teal-500/20 flex items-center gap-2 w-full md:w-auto justify-center"
                   >
                     {connecting === project.id ? (
                       <Loader2 className="animate-spin" size={16} />
@@ -625,7 +625,7 @@ export function Explore() {
                     userProfile?.role === 'industry') && (
                     <button
                       onClick={() => handleOpenBriefing(project)}
-                      className="bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-fuchsia-500/10 hover:shadow-fuchsia-500/20 flex items-center justify-center gap-1.5 w-full md:w-auto border border-fuchsia-500/20"
+                      className="bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-550 hover:to-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 shadow-lg shadow-teal-500/10 hover:shadow-teal-500/20 flex items-center justify-center gap-1.5 w-full md:w-auto border border-teal-500/20"
                     >
                       <span>✨ Analista IA</span>
                     </button>
@@ -644,7 +644,7 @@ export function Explore() {
               <button 
                 onClick={() => loadResults(true)}
                 disabled={loading}
-                className="bg-indigo-600/10 hover:bg-indigo-600/20 border border-indigo-500/20 hover:border-indigo-500/40 text-indigo-400 font-bold px-6 py-3 rounded-xl transition text-sm flex items-center gap-2"
+                className="bg-teal-650/10 hover:bg-teal-650/20 border border-teal-500/20 hover:border-teal-500/40 text-teal-400 font-bold px-6 py-3 rounded-xl transition text-sm flex items-center gap-2"
               >
                 {loading ? <Loader2 className="animate-spin" size={16} /> : "Carregar Mais Projetos"}
               </button>
@@ -660,13 +660,13 @@ export function Explore() {
             {/* Header */}
             <div className="p-6 border-b border-slate-800 bg-slate-900/90 flex justify-between items-center shrink-0">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-gradient-to-r from-fuchsia-500/10 to-indigo-500/10 text-fuchsia-400 border border-fuchsia-500/20">
+                <div className="p-2.5 rounded-xl bg-gradient-to-r from-teal-500/10 to-emerald-500/10 text-teal-400 border border-teal-500/20">
                   <Compass size={22} className="animate-pulse" />
                 </div>
                 <div>
                   <h4 className="text-base font-bold text-white flex items-center gap-2">
                     AI Scouting Briefing
-                    <span className="text-[9px] px-2 py-0.5 rounded bg-fuchsia-500/10 text-fuchsia-400 border border-fuchsia-500/20 font-bold uppercase tracking-wider">
+                    <span className="text-[9px] px-2 py-0.5 rounded bg-teal-500/10 text-teal-400 border border-teal-500/20 font-bold uppercase tracking-wider">
                       Virtual Analyst
                     </span>
                   </h4>
@@ -689,7 +689,7 @@ export function Explore() {
                 <h5 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Projeto Alvo</h5>
                 <h3 className="text-lg font-bold text-slate-100">{briefingProject.title}</h3>
                 <div className="flex flex-wrap gap-2 pt-1 text-[10px] font-bold">
-                  <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">
+                  <span className="bg-teal-500/10 text-teal-400 border border-teal-500/20 px-2 py-0.5 rounded">
                     Maturidade: TRL {briefingProject.declaredTRL || briefingProject.maturity || 1}
                   </span>
                   <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded">
@@ -704,7 +704,7 @@ export function Explore() {
               {/* Briefing body */}
               {generatingBriefing ? (
                 <div className="py-20 flex flex-col items-center justify-center space-y-4">
-                  <Loader2 className="animate-spin text-fuchsia-500" size={40} />
+                  <Loader2 className="animate-spin text-teal-500" size={40} />
                   <div className="text-center space-y-1">
                     <p className="text-sm font-bold text-slate-300 animate-pulse">Gemini Executando Prospecção...</p>
                     <p className="text-xs text-slate-500">Mapeando TRL, market-fit, incentivos fiscais e SWOT com Gemini.</p>
@@ -717,7 +717,7 @@ export function Explore() {
                       return <h4 key={idx} className="text-sm font-bold text-slate-200 mt-6 mb-2">{line.replace("### ", "")}</h4>;
                     }
                     if (line.trim().startsWith("## ")) {
-                      return <h3 key={idx} className="text-base font-bold text-indigo-400 mt-8 mb-3 border-b border-slate-800 pb-2">{line.replace("## ", "")}</h3>;
+                      return <h3 key={idx} className="text-base font-bold text-teal-400 mt-8 mb-3 border-b border-slate-800 pb-2">{line.replace("## ", "")}</h3>;
                     }
                     if (line.trim().startsWith("# ")) {
                       return <h2 key={idx} className="text-lg font-bold text-white mt-10 mb-4">{line.replace("# ", "")}</h2>;
@@ -731,7 +731,7 @@ export function Explore() {
               ) : (
                 // Unprocessed / CTA to generate
                 <div className="border border-dashed border-slate-800 rounded-2xl p-10 text-center space-y-6 py-16 bg-slate-900/20">
-                  <div className="w-16 h-16 rounded-full bg-fuchsia-500/10 text-fuchsia-400 flex items-center justify-center mx-auto">
+                  <div className="w-16 h-16 rounded-full bg-teal-500/10 text-teal-400 flex items-center justify-center mx-auto">
                     <Compass size={28} className="animate-pulse" />
                   </div>
                   <div className="max-w-md mx-auto space-y-2">
@@ -742,7 +742,7 @@ export function Explore() {
                   </div>
                   <button
                     onClick={handleTriggerBriefing}
-                    className="bg-gradient-to-r from-fuchsia-600 to-indigo-600 hover:from-fuchsia-500 hover:to-indigo-500 text-white px-6 py-3 rounded-xl font-bold text-xs shadow-[0_0_20px_rgba(217,70,239,0.3)] transition-all"
+                    className="bg-gradient-to-r from-teal-650 to-emerald-600 hover:from-teal-550 hover:to-emerald-500 text-white px-6 py-3 rounded-xl font-bold text-xs shadow-[0_0_20px_rgba(0,181,156,0.3)] transition-all"
                   >
                     Solicitar Briefing do Analista Virtual (Gemini)
                   </button>

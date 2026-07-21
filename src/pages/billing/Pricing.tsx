@@ -34,7 +34,7 @@ const INVENTOR_PLANS = [
     description: 'Ferramentas de IA para otimização de pitches e VDR Room.',
     features: [
       'Matches ilimitados (AI Multi-Factor)',
-      'Orizon Advisor (Chat IA Contextual)',
+      'InovaHelix Advisor (Chat IA Contextual)',
       'Pitch enhancer IA',
       'VDR Room ilimitado',
       'Destaque básico no Radar'
@@ -166,17 +166,17 @@ export default function Pricing() {
     <div className="min-h-screen bg-[#020617] text-slate-200 py-20 px-6 relative overflow-hidden">
       {/* Background Gradients */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-teal-500/10 blur-[120px]" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-cyan-500/10 blur-[120px]" />
       </div>
 
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="text-center space-y-4 mb-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-widest">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 text-teal-400 text-[10px] font-bold uppercase tracking-widest">
             <Zap size={12} /> Planos & Preços
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-white tracking-tight">
-            Acelere sua Inovação no <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">Orizon Match</span>
+            Acelere sua Inovação no <span className="bg-gradient-to-r from-teal-400 to-cyan-400 bg-clip-text text-transparent">InovaHelix</span>
           </h1>
           <p className="text-slate-400 max-w-2xl mx-auto text-lg">
             Escolha o plano ideal para conectar sua ideia ao mercado ou encontrar tecnologias disruptivas.
@@ -190,7 +190,7 @@ export default function Pricing() {
               onClick={() => setActiveCategory('inventor')}
               className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer ${
                 activeCategory === 'inventor' 
-                  ? 'bg-indigo-600 text-white shadow-xl border border-indigo-500/30' 
+                  ? 'bg-teal-600 text-white shadow-xl border border-teal-500/30' 
                   : 'text-slate-500 hover:text-slate-350'
               }`}
             >
@@ -200,7 +200,7 @@ export default function Pricing() {
               onClick={() => setActiveCategory('company')}
               className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all cursor-pointer ${
                 activeCategory === 'company' 
-                  ? 'bg-indigo-600 text-white shadow-xl border border-indigo-500/30' 
+                  ? 'bg-teal-600 text-white shadow-xl border border-teal-500/30' 
                   : 'text-slate-500 hover:text-slate-350'
               }`}
             >
@@ -220,12 +220,12 @@ export default function Pricing() {
                 key={plan.id}
                 className={`relative p-8 rounded-3xl border transition-all duration-500 flex flex-col justify-between ${
                   plan.highlight 
-                  ? 'bg-gradient-to-b from-slate-900/90 to-slate-950/90 border-indigo-500/50 shadow-[0_20px_50px_rgba(99,102,241,0.15)] scale-105 z-20 hover:border-indigo-500 hover:shadow-[0_20px_60px_rgba(99,102,241,0.22)] hover:-translate-y-1' 
+                  ? 'bg-gradient-to-b from-slate-900/90 to-slate-950/90 border-teal-500/50 shadow-[0_20px_50px_rgba(0,181,156,0.15)] scale-105 z-20 hover:border-teal-500 hover:shadow-[0_20px_60px_rgba(0,181,156,0.22)] hover:-translate-y-1' 
                   : 'bg-slate-900/40 border-slate-800/80 scale-100 z-10 hover:border-slate-700/80 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)]'
                 }`}
               >
                 {plan.highlight && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-teal-600 text-white text-[10px] font-black uppercase tracking-widest shadow-lg">
                     Mais Popular
                   </div>
                 )}
@@ -233,7 +233,7 @@ export default function Pricing() {
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-2 flex items-center gap-2">
-                      {plan.premium ? <Star className="text-amber-400 fill-amber-400" size={24} /> : <Rocket className="text-indigo-400" size={24} />}
+                      {plan.premium ? <Star className="text-amber-400 fill-amber-400" size={24} /> : <Rocket className="text-teal-400" size={24} />}
                       {plan.name}
                     </h3>
                     <p className="text-slate-400 text-sm leading-relaxed min-h-[48px]">{plan.description}</p>
@@ -247,7 +247,7 @@ export default function Pricing() {
                   <div className="space-y-4 pt-4">
                     {plan.features.map((feature, idx) => (
                       <div key={idx} className="flex items-start gap-3 group">
-                        <div className={`mt-1 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${plan.highlight ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-800 text-slate-500'}`}>
+                        <div className={`mt-1 flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center ${plan.highlight ? 'bg-teal-500/20 text-teal-400' : 'bg-slate-800 text-slate-500'}`}>
                           <Check size={12} />
                         </div>
                         <span className="text-sm text-slate-300 group-hover:text-white transition-colors">{feature}</span>
@@ -267,7 +267,7 @@ export default function Pricing() {
                       isCurrentPlan
                       ? 'bg-slate-800/80 text-slate-500 cursor-default'
                       : plan.highlight
-                        ? 'bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_0_20px_rgba(79,70,229,0.3)] cursor-pointer'
+                        ? 'bg-teal-600 text-white hover:bg-teal-500 shadow-[0_0_20px_rgba(0,181,156,0.3)] cursor-pointer'
                         : 'bg-slate-850 text-slate-300 hover:bg-slate-800 cursor-pointer border border-slate-700/50'
                     }`}
                   >

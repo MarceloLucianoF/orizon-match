@@ -1,4 +1,4 @@
-# Plano de Update - InovaHelix
+![alt text](image.png)# Plano de Update - InovaHelix
 
 Data de atualizacao: 2026-05-04
 
@@ -9,10 +9,11 @@ embutindo inteligencia de produto desde o inicio (score + explicacao de match).
 
 ## Status Geral
 
-- Fase A: concluida
-- Fase B: em andamento (forte avanco)
-- Fase C: iniciada (com reorganizacao de estrutura)
-- Fase D: nao iniciada
+- Fase A: Concluída
+- Fase B: Concluída
+- Fase C: Concluída
+- Fase D: Concluída
+- Rebranding & Sweep InovaHelix: Concluído e Validado
 
 ## Progresso por Fase
 
@@ -63,33 +64,33 @@ embutindo inteligencia de produto desde o inicio (score + explicacao de match).
 - [x] Estrutura de collections centralizada em `src/firebase/models/schema.ts`.
 - [x] Tipagem de documentos (`users`, `projects`, `matches`, `interests`, `onboarding_drafts`).
 - [x] Plano inicial de indexes para consultas de match e projetos.
-- [ ] Criar regras Firestore alinhadas ao novo modelo.
-- [ ] Implementar servicos de leitura/escrita para o wizard e dashboard.
+- [x] Criar regras Firestore alinhadas ao novo modelo.
+- [x] Implementar servicos de leitura/escrita para o wizard e dashboard.
 
-### Fase D - Match Engine no fluxo final (Nao iniciada)
+### Fase D - Match Engine no fluxo final (Concluída)
 
-- [ ] Persistir onboarding no Firebase.
-- [ ] Ligar wizard ao schema completo de projeto em producao.
-- [ ] Exibir matches reais por usuario logado.
-- [ ] Implementar acao "Tenho interesse".
+- [x] Persistir onboarding no Firebase.
+- [x] Ligar wizard ao schema completo de projeto em producao.
+- [x] Exibir matches reais por usuario logado.
+- [x] Implementar acao "Tenho interesse".
 
 ## Backlog Imediato
 
-1. Integrar contexto de autenticacao real no roteamento e na Navbar.
-2. Substituir paginas placeholder de login/register por versoes finais.
-3. Evoluir wizard para passos guiados completos (problema, solucao, mercado, proximos passos).
-4. Conectar submit do wizard com persistencia Firebase (draft + publicacao).
-5. Criar pagina de matches consumindo dados reais do usuario.
-6. Criar regras e indexes no Firebase a partir de `src/firebase/models/schema.ts`.
+1. Integrar contexto de autenticacao real no roteamento e na Navbar (Concluído).
+2. Substituir paginas placeholder de login/register por versoes finais (Concluído).
+3. Evoluir wizard para passos guiados completos (Concluído).
+4. Conectar submit do wizard com persistencia Firebase (Concluído).
+5. Criar pagina de matches consumindo dados reais do usuario (Concluído).
+6. Criar regras e indexes no Firebase a partir de `src/firebase/models/schema.ts` (Concluído).
 
 ## Riscos e Observacoes
 
 - Tailwind v4 exige cuidado com `@apply` em utilitarios customizados.
 - Em v4, tokens de cor custom precisam estar no `@theme` do CSS de entrada.
-- O fluxo atual usa usuario mockado no layout para acelerar migracao de UI.
+- O fluxo de transição está blindado no contrato e no roteamento do app.
 
 ## Criterio para fechar Fase C
 
-- Fluxo onboarding completo (perfil -> wizard -> salvamento).
-- Dashboard consumindo projeto salvo.
-- Navegacao protegida por autenticacao real.
+- Fluxo onboarding completo (perfil -> wizard -> salvamento) (Concluído).
+- Dashboard consumindo projeto salvo (Concluído).
+- Navegacao protegida por autenticacao real (Concluído).

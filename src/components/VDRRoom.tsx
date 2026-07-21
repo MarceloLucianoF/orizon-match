@@ -82,10 +82,10 @@ export function VDRRoom({
   }, []);
 
   const getSessionId = () => {
-    let sid = sessionStorage.getItem("orizon_session_id");
+    let sid = sessionStorage.getItem("inovahelix_session_id");
     if (!sid) {
       sid = "sess_" + Math.random().toString(36).substring(2, 15) + "_" + Date.now();
-      sessionStorage.setItem("orizon_session_id", sid);
+      sessionStorage.setItem("inovahelix_session_id", sid);
     }
     return sid;
   };
@@ -109,11 +109,11 @@ export function VDRRoom({
     { name: 'Certificado_Deposito_Patente.pdf', type: 'PDF', size: '450 KB', status: 'verified', lastModified: '10/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'pi', accessLevel: 'public' },
     { name: 'Projecao_Financeira_2024_2027.xlsx', type: 'XLSX', size: '2.4 MB', status: 'verified', lastModified: '08/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'finance', accessLevel: 'restricted' },
     { name: 'Plano_de_Negocios_Resumido.pdf', type: 'PDF', size: '3.1 MB', status: 'verified', lastModified: '05/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'finance', accessLevel: 'restricted' },
-    { name: 'Estatuto_Social_Orizon.pdf', type: 'PDF', size: '1.8 MB', status: 'verified', lastModified: '01/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'legal', accessLevel: 'restricted' },
+    { name: 'Estatuto_Social_InovaHelix.pdf', type: 'PDF', size: '1.8 MB', status: 'verified', lastModified: '01/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'legal', accessLevel: 'restricted' },
     { name: 'Acordo_de_Confidencialidade_Padrao.pdf', type: 'PDF', size: '890 KB', status: 'verified', lastModified: '28/04/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'legal', accessLevel: 'restricted' },
     { name: 'Laudo_Laboratorial_Homologado.pdf', type: 'PDF', size: '3.8 MB', status: 'verified', lastModified: '18/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'scientific', accessLevel: 'restricted' },
     { name: 'Relatorio_Testes_Industriais_Fase_Piloto.pdf', type: 'PDF', size: '4.5 MB', status: 'verified', lastModified: '20/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'scientific', accessLevel: 'restricted' },
-    { name: 'Orizon_Match_Pitch_Deck_V3.pdf', type: 'PDF', size: '5.2 MB', status: 'verified', lastModified: '15/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'pitch', accessLevel: 'public' },
+    { name: 'InovaHelix_Pitch_Deck_V3.pdf', type: 'PDF', size: '5.2 MB', status: 'verified', lastModified: '15/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'pitch', accessLevel: 'public' },
     { name: 'Video_Demonstracao_MVP.mp4', type: 'MP4', size: '45 MB', status: 'pending', lastModified: '14/05/2024', uploadedBy: 'Sistema', uploadedAt: new Date(), version: '1.0', category: 'pitch', accessLevel: 'public' }
   ];
 
@@ -468,13 +468,13 @@ export function VDRRoom({
   }, [viewerFile, viewerStartTime]);
 
   return (
-    <div className="bg-[#020617] bg-[radial-gradient(circle_at_top,rgba(99,102,241,0.02),transparent_60%)] border border-slate-850 rounded-[2rem] overflow-hidden shadow-2xl flex flex-col min-h-[600px] relative">
+    <div className="bg-[#020617] bg-[radial-gradient(circle_at_top,rgba(0,181,156,0.02),transparent_60%)] border border-slate-850 rounded-[2rem] overflow-hidden shadow-2xl flex flex-col min-h-[600px] relative">
       
       {/* VDR Header */}
       <div className="p-6 border-b border-slate-850 bg-slate-950/60 backdrop-blur-md flex flex-wrap justify-between items-center gap-3">
         <div>
           <h3 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
-            <FolderOpen className="text-indigo-400" size={20} /> Virtual Data Room (VDR)
+            <FolderOpen className="text-teal-400" size={20} /> Virtual Data Room (VDR)
             {inpiBadge && (
               <span className={`text-[10px] px-2.5 py-0.5 rounded-full border font-bold ml-2 flex items-center gap-1 ${inpiBadge.color}`}>
                 <ShieldCheck size={10} /> {inpiBadge.label}
@@ -490,7 +490,7 @@ export function VDRRoom({
               onClick={() => setShowAuditLogs(!showAuditLogs)}
               className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border active:scale-95 duration-200 ${
                 showAuditLogs 
-                  ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' 
+                  ? 'bg-teal-500/10 text-teal-400 border-teal-500/30' 
                   : 'bg-slate-900 border-slate-800 hover:border-slate-700 text-slate-300 hover:text-white'
               }`}
             >
@@ -501,7 +501,7 @@ export function VDRRoom({
           {!isPublic && (
             <button 
               onClick={() => setShowUploadModal(true)}
-              className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(79,70,229,0.25)] hover:shadow-[0_0_20px_rgba(79,70,229,0.45)] active:scale-95 duration-200"
+              className="bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(0,181,156,0.25)] hover:shadow-[0_0_20px_rgba(0,181,156,0.45)] active:scale-95 duration-200"
             >
               <Upload size={14} /> Subir Documento
             </button>
@@ -520,12 +520,12 @@ export function VDRRoom({
                 onClick={() => setActiveFolder(folder.id)}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-300 border ${
                   activeFolder === folder.id 
-                  ? 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20 shadow-[0_4px_15px_rgba(99,102,241,0.05)] font-bold' 
+                  ? 'bg-teal-500/10 text-teal-400 border-teal-500/20 shadow-[0_4px_15px_rgba(0,181,156,0.05)] font-bold' 
                   : 'text-slate-450 hover:bg-slate-900/40 hover:text-slate-200 border-transparent'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <folder.icon size={18} className={activeFolder === folder.id ? 'text-indigo-400' : 'text-slate-500'} />
+                  <folder.icon size={18} className={activeFolder === folder.id ? 'text-teal-400' : 'text-slate-500'} />
                   <span className="text-sm font-medium">{folder.name}</span>
                 </div>
                 {folder.isLocked ? <Lock size={14} className="text-slate-650" /> : <ChevronRight size={14} className="text-slate-700" />}
@@ -541,14 +541,14 @@ export function VDRRoom({
             <div className="space-y-4 animate-in fade-in duration-300">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-xs font-bold text-slate-350 uppercase tracking-widest flex items-center gap-2">
-                  <Clock size={16} className="text-indigo-400" /> Histórico de Auditoria do VDR
+                  <Clock size={16} className="text-teal-400" /> Histórico de Auditoria do VDR
                 </h4>
                 <span className="text-[10px] text-slate-500 font-bold uppercase">{auditLogs.length} Ações</span>
               </div>
               
               {loadingLogs ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="animate-spin text-indigo-400" size={32} />
+                  <Loader2 className="animate-spin text-teal-400" size={32} />
                 </div>
               ) : auditLogs.length === 0 ? (
                 <div className="text-center py-12 text-slate-550 border border-dashed border-slate-800 rounded-2xl">
@@ -573,7 +573,7 @@ export function VDRRoom({
                           <td className="p-4">
                             <span className={`px-2 py-0.5 rounded-full border text-[9px] font-black uppercase tracking-wider ${
                               log.action === 'upload' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
-                              log.action === 'download' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400' :
+                              log.action === 'download' ? 'bg-teal-500/10 border-teal-500/20 text-teal-400' :
                               'bg-amber-500/10 border-amber-500/20 text-amber-400'
                             }`}>
                               {log.action}
@@ -592,14 +592,14 @@ export function VDRRoom({
           ) : !activeFolder ? (
             // Empty Folder State
             <div className="h-full flex flex-col items-center justify-center text-slate-500 space-y-4 animate-in fade-in duration-500 py-20">
-              <FolderOpen size={48} className="opacity-20 text-indigo-400" />
+              <FolderOpen size={48} className="opacity-20 text-teal-400" />
               <p className="text-xs">Selecione uma pasta para visualizar os arquivos confidenciais.</p>
             </div>
           ) : currentFolder?.isLocked ? (
             // Folder Locked State
             <div className="h-full flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in-95 duration-300 py-16">
               <div className="w-20 h-20 rounded-full bg-slate-950 border border-slate-850 flex items-center justify-center shadow-lg">
-                <Lock size={32} className="text-indigo-500 animate-pulse" />
+                <Lock size={32} className="text-teal-500 animate-pulse" />
               </div>
               <div className="max-w-xs">
                 <h4 className="text-slate-200 font-bold mb-2">Acesso Restrito</h4>
@@ -609,14 +609,14 @@ export function VDRRoom({
               </div>
               <button 
                 onClick={() => setShowNDAModal(true)}
-                className="bg-indigo-650 hover:bg-indigo-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(79,70,229,0.3)] hover:shadow-[0_0_25px_rgba(79,70,229,0.5)] active:scale-95 transition-all duration-200"
+                className="bg-teal-650 hover:bg-teal-600 text-white px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-[0_0_20px_rgba(0,181,156,0.3)] hover:shadow-[0_0_25px_rgba(0,181,156,0.5)] active:scale-95 transition-all duration-200"
               >
                 Solicitar Acesso / Assinar NDA
               </button>
             </div>
           ) : (
             // Folder Active View
-            <div className="space-y-4 animate-in slide-in-from-right-4 duration-305">
+            <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-xs font-bold text-slate-350 uppercase tracking-widest">{currentFolder?.name}</h4>
                 <span className="text-[10px] text-slate-500 font-bold uppercase">{activeFolderFiles.length} Arquivos</span>
@@ -624,18 +624,18 @@ export function VDRRoom({
               
               {loadingFiles ? (
                 <div className="flex justify-center py-12">
-                  <Loader2 className="animate-spin text-indigo-400" size={24} />
+                  <Loader2 className="animate-spin text-teal-400" size={24} />
                 </div>
               ) : activeFolderFiles.length === 0 ? (
                 <div className="text-center py-12 text-slate-500 border border-dashed border-slate-850 rounded-2xl">
-                  Nenhum arquivo nesta pasta.
+                  Nenhum documento nesta partição.
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-3">
                   {activeFolderFiles.map(file => (
-                    <div key={file.id} className="group bg-slate-950/40 border border-slate-850 hover:border-indigo-500/30 hover:shadow-[0_4px_20px_rgba(99,102,241,0.05)] hover:scale-[1.005] rounded-xl p-4 flex items-center justify-between transition-all duration-300 backdrop-blur-sm">
+                    <div key={file.id} className="group bg-slate-950/40 border border-slate-850 hover:border-teal-500/30 hover:shadow-[0_4px_20px_rgba(20,184,166,0.05)] hover:scale-[1.005] rounded-xl p-4 flex items-center justify-between transition-all duration-300 backdrop-blur-sm">
                       <div className="flex items-center gap-4">
-                        <div className="w-11 h-11 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-center text-slate-450 group-hover:text-indigo-400 transition-colors shadow-sm">
+                        <div className="w-11 h-11 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-center text-slate-450 group-hover:text-teal-400 transition-colors shadow-sm">
                           <FileText size={20} />
                         </div>
                         <div>
@@ -650,7 +650,7 @@ export function VDRRoom({
                               {file.status === 'verified' ? 'Auditado' : 'Em Análise'}
                             </span>
                             <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full border ${
-                              file.accessLevel === 'public' ? 'bg-indigo-500/10 border-indigo-500/25 text-indigo-400' : 'bg-red-500/10 border-red-500/25 text-red-400'
+                              file.accessLevel === 'public' ? 'bg-teal-500/10 border-teal-500/25 text-teal-400' : 'bg-red-500/10 border-red-500/25 text-red-400'
                             }`}>
                               {file.accessLevel === 'public' ? 'Público' : 'Restrito (NDA)'}
                             </span>
@@ -668,7 +668,7 @@ export function VDRRoom({
                         </button>
                         <button 
                           onClick={() => handleDownloadFile(file)}
-                          className="p-2 text-slate-400 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-xl transition-all duration-205 active:scale-90 border border-transparent hover:border-indigo-500/20" 
+                          className="p-2 text-slate-400 hover:text-teal-400 hover:bg-teal-500/10 rounded-xl transition-all duration-205 active:scale-90 border border-transparent hover:border-teal-500/20" 
                           title="Baixar"
                         >
                           <Download size={18} />
@@ -700,7 +700,7 @@ export function VDRRoom({
         <div className="absolute inset-0 z-50 flex items-center justify-center p-6 bg-slate-950/80 backdrop-blur-md rounded-3xl">
           <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl animate-in zoom-in-95 duration-300">
             <h3 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-              <Upload className="text-indigo-400" size={24} /> Upload de Documento Seguro
+              <Upload className="text-teal-400" size={24} /> Upload de Documento Seguro
             </h3>
             <p className="text-slate-400 text-xs mb-6">Insira um novo documento confidencial ou técnico no VDR do projeto.</p>
 
@@ -708,7 +708,7 @@ export function VDRRoom({
               {/* File Select */}
               <div 
                 onClick={() => fileInputRef.current?.click()}
-                className="border-2 border-dashed border-slate-800 hover:border-indigo-500/50 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-950/40"
+                className="border-2 border-dashed border-slate-800 hover:border-teal-500/50 rounded-2xl p-6 text-center cursor-pointer transition bg-slate-950/40"
               >
                 <input 
                   type="file" 
@@ -734,7 +734,7 @@ export function VDRRoom({
                 <select 
                   value={uploadCategory} 
                   onChange={(e) => setUploadCategory(e.target.value as any)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-teal-500"
                 >
                   <option value="pi">Propriedade Intelectual (PI)</option>
                   <option value="finance">Financeiro / Negócios</option>
@@ -750,7 +750,7 @@ export function VDRRoom({
                 <select 
                   value={uploadAccessLevel} 
                   onChange={(e) => setUploadAccessLevel(e.target.value as any)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 focus:outline-none focus:border-teal-500"
                 >
                   <option value="restricted">Restrito (Requer NDA assinado)</option>
                   <option value="public">Público (Visível para qualquer usuário)</option>
@@ -778,7 +778,7 @@ export function VDRRoom({
                 <button
                   type="submit"
                   disabled={uploading || !uploadFile}
-                  className="flex-1 bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-650/40 text-white py-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95"
+                  className="flex-1 bg-teal-600 hover:bg-teal-500 disabled:bg-teal-650/40 text-white py-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2 active:scale-95"
                 >
                   {uploading ? (
                     <>
@@ -816,7 +816,7 @@ export function VDRRoom({
             {/* Header */}
             <div className="p-5 border-b border-slate-850 bg-slate-950/90 backdrop-blur-md flex justify-between items-center z-50">
               <div className="flex items-center gap-3">
-                <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <div className="p-2 rounded-xl bg-teal-500/10 text-teal-400 border border-teal-500/20">
                   <ShieldCheck size={20} />
                 </div>
                 <div>
@@ -859,17 +859,17 @@ export function VDRRoom({
                 <div className="max-w-2xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-8 space-y-6 text-slate-300 font-serif leading-relaxed shadow-lg">
                   <div className="text-center space-y-2 border-b border-slate-800 pb-6">
                     <h2 className="text-xl font-bold font-sans text-slate-100 uppercase tracking-wide">
-                      Orizon Match - Acordo de Homologação
+                      InovaHelix - Acordo de Homologação
                     </h2>
                     <p className="text-xs font-mono text-slate-500 tracking-wider">
-                      CÓDIGO DE CONTROLE: OM-VDR-{viewerFile.id.toUpperCase()}-SECURE
+                      CÓDIGO DE CONTROLE: IH-VDR-{viewerFile.id.toUpperCase()}-SECURE
                     </p>
                   </div>
                   
                   <div className="space-y-4 text-xs font-sans text-slate-400 leading-normal">
                     <p>
-                      <strong>PROJETO:</strong> {projectTitle || "Inovação Orizon"} <br />
-                      <strong>CATEGORIA:</strong> {viewerFile.category.toUpperCase()} • <strong>NÍVEL:</strong> RESTRIITO (NDA)
+                      <strong>PROJETO:</strong> {projectTitle || "Inovação InovaHelix"} <br />
+                      <strong>CATEGORIA:</strong> {viewerFile.category.toUpperCase()} • <strong>NÍVEL:</strong> RESTRITO (NDA)
                     </p>
                     <p>
                       Este documento é de propriedade intelectual exclusiva e contém informações comerciais confidenciais, segredos industriais e dados laboratoriais protegidos nos termos da Lei Federal nº 9.279/96 (Propriedade Industrial) e sob o amparo do Acordo de Confidencialidade firmado previamente por clique digital (clickwrap) sob a chave de hash do investidor.
@@ -893,7 +893,7 @@ export function VDRRoom({
                   <div className="pt-8 flex justify-between text-[10px] font-sans text-slate-500">
                     <div>
                       <p className="font-bold text-slate-400">Assinado Digitalmente por:</p>
-                      <p>Inatel NIT Management - Sistema Orizon</p>
+                      <p>Inatel NIT Management - Sistema InovaHelix</p>
                     </div>
                     <div className="text-right">
                       <p className="font-bold text-slate-400">Hash de Validação:</p>

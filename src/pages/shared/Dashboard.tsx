@@ -12,7 +12,7 @@ export function Dashboard() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <Loader2 className="animate-spin text-indigo-500" size={48} />
+        <Loader2 className="animate-spin text-teal-500" size={48} />
       </div>
     );
   }
@@ -26,7 +26,7 @@ export function Dashboard() {
   if (userProfile === undefined) {
       return (
         <div className="flex justify-center items-center h-64">
-          <Loader2 className="animate-spin text-indigo-500" size={48} />
+          <Loader2 className="animate-spin text-teal-500" size={48} />
         </div>
       );
   }

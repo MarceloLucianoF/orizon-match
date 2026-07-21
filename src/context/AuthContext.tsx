@@ -47,7 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // First-time Google SSO user or manual register pending profile
             const newProfile = {
               uid: currentUser.uid,
-              name: currentUser.displayName || "Usuário Orizon",
+              name: currentUser.displayName || "Usuário InovaHelix",
               email: currentUser.email || "",
               role: "user", // default role
               createdAt: serverTimestamp(),

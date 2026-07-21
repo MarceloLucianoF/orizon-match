@@ -255,7 +255,7 @@ exports.onLegalInviteCreated = functions.region("southamerica-east1").runWith({
         // Fetch inviter profile
         const inviterDoc = await db.collection("users").doc(invite.invitedBy).get();
         const inviterName = ((_a = inviterDoc.data()) === null || _a === void 0 ? void 0 : _a.name) || "Um inventor";
-        const inviteLink = `https://orizon-match.web.app/onboarding?ref=legal&invite=${snap.id}`;
+        const inviteLink = `https://inovahelix.web.app/onboarding?ref=legal&invite=${snap.id}`;
         const { subject, html } = (0, emailTemplates_1.legalInviteEmail)({
             inviterName,
             projectTitle: invite.projectTitle || "Projeto Confidencial",
@@ -264,7 +264,7 @@ exports.onLegalInviteCreated = functions.region("southamerica-east1").runWith({
         });
         const resend = new resend_1.Resend(resendApiKey);
         await resend.emails.send({
-            from: "Orizon Match <onboarding@resend.dev>",
+            from: "InovaHelix <onboarding@resend.dev>",
             to: invite.email,
             subject,
             html,

@@ -74,11 +74,11 @@ export function TRLCalculator({ initialValues = {}, onUpdate, readOnly = false }
     <div className="space-y-8">
       {/* SCORES SUMMARY */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-indigo-500/10 border border-indigo-500/30 p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden">
+        <div className="bg-teal-500/10 border border-teal-500/30 p-6 rounded-2xl flex items-center gap-6 relative overflow-hidden">
           <div className="absolute top-[-10px] right-[-10px] opacity-10 rotate-12">
             <TrendingUp size={80} />
           </div>
-          <div className="w-16 h-16 rounded-2xl bg-indigo-500 flex flex-col items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+          <div className="w-16 h-16 rounded-2xl bg-teal-500 flex flex-col items-center justify-center text-white shadow-lg shadow-teal-500/20">
             <span className="text-xs font-bold uppercase opacity-80 leading-none">TRL</span>
             <span className="text-3xl font-black">{currentTrl}</span>
           </div>
@@ -107,7 +107,7 @@ export function TRLCalculator({ initialValues = {}, onUpdate, readOnly = false }
         {/* TRL CHECKLIST */}
         <div className="space-y-4">
           <div className="flex items-center gap-2 mb-4">
-            <Calculator className="text-indigo-400" size={20} />
+            <Calculator className="text-teal-400" size={20} />
             <h3 className="font-bold text-white uppercase tracking-wider text-sm">Checklist TRL (Técnico)</h3>
           </div>
           <div className="space-y-2">
@@ -118,12 +118,12 @@ export function TRLCalculator({ initialValues = {}, onUpdate, readOnly = false }
                 onClick={() => toggleItem(q.id)}
                 className={`w-full flex items-start gap-4 p-4 rounded-xl border transition-all text-left group ${
                   checklist[q.id] 
-                    ? 'bg-indigo-500/10 border-indigo-500/50 text-indigo-100' 
+                    ? 'bg-teal-500/10 border-teal-500/50 text-teal-100' 
                     : 'bg-slate-900 border-slate-800 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 <div className={`mt-0.5 shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
-                  checklist[q.id] ? 'bg-indigo-500 border-indigo-500' : 'border-slate-700 group-hover:border-slate-600'
+                  checklist[q.id] ? 'bg-teal-500 border-teal-500' : 'border-slate-700 group-hover:border-slate-600'
                 }`}>
                   {checklist[q.id] && <CheckCircle2 size={14} className="text-white" />}
                 </div>
@@ -168,7 +168,7 @@ export function TRLCalculator({ initialValues = {}, onUpdate, readOnly = false }
 
           <div className="mt-8 p-6 rounded-2xl bg-slate-950 border border-slate-800">
             <div className="flex gap-3 text-slate-400 text-xs leading-relaxed">
-              <Info size={24} className="shrink-0 text-indigo-400" />
+              <Info size={24} className="shrink-0 text-teal-400" />
               <p>
                 A certificação de maturidade aumenta as chances de match em até <strong>4x</strong>. Projetos com TRL verificado transmitem maior segurança para fundos de investimento e indústrias.
               </p>
