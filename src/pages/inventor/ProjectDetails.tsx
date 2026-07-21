@@ -46,7 +46,7 @@ const CustomH2 = ({ children }: any) => {
         <div className="p-1.5 bg-teal-500/10 rounded-lg text-teal-400 border border-teal-500/20">
           {icon}
         </div>
-        <h2 className="text-lg font-bold tracking-tight text-white m-0 !border-b-0 !pb-0 !mt-0 !bg-none !webkit-text-fill-color-initial">
+        <h2 className="text-lg font-bold tracking-tight text-white m-0 !border-b-0 !pb-0 !mt-0 !bg-none ![webkit-text-fill-color:initial]">
           {children}
         </h2>
       </div>
@@ -203,26 +203,87 @@ function parseBriefing(report: string) {
   
   if (!report) return sections;
   
-  // Split by ## 
-  const parts = report.split(/##\s+/);
+  const lines = report.split("\n");
+  let currentSection: string | null = null;
   
-  parts.forEach(part => {
-    const lines = part.trim().split("\n");
-    if (lines.length === 0) return;
-    const title = lines[0].trim().toLowerCase();
-    
-    if (title.includes("sumário") || title.includes("sumario") || title.includes("executive") || title.includes("executivo")) {
-      sections.summary = "## " + part;
-    } else if (title.includes("swot") || title.includes("análise") || title.includes("analise")) {
-      sections.swot = "## " + part;
-    } else if (title.includes("roadmap") || title.includes("parceria") || title.includes("estratégico") || title.includes("estrategico")) {
-      sections.roadmap = "## " + part;
-    } else if (title.includes("conclusão") || title.includes("conclusao") || title.includes("recomendações") || title.includes("recomendacoes")) {
-      sections.conclusion = "## " + part;
-    }
-  });
+  const accumulators: { [key: string]: string[] } = {
+    summary: [],
+    swot: [],
+    roadmap: [],
+    conclusion: []
+  };
 
-  // Fallbacks if any section was not parsed properly, split by order
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+    
+    // Check if line is a primary header (starts with # or ## but NOT ###)
+    // or looks like a bold header (Setext style or simple markdown bold title)
+    const isNextLineSetextUnderline = i < lines.length - 1 && 
+      (lines[i+1].trim().startsWith("===") || lines[i+1].trim().startsWith("---"));
+      
+    const isHeading = (trimmed.startsWith("# ") || trimmed.startsWith("## ")) || 
+                      (trimmed.startsWith("**") && trimmed.endsWith("**") && trimmed.length < 60) ||
+                      isNextLineSetextUnderline;
+
+    if (isHeading && !trimmed.startsWith("###")) {
+      const headingText = trimmed.replace(/[#*:=]/g, "").trim().toLowerCase();
+      
+      if (
+        headingText.includes("sumário") || 
+        headingText.includes("sumario") || 
+        headingText.includes("executive") || 
+        headingText.includes("executivo") || 
+        headingText.includes("overview")
+      ) {
+        currentSection = "summary";
+      } else if (
+        headingText.includes("swot") || 
+        headingText.includes("análise") || 
+        headingText.includes("analise")
+      ) {
+        currentSection = "swot";
+      } else if (
+        headingText.includes("roadmap") || 
+        headingText.includes("parceria") || 
+        headingText.includes("cronograma") || 
+        headingText.includes("fases")
+      ) {
+        currentSection = "roadmap";
+      } else if (
+        headingText.includes("conclusão") || 
+        headingText.includes("conclusao") || 
+        headingText.includes("recomendações") || 
+        headingText.includes("recomendacoes") || 
+        headingText.includes("recomendação") || 
+        headingText.includes("recomendacao") || 
+        headingText.includes("diretrizes") || 
+        headingText.includes("ações") ||
+        headingText.includes("acoes")
+      ) {
+        currentSection = "conclusion";
+      }
+    }
+    
+    // Skip Setext underline line so it doesn't render raw in the output
+    if (trimmed.startsWith("===") || trimmed.startsWith("---")) {
+      continue;
+    }
+    
+    if (currentSection) {
+      accumulators[currentSection].push(line);
+    } else {
+      // Default to summary for any preamble text
+      accumulators.summary.push(line);
+    }
+  }
+  
+  sections.summary = accumulators.summary.join("\n").trim();
+  sections.swot = accumulators.swot.join("\n").trim();
+  sections.roadmap = accumulators.roadmap.join("\n").trim();
+  sections.conclusion = accumulators.conclusion.join("\n").trim();
+
+  // Strict fallback in case everything is empty
   if (!sections.summary && !sections.swot && !sections.roadmap && !sections.conclusion) {
     sections.summary = report;
   }
@@ -702,7 +763,7 @@ export function ProjectDetails() {
               {/* Main Content Split: Sidebar + Text */}
               <div className="grid grid-cols-1 lg:grid-cols-4 no-print">
                 {/* Sidebar Navigation */}
-                <div className="lg:col-span-1 border-r border-slate-800/60 p-6 lg:p-8 bg-slate-950/20 lg:sticky lg:top-24 h-fit max-h-[80vh] overflow-y-auto">
+                <div className="lg:col-span-1 border-r border-slate-800/60 p-4 lg:p-5 lg:px-4 bg-slate-950/20 lg:sticky lg:top-24 h-fit max-h-[80vh] overflow-y-auto overflow-x-hidden custom-scrollbar">
                   <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Seções do Briefing</h4>
                   <nav className="space-y-1">
                     {[
@@ -716,7 +777,7 @@ export function ProjectDetails() {
                         <button
                           key={item.id}
                           onClick={() => setActiveSection(item.id)}
-                          className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all text-left ${
+                          className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-xl text-xs font-bold transition-all text-left min-w-0 ${
                             activeSection === item.id 
                               ? "bg-teal-500/10 text-teal-400 border border-teal-500/20 shadow-[0_0_15px_rgba(20,184,166,0.05)]" 
                               : hasContent 
@@ -724,9 +785,9 @@ export function ProjectDetails() {
                                 : "text-slate-600 border border-transparent cursor-default opacity-50"
                           }`}
                         >
-                          {item.icon}
-                          <span>{item.label}</span>
-                          {!hasContent && <span className="ml-auto text-[8px] text-slate-700 uppercase tracking-widest">—</span>}
+                          <span className="shrink-0">{item.icon}</span>
+                          <span className="truncate whitespace-nowrap">{item.label}</span>
+                          {!hasContent && <span className="ml-auto shrink-0 text-[8px] text-slate-700 uppercase tracking-widest">—</span>}
                         </button>
                       );
                     })}

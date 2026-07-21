@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Logo } from "../../components/ui/Logo";
 import { 
@@ -20,6 +21,8 @@ import {
 } from "lucide-react";
 
 export default function Home() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   return (
     <div className="bg-[#030712] text-slate-100 min-h-screen overflow-x-hidden selection:bg-teal-500/30 selection:text-teal-200">
 
@@ -92,6 +95,25 @@ export default function Home() {
               <span className="bg-slate-900/40 border border-slate-800/60 px-3.5 py-1.5 rounded-xl text-teal-400/90">✓ Inventores</span>
               <span className="bg-slate-900/40 border border-slate-800/60 px-3.5 py-1.5 rounded-xl text-teal-400/90">✓ Startups & Matchmakers</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SEÇÃO NÚMEROS DO ECOSSISTEMA (IMPACTO) */}
+      <section className="bg-slate-950/40 py-12 border-b border-slate-800/30 relative no-print">
+        <div className="max-w-6xl mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {[
+              { val: "R$ 18.2M", label: "Volume de P&D Transacionado" },
+              { val: "140+", label: "Patentes Ativas Catalogadas" },
+              { val: "45", label: "ICTs & Universidades Parceiras" },
+              { val: "91.8%", label: "Precisão de Matching por IA" }
+            ].map((stat, idx) => (
+              <div key={idx} className="p-5 rounded-2xl bg-slate-900/25 border border-slate-850/60 hover:border-teal-500/10 transition-all duration-300">
+                <div className="text-2xl md:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-400 to-emerald-400 tracking-tight mb-1 font-mono">{stat.val}</div>
+                <div className="text-[10px] md:text-xs text-slate-500 font-bold uppercase tracking-wider">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -412,6 +434,62 @@ export default function Home() {
         </div>
       </section>
 
+      {/* PROJETOS EM DESTAQUE (SHOWCASE) */}
+      <section className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24 relative no-print">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-teal-400">Showcase de Tecnologia</span>
+          <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-2 mb-4">
+            Tecnologias em Destaque no Ecossistema
+          </h2>
+          <p className="text-slate-400 text-sm md:text-base font-light">
+            Conheça alguns dos ativos tecnológicos acadêmicos prontos para transferência e licenciamento industrial.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+          {[
+            {
+              title: "Conversor de Hidrogênio Verde de Alta Eficiência",
+              inst: "EMBRAPII UFSC - Automação Industrial",
+              trl: "TRL 5 - Protótipo Validado",
+              desc: "Arquitetura eletrônica inovadora que eleva a eficiência do processo de eletrólise para produção de hidrogênio de baixa emissão.",
+              segment: "Energia"
+            },
+            {
+              title: "Rastreador de Ativos LoRaWAN de Ultra Baixo Consumo",
+              inst: "Instituto Nacional de Telecomunicações - Inatel",
+              trl: "TRL 6 - Modelo de Engenharia",
+              desc: "Solução robusta de geolocalização indoor/outdoor com gerenciamento inteligente de energia e vida útil de bateria estendida por até 8 anos.",
+              segment: "Transporte e Logística"
+            },
+            {
+              title: "Algoritmo Edge AI de Redução Ativa de Ruído",
+              inst: "Fundação CERTI - Florianópolis",
+              trl: "TRL 4 - Protótipo de Laboratório",
+              desc: "Redutor de ruído ambiente com inferência local em tempo real, desenvolvido especificamente para isolamento sonoro de equipamentos hospitalares.",
+              segment: "Tecnologia e Inovação"
+            }
+          ].map((proj, idx) => (
+            <div key={idx} className="p-6 md:p-8 rounded-3xl bg-slate-900/30 border border-slate-800 hover:border-teal-500/20 transition-all duration-300 flex flex-col justify-between group">
+              <div className="space-y-4">
+                <div className="flex justify-between items-center text-[10px] text-teal-400 font-bold uppercase tracking-wider">
+                  <span>{proj.segment}</span>
+                  <span className="px-2 py-0.5 bg-teal-500/10 border border-teal-500/20 rounded-md text-[9px] font-black">{proj.trl}</span>
+                </div>
+                <h3 className="font-extrabold text-white text-sm md:text-base leading-snug tracking-tight group-hover:text-teal-400 transition-colors duration-200">{proj.title}</h3>
+                <p className="text-[10px] text-slate-500 font-bold mt-1">{proj.inst}</p>
+                <p className="text-slate-400 text-xs leading-relaxed font-light mt-2 line-clamp-3">{proj.desc}</p>
+              </div>
+              <div className="border-t border-slate-800/60 mt-6 pt-5 flex items-center justify-between">
+                <Link to="/onboarding" className="inline-flex items-center gap-1.5 text-xs font-bold text-white hover:text-teal-450 transition-colors">
+                  Solicitar Acesso ao VDR <ArrowUpRight size={13} className="text-teal-400" />
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* COMPARAÇÃO IMPLÍCITA (TABELA) */}
       <section className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
         <div className="text-center max-w-3xl mx-auto mb-16">
@@ -587,6 +665,62 @@ export default function Home() {
               </div>
               <h3 className="font-bold text-white text-sm md:text-base mb-2 tracking-tight">{title}</h3>
               <p className="text-slate-400 text-xs leading-relaxed">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ SECTION (PERGUNTAS FREQUENTES ACCORDION) */}
+      <section className="max-w-4xl mx-auto px-4 md:px-6 py-20 md:py-24 relative border-t border-slate-850/50 no-print">
+        <div className="text-center mb-16">
+          <span className="text-xs font-bold uppercase tracking-[0.2em] text-teal-400">FAQ</span>
+          <h2 className="text-3xl md:text-4xl font-black text-white tracking-tight mt-2 mb-4">
+            Perguntas Frequentes
+          </h2>
+          <p className="text-slate-400 text-sm md:text-base font-light">
+            Esclareça suas principais dúvidas sobre o funcionamento da InovaHelix e segurança jurídica.
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          {[
+            {
+              q: "Como a propriedade intelectual é protegida no VDR?",
+              a: "A plataforma conta com uma sala de dados virtuais (VDR) altamente segura com criptografia de ponta a ponta. Arquivos confidenciais (como patentes pendentes e relatórios internos) só podem ser visualizados na nuvem por usuários autorizados, sob marca d'água dinâmica do leitor, impedindo downloads, cópias ou impressões não autorizadas."
+            },
+            {
+              q: "O que é o Smart NDA e qual a sua validade jurídica?",
+              a: "O Smart NDA é um acordo bilateral de confidencialidade gerado e assinado digitalmente dentro da plataforma antes do acesso ao VDR. Ele tem validade jurídica plena de acordo com a legislação federal brasileira de assinaturas eletrônicas (ICP-Brasil), registrando timestamps invioláveis de aceitação e logs de auditoria."
+            },
+            {
+              q: "Como funciona a avaliação de maturidade (TRL e IRL) por IA?",
+              a: "Nossa inteligência artificial analisa os dados do projeto cadastrado e o compara com bases de referência globais da NASA e do ecossistema de inovação aberta. Ela estima a maturidade tecnológica (TRL de 1 a 9) e comercial (IRL) do ativo, sugerindo planos de ação objetivos para escala industrial."
+            },
+            {
+              q: "Sou universidade/NIT. Há custos para catalogar nossas patentes?",
+              a: "Não. A InovaHelix oferece contas gratuitas de nível universitário para que NITs (Núcleos de Inovação Tecnológica) e instituições públicas de ensino possam catalogar, monitorar e transferir suas tecnologias sem nenhum custo de assinatura inicial."
+            }
+          ].map((faq, idx) => (
+            <div key={idx} className="bg-slate-900/30 border border-slate-850 rounded-2xl overflow-hidden transition-all duration-300">
+              <button
+                type="button"
+                onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                className="w-full flex justify-between items-center p-5 md:p-6 text-left text-sm md:text-base font-bold text-white hover:text-teal-400 transition-colors focus:outline-none"
+              >
+                <span>{faq.q}</span>
+                <span className="text-teal-400 font-bold text-lg leading-none select-none ml-4">
+                  {openFaq === idx ? "−" : "+"}
+                </span>
+              </button>
+              <div 
+                className={`transition-all duration-350 ease-in-out overflow-hidden ${
+                  openFaq === idx ? "max-h-60 border-t border-slate-850/60 opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <p className="p-5 md:p-6 text-xs md:text-sm text-slate-400 leading-relaxed font-light bg-slate-950/20">
+                  {faq.a}
+                </p>
+              </div>
             </div>
           ))}
         </div>

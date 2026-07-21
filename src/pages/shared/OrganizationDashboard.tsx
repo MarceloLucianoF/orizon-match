@@ -322,7 +322,7 @@ export default function OrganizationDashboard() {
       {activeModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-md bg-slate-950/60 animate-in fade-in duration-200">
           <div className={`relative w-full ${
-            ['validate_trl', 'prepare_proposal', 'embrapit_report', 'consult_inventor', 'add_lab'].includes(activeModal) 
+            ['validate_trl', 'prepare_proposal', 'embrapit_report', 'consult_inventor', 'add_lab', 'allocate_researcher'].includes(activeModal) 
               ? 'max-w-3xl' 
               : 'max-w-lg'
           } bg-slate-900 border border-slate-800 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(0,0,0,0.8)] space-y-6 overflow-hidden max-h-[90vh] overflow-y-auto custom-scrollbar transition-all`}>
@@ -984,9 +984,9 @@ export default function OrganizationDashboard() {
 
                         <button 
                           type="submit"
-                          className="w-full py-3.5 bg-teal-600 hover:bg-teal-500 text-white rounded-xl text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,181,156,0.25)] flex items-center justify-center gap-1.5 uppercase tracking-widest"
+                          className="w-full mt-4 py-3 bg-gradient-to-r from-teal-600 to-teal-500 hover:from-teal-500 hover:to-teal-400 text-white rounded-xl text-xs font-black transition-all shadow-[0_0_20px_rgba(0,181,156,0.25)] hover:shadow-[0_0_25px_rgba(0,181,156,0.4)] flex items-center justify-center gap-2 uppercase tracking-widest whitespace-nowrap select-none"
                         >
-                          <GraduationCap size={14} /> Confirmar Alocação Técnica
+                          <GraduationCap size={15} /> Confirmar Alocação Técnica
                         </button>
                       </div>
                     </form>
