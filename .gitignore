@@ -29,3 +29,4 @@ firebase-debug.log
 .firebase/
 .firebaserc
 .gemini/*
+outputs/
